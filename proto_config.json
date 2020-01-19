@@ -1,0 +1,39 @@
+{
+    "database": "bot.db",
+    "telegram": {
+        "bot_api_key": "bot_id:key_hash",
+        "api_id": "id",
+        "api_hash": "hash"
+    },
+    "masters": [
+        123456789
+    ],
+    "available_languages": [
+        "en"
+    ],
+    "settings": {
+        "log_chat": -100123456789,
+        "channel": -100123456789,
+        "delay_log_channel": 10,
+        "min_flood": 3,
+        "max_flood": 10,
+        "min_flood_time": 3,
+        "max_flood_time": 10,
+        "min_invites": 1,
+        "max_invites": 10,
+        "max_warns": 10,
+        "max_welcome_members": 10,
+        "max_flood_msgs_user": 7,
+        "max_flood_msgs_time": 2,
+        "max_flood_cb_qrs_chat": 5,
+        "max_flood_cb_qrs_user": 5,
+        "max_flood_cb_qrs_time": 8,
+        "flood_surveillance_window": 120,
+        "max_items_keyboard": 8,
+        "max_nicknames": 5,
+        "temp_variables_expiration": 60,
+        "max_cmd_hashes": 4,
+        "temp_dictionaries_expiration": 60,
+        "max_forbidden_writing_counter": 5
+    }
+}
