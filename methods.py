@@ -1549,7 +1549,12 @@ def CallbackQueryAnswer(
     cache_time: int = 0,
 ) -> bool:
     try:
-        cb_qry.answer(text=text, show_alert=show_alert, url=url, cache_time=cache_time)
+        cb_qry.answer(
+            text=(text[:197] + "...") if len(text) > 200 else text,
+            show_alert=show_alert,
+            url=url,
+            cache_time=cache_time,
+        )
     except pyrogram.errors.RPCError as ex:
         print(ex)
         traceback.print_exc()
