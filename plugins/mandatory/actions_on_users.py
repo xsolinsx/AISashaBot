@@ -43,7 +43,7 @@ def CmdInviteReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
             text = methods.Invite(
                 client=client,
                 executer=msg.from_user.id,
-                target=msg.reply_to_message.new_chat_members[0],
+                target=msg.reply_to_message.new_chat_members[0].id,
                 chat_id=msg.chat.id,
                 r_executer_chat=msg.r_user_chat,
                 chat_settings=msg.chat.settings,
@@ -196,7 +196,7 @@ def CmdWarnReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
             text = methods.Warn(
                 client=client,
                 executer=msg.from_user.id,
-                target=msg.reply_to_message.new_chat_members[0],
+                target=msg.reply_to_message.new_chat_members[0].id,
                 chat_id=msg.chat.id,
                 reasons=reason,
                 r_executer_chat=msg.r_user_chat,
@@ -323,7 +323,7 @@ def CmdUnwarnReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
             text = methods.Unwarn(
                 client=client,
                 executer=msg.from_user.id,
-                target=msg.reply_to_message.new_chat_members[0],
+                target=msg.reply_to_message.new_chat_members[0].id,
                 chat_id=msg.chat.id,
                 reasons=reason,
                 r_executer_chat=msg.r_user_chat,
@@ -450,7 +450,7 @@ def CmdUnwarnAllReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
             text = methods.UnwarnAll(
                 client=client,
                 executer=msg.from_user.id,
-                target=msg.reply_to_message.new_chat_members[0],
+                target=msg.reply_to_message.new_chat_members[0].id,
                 chat_id=msg.chat.id,
                 reasons=reason,
                 r_executer_chat=msg.r_user_chat,
@@ -578,7 +578,7 @@ def CmdKickReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
             text = methods.Kick(
                 client=client,
                 executer=msg.from_user.id,
-                target=msg.reply_to_message.new_chat_members[0],
+                target=msg.reply_to_message.new_chat_members[0].id,
                 chat_id=msg.chat.id,
                 reasons=reason,
                 r_executer_chat=msg.r_user_chat,
@@ -706,7 +706,7 @@ def CmdTempRestrictReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
             text = methods.Restrict(
                 client=client,
                 executer=msg.from_user.id,
-                target=msg.reply_to_message.new_chat_members[0],
+                target=msg.reply_to_message.new_chat_members[0].id,
                 chat_id=msg.chat.id,
                 until_date=int(time.time()) + msg.chat.settings.max_temp_restrict,
                 reasons=reason,
@@ -838,7 +838,7 @@ def CmdRestrictReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
             text = methods.Restrict(
                 client=client,
                 executer=msg.from_user.id,
-                target=msg.reply_to_message.new_chat_members[0],
+                target=msg.reply_to_message.new_chat_members[0].id,
                 chat_id=msg.chat.id,
                 reasons=reason,
                 r_executer_chat=msg.r_user_chat,
@@ -966,7 +966,7 @@ def CmdUnrestrictReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
             text = methods.Unrestrict(
                 client=client,
                 executer=msg.from_user.id,
-                target=msg.reply_to_message.new_chat_members[0],
+                target=msg.reply_to_message.new_chat_members[0].id,
                 chat_id=msg.chat.id,
                 reasons=reason,
                 r_executer_chat=msg.r_user_chat,
@@ -1094,7 +1094,7 @@ def CmdTempBanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
             text = methods.Ban(
                 client=client,
                 executer=msg.from_user.id,
-                target=msg.reply_to_message.new_chat_members[0],
+                target=msg.reply_to_message.new_chat_members[0].id,
                 chat_id=msg.chat.id,
                 until_date=int(time.time()) + msg.chat.settings.max_temp_ban,
                 reasons=reason,
@@ -1226,7 +1226,7 @@ def CmdBanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
             text = methods.Ban(
                 client=client,
                 executer=msg.from_user.id,
-                target=msg.reply_to_message.new_chat_members[0],
+                target=msg.reply_to_message.new_chat_members[0].id,
                 chat_id=msg.chat.id,
                 reasons=reason,
                 r_executer_chat=msg.r_user_chat,
@@ -1354,7 +1354,7 @@ def CmdUnbanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
             text = methods.Unban(
                 client=client,
                 executer=msg.from_user.id,
-                target=msg.reply_to_message.new_chat_members[0],
+                target=msg.reply_to_message.new_chat_members[0].id,
                 chat_id=msg.chat.id,
                 reasons=reason,
                 r_executer_chat=msg.r_user_chat,
@@ -1487,7 +1487,7 @@ def CmdGBanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
             text = methods.GBan(
                 client=client,
                 executer=msg.from_user.id,
-                target=msg.reply_to_message.new_chat_members[0],
+                target=msg.reply_to_message.new_chat_members[0].id,
                 chat_id=msg.chat.id,
                 seconds=seconds,
                 reasons=reason,
@@ -1579,7 +1579,7 @@ def CmdUngbanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
             text = methods.Ungban(
                 client=client,
                 executer=msg.from_user.id,
-                target=msg.reply_to_message.new_chat_members[0],
+                target=msg.reply_to_message.new_chat_members[0].id,
                 chat_id=msg.chat.id,
                 reasons=reason,
                 chat_settings=msg.chat.settings,
@@ -1668,7 +1668,7 @@ def CmdBlockReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
             text = methods.Block(
                 client=client,
                 executer=msg.from_user.id,
-                target=msg.reply_to_message.new_chat_members[0],
+                target=msg.reply_to_message.new_chat_members[0].id,
                 chat_id=msg.chat.id,
                 seconds=seconds,
                 reasons=reason,
@@ -1760,7 +1760,7 @@ def CmdUnblockReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
             text = methods.Unblock(
                 client=client,
                 executer=msg.from_user.id,
-                target=msg.reply_to_message.new_chat_members[0],
+                target=msg.reply_to_message.new_chat_members[0].id,
                 chat_id=msg.chat.id,
                 reasons=reason,
                 chat_settings=msg.chat.settings,
