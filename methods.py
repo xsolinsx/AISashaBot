@@ -73,11 +73,46 @@ def Info(
                 + f"{r_target_chat.message_counter}\n"
             )
             other_info = []
-            if r_target_chat.is_admin:
-                other_info.append(_(chat_settings.language, "administrator").upper())
             if r_target_chat.user.is_bot:
                 other_info.append(_(chat_settings.language, "bot").upper())
-            user_info += _(chat_settings.language, "info_other") + ",".join(other_info)
+            # get current chat_member info
+            try:
+                member: pyrogram.ChatMember = client.get_chat_member(
+                    chat_id=chat_id, user_id=target
+                )
+            except pyrogram.errors.FloodWait as ex:
+                print(ex)
+                traceback.print_exc()
+            except pyrogram.errors.RPCError as ex:
+                print(ex)
+                traceback.print_exc()
+            else:
+                # update telegram data saved on db
+                db_management.RUserChat.update(
+                    is_admin=member.status == "administrator",
+                    can_be_edited=bool(member.can_be_edited),
+                    can_change_info=member.status == "creator"
+                    or bool(member.can_change_info),
+                    can_delete_messages=member.status == "creator"
+                    or bool(member.can_delete_messages),
+                    can_invite_users=member.status == "creator"
+                    or bool(member.can_invite_users),
+                    can_pin_messages=member.status == "creator"
+                    or bool(member.can_pin_messages),
+                    can_promote_members=member.status == "creator"
+                    or bool(member.can_promote_members),
+                    can_restrict_members=member.status == "creator"
+                    or bool(member.can_restrict_members),
+                ).where(
+                    (db_management.RUserChat.user_id == target)
+                    & (db_management.RUserChat.chat_id == chat_id)
+                ).execute()
+                other_info.append(_(chat_settings.language, member.status).upper())
+
+            if other_info:
+                user_info += _(chat_settings.language, "info_other") + ", ".join(
+                    other_info
+                )
             chat_info = GetObjInfo(
                 client=client,
                 value=chat_id,
