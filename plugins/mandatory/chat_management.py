@@ -2839,10 +2839,27 @@ def CmdLinkChat(client: pyrogram.Client, msg: pyrogram.Message):
     my_filters.callback_regex(pattern=r"^\(i\)censorships", flags=re.I)
 )
 def CbQryCensorshipsInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+    parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
+        " "
+    )
+    chat_id = int(parameters[1])
+    text = ""
+
+    query: peewee.ModelSelect = db_management.ChatCensorships.select().where(
+        db_management.ChatCensorships.chat == chat_id
+    ).order_by(peewee.fn.LOWER(db_management.ChatCensorships.value))
+    if utils.IsInt(cb_qry.data.replace("(i)censorships ", "")):
+        if int(cb_qry.data.replace("(i)censorships ", "")) < len(query):
+            text = _(cb_qry.from_user.settings.language, "(i)censorships").format(
+                query[int(cb_qry.data.replace("(i)censorships ", ""))].value
+            )
+        else:
+            text = _(cb_qry.from_user.settings.language, "error_try_again")
+    else:
+        text = _(cb_qry.from_user.settings.language, cb_qry.data)
+
     methods.CallbackQueryAnswer(
-        cb_qry=cb_qry,
-        text=_(cb_qry.from_user.settings.language, cb_qry.data),
-        show_alert=True,
+        cb_qry=cb_qry, text=text, show_alert=True,
     )
 
 
@@ -3343,7 +3360,7 @@ def CmdCensorships(client: pyrogram.Client, msg: pyrogram.Message):
                 msg=msg,
                 text=_(msg.chat.settings.language, "globally_banned_users"),
                 reply_markup=pyrogram.InlineKeyboardMarkup(
-                    keyboards.BuildGloballyBannedUsersList(
+                    keyboards.BuildCensorshipsList(
                         chat_settings=msg.chat.settings, page=0
                     )
                 ),
@@ -3415,7 +3432,11 @@ def CmdPin(client: pyrogram.Client, msg: pyrogram.Message):
             )
         else:
             if msg.chat.settings.has_pin_markers:
-                methods.ReplyText(client=client, msg=msg.reply_to_message, text=f"#pin{abs(msg.chat.id)}")
+                methods.ReplyText(
+                    client=client,
+                    msg=msg.reply_to_message,
+                    text=f"#pin{abs(msg.chat.id)}",
+                )
             utils.Log(
                 client=client,
                 chat_id=msg.chat.id,
@@ -3457,7 +3478,11 @@ def CmdSilentPin(client: pyrogram.Client, msg: pyrogram.Message):
             )
         else:
             if msg.chat.settings.has_pin_markers:
-                methods.ReplyText(client=client, msg=msg.reply_to_message, text=f"#pin{abs(msg.chat.id)}")
+                methods.ReplyText(
+                    client=client,
+                    msg=msg.reply_to_message,
+                    text=f"#pin{abs(msg.chat.id)}",
+                )
             utils.Log(
                 client=client,
                 chat_id=msg.chat.id,

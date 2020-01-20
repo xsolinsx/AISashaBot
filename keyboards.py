@@ -2386,7 +2386,7 @@ def BuildCensorshipsList(
             [
                 pyrogram.InlineKeyboardButton(
                     text=_(chat_settings.language, "censorships_punishment"),
-                    callback_data="(i)censorships punishment",
+                    callback_data="(i)settings censorships_punishment",
                 ),
                 pyrogram.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.censorships_punishment]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.censorships_punishment])}",
@@ -2422,7 +2422,7 @@ def BuildCensorshipsList(
             keyboard.append(
                 [
                     pyrogram.InlineKeyboardButton(
-                        text=query[i].value, callback_data="(i)censorships",
+                        text=query[i].value, callback_data=f"(i)censorships {i}",
                     ),
                     pyrogram.InlineKeyboardButton(
                         text=pyrogram.Emoji.EYE + _(chat_settings.language, "get"),
@@ -2518,7 +2518,7 @@ def BuildExtraList(
             keyboard.append(
                 [
                     pyrogram.InlineKeyboardButton(
-                        text=query[i].key, callback_data="(i)extras",
+                        text=query[i].key, callback_data=f"(i)extras {i}",
                     ),
                     pyrogram.InlineKeyboardButton(
                         text=pyrogram.Emoji.MEMO + _(chat_settings.language, "set"),
@@ -3002,7 +3002,7 @@ def BuildAlternativeCommandsList(
         keyboard.append(
             [
                 pyrogram.InlineKeyboardButton(
-                    text=f"/{query[i].original}", callback_data="(i)alternatives",
+                    text=f"/{query[i].original}", callback_data=f"(i)alternatives {i}",
                 ),
                 pyrogram.InlineKeyboardButton(
                     text=f"{pyrogram.Emoji.EYE} {query[i].alternative}",

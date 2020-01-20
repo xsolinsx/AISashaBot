@@ -41,10 +41,29 @@ def TranslateAlternativeIntoCommand(client: pyrogram.Client, msg: pyrogram.Messa
     my_filters.callback_regex(pattern=r"^\(i\)alternatives", flags=re.I)
 )
 def CbQryAlternativesInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+    parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
+        " "
+    )
+    chat_id = int(parameters[1])
+    text = ""
+
+    query: peewee.ModelSelect = db_management.ChatAlternatives.select().where(
+        db_management.ChatAlternatives.chat == chat_id
+    ).order_by(
+        peewee.fn.LOWER(db_management.ChatAlternatives.original),
+        peewee.fn.LOWER(db_management.ChatAlternatives.alternative),
+    )
+    if utils.IsInt(cb_qry.data.replace("(i)alternatives ", "")) and int(
+        cb_qry.data.replace("(i)alternatives ", "")
+    ) < len(query):
+        text = _(cb_qry.from_user.settings.language, "(i)alternatives").format(
+            "/" + query[int(cb_qry.data.replace("(i)alternatives ", ""))].original
+        )
+    else:
+        text = _(cb_qry.from_user.settings.language, "error_try_again")
+
     methods.CallbackQueryAnswer(
-        cb_qry=cb_qry,
-        text=_(cb_qry.from_user.settings.language, cb_qry.data),
-        show_alert=True,
+        cb_qry=cb_qry, text=text, show_alert=True,
     )
 
 

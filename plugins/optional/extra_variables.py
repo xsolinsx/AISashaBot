@@ -97,10 +97,27 @@ def SendExtra(client: pyrogram.Client, msg: pyrogram.Message):
     my_filters.callback_regex(pattern=r"^\(i\)extras", flags=re.I)
 )
 def CbQryExtrasInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+    parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
+        " "
+    )
+    chat_id = int(parameters[1])
+    text = ""
+
+    query: peewee.ModelSelect = db_management.ChatExtras.select().where(
+        (db_management.ChatExtras.chat == chat_id)
+        & (~db_management.ChatExtras.is_group_data)
+    ).order_by(peewee.fn.LOWER(db_management.ChatExtras.key))
+    if utils.IsInt(cb_qry.data.replace("(i)extras ", "")) and int(
+        cb_qry.data.replace("(i)extras ", "")
+    ) < len(query):
+        text = _(cb_qry.from_user.settings.language, "(i)extras").format(
+            query[int(cb_qry.data.replace("(i)extras ", ""))].key
+        )
+    else:
+        text = _(cb_qry.from_user.settings.language, "error_try_again")
+
     methods.CallbackQueryAnswer(
-        cb_qry=cb_qry,
-        text=_(cb_qry.from_user.settings.language, cb_qry.data),
-        show_alert=True,
+        cb_qry=cb_qry, text=text, show_alert=True,
     )
 
 
