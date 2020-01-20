@@ -346,32 +346,37 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             r_target_chat=r_target_chat,
             min_rank=dictionaries.RANKS["junior_mod"],
         ):
+            text = None
             if "--" in cb_qry.data:
-                methods.CallbackQueryAnswer(
-                    cb_qry=cb_qry,
-                    text=methods.Unwarn(
-                        client=client,
-                        executer=cb_qry.from_user.id,
-                        target=target_id,
-                        chat_id=chat_id,
-                        r_executer_chat=r_executer_chat,
-                        r_target_chat=r_target_chat,
-                        chat_settings=chat_settings,
-                    ),
-                    show_alert=True,
+                text = methods.Unwarn(
+                    client=client,
+                    executer=cb_qry.from_user.id,
+                    target=target_id,
+                    chat_id=chat_id,
+                    r_executer_chat=r_executer_chat,
+                    r_target_chat=r_target_chat,
+                    chat_settings=chat_settings,
                 )
             elif "++" in cb_qry.data:
+                text = methods.Warn(
+                    client=client,
+                    executer=cb_qry.from_user.id,
+                    target=target_id,
+                    chat_id=chat_id,
+                    r_executer_chat=r_executer_chat,
+                    r_target_chat=r_target_chat,
+                    chat_settings=chat_settings,
+                )
+
+            if text:
+                methods.CallbackQueryAnswer(
+                    cb_qry=cb_qry, text=text, show_alert=True,
+                )
+                methods.SendMessage(client=client, chat_id=chat_id, text=text)
+            else:
                 methods.CallbackQueryAnswer(
                     cb_qry=cb_qry,
-                    text=methods.Warn(
-                        client=client,
-                        executer=cb_qry.from_user.id,
-                        target=target_id,
-                        chat_id=chat_id,
-                        r_executer_chat=r_executer_chat,
-                        r_target_chat=r_target_chat,
-                        chat_settings=chat_settings,
-                    ),
+                    text=_(cb_qry.from_user.settings.language, "error_try_again"),
                     show_alert=True,
                 )
         else:
@@ -390,11 +395,11 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             min_rank=dictionaries.RANKS["junior_mod"],
         ):
             if "selectvalue" in cb_qry.data:
+                text = None
                 punishment = int(regex_info_select_value.match(cb_qry.data)[2])
-                hashtag = dictionaries.PUNISHMENT_STRING.get(punishment, "")
                 until_date = None
                 if punishment == 3:
-                    methods.Kick(
+                    text = methods.Kick(
                         client=client,
                         executer=cb_qry.from_user.id,
                         target=target_id,
@@ -402,7 +407,7 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                     )
                 elif punishment == 4:
                     until_date = int(time.time() + chat_settings.max_temp_restrict)
-                    methods.Restrict(
+                    text = methods.Restrict(
                         client=client,
                         executer=cb_qry.from_user.id,
                         target=target_id,
@@ -410,7 +415,7 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                         until_date=until_date,
                     )
                 elif punishment == 5:
-                    methods.Restrict(
+                    text = methods.Restrict(
                         client=client,
                         executer=cb_qry.from_user.id,
                         target=target_id,
@@ -418,7 +423,7 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                     )
                 elif punishment == 6:
                     until_date = int(time.time() + chat_settings.max_temp_ban)
-                    methods.Ban(
+                    text = methods.Ban(
                         client=client,
                         executer=cb_qry.from_user.id,
                         target=target_id,
@@ -426,7 +431,7 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                         until_date=until_date,
                     )
                 elif punishment == 7:
-                    methods.Ban(
+                    text = methods.Ban(
                         client=client,
                         executer=cb_qry.from_user.id,
                         target=target_id,
@@ -435,31 +440,15 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                 else:
                     punishment = None
 
-                if punishment is None:
+                if punishment and text:
+                    methods.CallbackQueryAnswer(
+                        cb_qry=cb_qry, text=text, show_alert=True,
+                    )
+                    methods.SendMessage(client=client, chat_id=chat_id, text=text)
+                else:
                     methods.CallbackQueryAnswer(
                         cb_qry=cb_qry,
                         text=_(cb_qry.from_user.settings.language, "error_try_again"),
-                        show_alert=True,
-                    )
-                else:
-                    if until_date:
-                        hashtag += (
-                            " "
-                            + _(chat_settings.language, "until")
-                            + f" UTC {datetime.datetime.utcfromtimestamp(until_date)}"
-                        )
-
-                    methods.CallbackQueryAnswer(
-                        cb_qry=cb_qry,
-                        text=_(
-                            cb_qry.from_user.settings.language, "action_on_user"
-                        ).format(
-                            f"#{hashtag}",
-                            target_id,
-                            "",
-                            cb_qry.from_user.id,
-                            abs(chat_id),
-                        ),
                         show_alert=True,
                     )
             else:
