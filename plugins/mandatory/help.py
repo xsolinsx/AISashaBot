@@ -231,7 +231,7 @@ def CmdHelp(client: pyrogram.Client, msg: pyrogram.Message):
             parse_mode="html",
         )
     else:
-        plugin = msg.command[1]
+        plugin = "_".join(msg.command[1:])
         if plugin not in dictionaries.HELP_DICTIONARY:
             text = _(msg.from_user.settings.language, "error_try_again")
         else:

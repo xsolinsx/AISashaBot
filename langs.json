@@ -505,7 +505,7 @@
         "back_to_help_menu": "Back to Help Menu",
         "true": "True",
         "false": "False",
-        "help_intro": "👤 = Also executable from private with this format: <code>/command -100123456789 other parameters</code> where -100123456789 is the ID of the chat.\n</br>📨 = Appending <code>pvt</code> to the command (e.g. <code>/settingspvt</code>) will send the result in private.\n</br><u><b>If I do not reply to a command probably you do not have the permissions to use it or there is some error in the syntax.</b></u>\n\n</br></br>",
+        "help_intro": "👤 = Also executable from private with this format: <code>/command -100123456789 other parameters</code> where -100123456789 is the ID of the chat.\n</br>📨 = Appending <code>pvt</code> to the command (e.g. <code>/settingspvt</code>) will send the result in private.\n</br><u><b>If I do not reply to a command you probably do not have the permissions to use it or there is some error in the syntax.</b></u>\n\n</br></br>",
         "help_actions_on_users_invite": "<code>/invite</code>: Invite <code>{user}</code> to the chat <i>(via reply, @username or user_id)</i>.",
         "help_actions_on_users_warn": "<code>/unwarnall {user}</code>: Warn <code>{user}</code> <i>(via reply, @username or user_id)</i>. You can also specify the reasons afterwards. 👤",
         "help_actions_on_users_unwarn": "<code>/unwarnall {user}</code>: Unwarn <code>{user}</code> <i>(via reply, @username or user_id)</i>. You can also specify the reasons afterwards. 👤",
