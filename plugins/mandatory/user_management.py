@@ -48,17 +48,13 @@ def SendTagAlerts(client: pyrogram.Client, msg: pyrogram.Message):
             for user in query:
                 if user.user_id != msg.from_user.id:
                     username = user.user.username
-                    regex1 = re.compile(
-                        pattern=f"(^[@]?{username}$)|(^[@]?{username})\\s|\\s([@]?{username}$)|\\s([@]?{username})\\s",
-                        flags=re.I | re.M,
-                    )
+                    regex1 = re.compile(pattern=f"\\b([@]?{username})\\b", flags=re.I,)
                     match = regex1.match(text_to_use)
                     if not match and user.nickname:
                         # test all nicknames of the user
                         for nickname in user.nickname.split("|"):
                             regex2 = re.compile(
-                                pattern=f"(^{nickname}$)|(^{nickname})\\s|\\s({nickname}$)|\\s({nickname})\\s",
-                                flags=re.I | re.M,
+                                pattern=f"\\b({nickname})\\b", flags=re.I | re.M,
                             )
                             if match or regex2.match(text_to_use):
                                 match = True
