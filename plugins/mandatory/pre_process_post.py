@@ -1,5 +1,6 @@
 import datetime
 import re
+import time
 import traceback
 import typing
 
@@ -17,6 +18,9 @@ _ = utils.GetLocalizedString
 
 @pyrogram.Client.on_message(group=-11)
 def PreMessage(client: pyrogram.Client, msg: pyrogram.Message):
+    # as this is the first handler of this type, if the db is locked wait
+    while db_management.DB.is_stopped():
+        time.sleep(1)
     # save everything to db
     msg = db_management.DBObject(obj=msg, client=client)
     utils.InstantiateKickedPeopleDictionary(chat_id=msg.chat.id)
@@ -30,6 +34,9 @@ def PreMessage(client: pyrogram.Client, msg: pyrogram.Message):
 
 @pyrogram.Client.on_callback_query(group=-11)
 def PreCallbackQuery(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+    # as this is the first handler of this type, if the db is locked wait
+    while db_management.DB.is_stopped():
+        time.sleep(1)
     # save everything to db
     cb_qry = db_management.DBObject(obj=cb_qry, client=client)
     utils.InstantiateKickedPeopleDictionary(chat_id=cb_qry.message.chat.id)
@@ -40,6 +47,9 @@ def PreCallbackQuery(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 # @pyrogram.Client.on_deleted_messages(group=-11)
 def PreDeletedMessages(client: pyrogram.Client, msgs: typing.List[pyrogram.Message]):
+    # as this is the first handler of this type, if the db is locked wait
+    while db_management.DB.is_stopped():
+        time.sleep(1)
     tmp = ""
     tmp = " ".join([msg.message_id for msg in msgs.messages])
     # print("######################\nDELETED MESSAGES")
@@ -54,6 +64,9 @@ def PreDeletedMessages(client: pyrogram.Client, msgs: typing.List[pyrogram.Messa
 
 # @pyrogram.Client.on_user_status(group=-11)
 def PreUserStatus(client: pyrogram.Client, user: pyrogram.User):
+    # as this is the first handler of this type, if the db is locked wait
+    while db_management.DB.is_stopped():
+        time.sleep(1)
     # print("######################\nUSER STATUS")
     print(
         +f"{utils.PrintUser(user=user)} Status: {user.status} Last seen "
@@ -74,6 +87,9 @@ def PreProcessRawUpdate(
         int, typing.Union[pyrogram.api.types.Chat, pyrogram.api.types.Channel]
     ],
 ):
+    # as this is the first handler of this type, if the db is locked wait
+    while db_management.DB.is_stopped():
+        time.sleep(1)
     print("######################\nRAW UPDATE")
     print(str(update))
 
