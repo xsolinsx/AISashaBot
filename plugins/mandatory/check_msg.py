@@ -360,8 +360,7 @@ def CheckGroupMessageForwardFromChat(client: pyrogram.Client, msg: pyrogram.Mess
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group & (pyrogram.Filters.text | pyrogram.Filters.caption),
-    group=-9,
+    pyrogram.Filters.group, group=-9,
 )
 def CheckGroupMessageTextCaptionName(client: pyrogram.Client, msg: pyrogram.Message):
     # CHECKS THAT REQUIRE TEXT
@@ -408,46 +407,6 @@ def CheckGroupMessageTextCaptionName(client: pyrogram.Client, msg: pyrogram.Mess
                 )
                 if text:
                     methods.ReplyText(client=client, msg=msg, text=text)
-    # rtl
-    if msg.chat.settings.rtl_punishment and (
-        utils.RTL_CHARACTER in text_to_use
-        or utils.RTL_CHARACTER in msg.from_user.first_name
-        or (msg.from_user.last_name and utils.RTL_CHARACTER in msg.from_user.last_name)
-    ):
-        ChangePunishmentAddReason(
-            chat_id=msg.chat.id,
-            id_=msg.message_id,
-            punishment=msg.chat.settings.rtl_punishment,
-            reason="rtl_character",
-        )
-    # spam
-    if msg.chat.settings.text_spam_punishment and (
-        len(text_to_use) > 2048
-        or len(msg.from_user.first_name)
-        + (len(msg.from_user.last_name) if msg.from_user.last_name else 0)
-        > 70
-    ):
-        ChangePunishmentAddReason(
-            chat_id=msg.chat.id,
-            id_=msg.message_id,
-            punishment=msg.chat.settings.text_spam_punishment,
-            reason="spam_long_text",
-        )
-    # arabic
-    if msg.chat.settings.arabic_punishment and (
-        utils.ARABIC_REGEX.findall(string=text_to_use)
-        or utils.ARABIC_REGEX.findall(string=msg.from_user.first_name)
-        or (
-            msg.from_user.last_name
-            and utils.ARABIC_REGEX.findall(string=msg.from_user.last_name)
-        )
-    ):
-        ChangePunishmentAddReason(
-            chat_id=msg.chat.id,
-            id_=msg.message_id,
-            punishment=msg.chat.settings.arabic_punishment,
-            reason="arabic",
-        )
     # censorships
     if msg.chat.settings.censorships_punishment:
         censorships: peewee.ModelSelect = msg.chat.settings.censorships
@@ -678,12 +637,53 @@ def CheckGroupMessageTextCaptionName(client: pyrogram.Client, msg: pyrogram.Mess
                                         reason="public_chat_username",
                                     )
     # anti text
-    if msg.chat.settings.anti_text:
+    if msg.chat.settings.anti_text and (msg.text or msg.caption):
         ChangePunishmentAddReason(
             chat_id=msg.chat.id,
             id_=msg.message_id,
             punishment=msg.chat.settings.anti_text,
             reason="text",
+        )
+    # checks also on the name
+    # rtl
+    if msg.chat.settings.rtl_punishment and (
+        utils.RTL_CHARACTER in text_to_use
+        or utils.RTL_CHARACTER in msg.from_user.first_name
+        or (msg.from_user.last_name and utils.RTL_CHARACTER in msg.from_user.last_name)
+    ):
+        ChangePunishmentAddReason(
+            chat_id=msg.chat.id,
+            id_=msg.message_id,
+            punishment=msg.chat.settings.rtl_punishment,
+            reason="rtl_character",
+        )
+    # spam
+    if msg.chat.settings.text_spam_punishment and (
+        len(text_to_use) > 2048
+        or len(msg.from_user.first_name)
+        + (len(msg.from_user.last_name) if msg.from_user.last_name else 0)
+        > 70
+    ):
+        ChangePunishmentAddReason(
+            chat_id=msg.chat.id,
+            id_=msg.message_id,
+            punishment=msg.chat.settings.text_spam_punishment,
+            reason="spam_long_text",
+        )
+    # arabic
+    if msg.chat.settings.arabic_punishment and (
+        utils.ARABIC_REGEX.findall(string=text_to_use)
+        or utils.ARABIC_REGEX.findall(string=msg.from_user.first_name)
+        or (
+            msg.from_user.last_name
+            and utils.ARABIC_REGEX.findall(string=msg.from_user.last_name)
+        )
+    ):
+        ChangePunishmentAddReason(
+            chat_id=msg.chat.id,
+            id_=msg.message_id,
+            punishment=msg.chat.settings.arabic_punishment,
+            reason="arabic",
         )
     msg.continue_propagation()
 
