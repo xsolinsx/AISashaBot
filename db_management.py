@@ -1135,21 +1135,17 @@ def DBUserChat(user: typing.Union[pyrogram.Chat, pyrogram.User], chat: pyrogram.
 def DBChatAdmins(client: pyrogram.Client, chat_id: int, clean_up=False):
     settings: ChatSettings = ChatSettings.get(chat_id=chat_id)
     if clean_up:
-        query: peewee.ModelSelect = RUserChat.select().where(
-            (RUserChat.chat_id == chat_id) & (RUserChat.is_admin)
-        ).order_by(RUserChat.rank.desc())
-        for r_user_chat in query:
-            r_user_chat.rank = 0
-            r_user_chat.is_member = False
-            r_user_chat.is_admin = False
-            r_user_chat.can_be_edited = True
-            r_user_chat.can_change_info = False
-            r_user_chat.can_delete_messages = False
-            r_user_chat.can_invite_users = False
-            r_user_chat.can_pin_messages = False
-            r_user_chat.can_promote_members = False
-            r_user_chat.can_restrict_members = False
-            r_user_chat.save()
+        RUserChat.update(
+            rank=0,
+            is_admin=False,
+            can_be_edited=True,
+            can_change_info=False,
+            can_delete_messages=False,
+            can_invite_users=False,
+            can_pin_messages=False,
+            can_promote_members=False,
+            can_restrict_members=False,
+        ).where((RUserChat.chat_id == chat_id) & (RUserChat.is_admin)).execute()
     for member in client.iter_chat_members(chat_id=chat_id, filter="administrators"):
         DBUser(user=member.user)
         creator = member.status == "creator"
@@ -1198,6 +1194,35 @@ def DBChatAdmins(client: pyrogram.Client, chat_id: int, clean_up=False):
         if creator:
             settings.owner_id = member.user.id
             settings.save()
+
+
+def DBChatMembers(client: pyrogram.Client, chat_id: int, clean_up=True):
+    if clean_up:
+        RUserChat.update(is_member=False).where(
+            (RUserChat.chat_id == chat_id) & (RUserChat.is_member)
+        )
+    # check restricted members
+    for member in client.iter_chat_members(chat_id=chat_id, filter="restricted"):
+        DBUser(user=member.user)
+        if RUserChat.get_or_none(user_id=member.user.id, chat_id=chat_id):
+            RUserChat.update(is_member=member.is_member).where(
+                (RUserChat.user_id == member.user.id) & (RUserChat.chat_id == chat_id)
+            ).execute()
+        else:
+            RUserChat.create(
+                user_id=member.user.id, chat_id=chat_id, is_member=member.is_member,
+            )
+    # check members, admins and creator
+    for member in client.iter_chat_members(chat_id=chat_id, filter="all"):
+        DBUser(user=member.user)
+        if RUserChat.get_or_none(user_id=member.user.id, chat_id=chat_id):
+            RUserChat.update(is_member=True).where(
+                (RUserChat.user_id == member.user.id) & (RUserChat.chat_id == chat_id)
+            ).execute()
+        else:
+            RUserChat.create(
+                user_id=member.user.id, chat_id=chat_id, is_member=True,
+            )
 
 
 def DBObject(
@@ -1347,7 +1372,7 @@ def DBObject(
             )
             obj.r_user_chat.timestamp = datetime.datetime.utcnow()
             obj.r_user_chat.save()
-            
+
             obj.r_bot_chat: RUserChat = RUserChat.get_or_none(
                 user_id=client.ME.id, chat_id=obj.chat.id
             )
