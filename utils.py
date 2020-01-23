@@ -104,11 +104,11 @@ tmp_steps = {
 
 # CLEAN EVERY X MINUTES (WRITTEN IN CONFIG.JSON)
 tmp_dicts = dict(
-    # temp dictionary to stop punishing a user after (s)he's been kicked^
+    # temp dictionary to stop automatic punishments of user after kick^ (stopping flood or other things)
     kickedPeople=dict(
         # chat_id = set( user_ids )
     ),
-    # temp dictionary to not invite the same user again and again(just once every X minutes or if (s)he is kicked)
+    # temp dictionary to not invite the same user again and again (just once every X minutes or if (s)he is kicked)
     invitedPeople=dict(
         # chat_id = set( user_ids )
     ),
@@ -695,87 +695,83 @@ def GetCommandsVariants(commands: list, del_: bool = False, pvt: bool = False) -
     return tmp
 
 
-def AdjustMarkers(value: str, msg: pyrogram.Message) -> str:
+def AdjustMarkers(value: str, msg: pyrogram.Message, welcome: bool = False) -> str:
     # chat
     value = AdjustChatMarkers(value=value, chat=msg.chat)
 
     if msg.new_chat_members:
-        if len(msg.new_chat_members) == 1:
-            # joined/invited user
-            if msg.new_chat_members[0].is_bot:
-                return None
+        # if welcoming users use filtered list excluding bots and kicked people, otherwise use normal list
+        new_chat_members = (
+            [
+                x
+                for x in msg.new_chat_members
+                if not x.is_bot and x.id not in tmp_dicts["kickedPeople"][msg.chat.id]
+            ]
+            if welcome
+            else msg.new_chat_members
+        )
+        if new_chat_members:
+            if len(new_chat_members) == 1:
+                # joined/invited user
+                value = AdjustUserMarkers(value=value, user=new_chat_members[0])
             else:
-                value = AdjustUserMarkers(value=value, user=msg.new_chat_members[0])
-        else:
-            # invited users
-            value = value.replace(
-                "$user_id",
-                ", ".join([str(x.id) for x in msg.new_chat_members if not x.is_bot]),
-            )
-            value = value.replace(
-                "$first_name",
-                ", ".join(
-                    [
-                        html.escape(x.first_name)
-                        for x in msg.new_chat_members
-                        if not x.is_bot
-                    ]
-                ),
-            )
-            value = value.replace(
-                "$last_name",
-                ", ".join(
-                    [
-                        html.escape(x.last_name) if x.last_name else ""
-                        for x in msg.new_chat_members
-                        if not x.is_bot
-                    ]
-                ),
-            )
-            value = value.replace(
-                "$full_name",
-                ", ".join(
-                    [
-                        html.escape(x.first_name)
-                        + (f" {html.escape(x.last_name)}" if x.last_name else "")
-                        for x in msg.new_chat_members
-                        if not x.is_bot
-                    ]
-                ),
-            )
-            value = value.replace(
-                "$reversed_full_name",
-                ", ".join(
-                    [
-                        (f"{html.escape(x.last_name)} " if x.last_name else "")
-                        + html.escape(x.first_name)
-                        for x in msg.new_chat_members
-                        if not x.is_bot
-                    ]
-                ),
-            )
-            value = value.replace(
-                "$username",
-                ", ".join(
-                    [
-                        f"@{x.username}" if x.username else "@USERNAME"
-                        for x in msg.new_chat_members
-                        if not x.is_bot
-                    ]
-                ),
-            )
-            value = value.replace(
-                "$mention",
-                ", ".join(
-                    [
-                        f'<a href="tg://user?id={x.id}">{html.escape(x.first_name)}</a>'
-                        for x in msg.new_chat_members
-                        if not x.is_bot
-                    ]
-                ),
-            )
+                # invited users
+                value = value.replace(
+                    "$user_id", ", ".join([str(x.id) for x in new_chat_members]),
+                )
+                value = value.replace(
+                    "$first_name",
+                    ", ".join([html.escape(x.first_name) for x in new_chat_members]),
+                )
+                value = value.replace(
+                    "$last_name",
+                    ", ".join(
+                        [
+                            html.escape(x.last_name) if x.last_name else ""
+                            for x in new_chat_members
+                        ]
+                    ),
+                )
+                value = value.replace(
+                    "$full_name",
+                    ", ".join(
+                        [
+                            html.escape(x.first_name)
+                            + (f" {html.escape(x.last_name)}" if x.last_name else "")
+                            for x in new_chat_members
+                        ]
+                    ),
+                )
+                value = value.replace(
+                    "$reversed_full_name",
+                    ", ".join(
+                        [
+                            (f"{html.escape(x.last_name)} " if x.last_name else "")
+                            + html.escape(x.first_name)
+                            for x in new_chat_members
+                        ]
+                    ),
+                )
+                value = value.replace(
+                    "$username",
+                    ", ".join(
+                        [
+                            f"@{x.username}" if x.username else "@USERNAME"
+                            for x in new_chat_members
+                        ]
+                    ),
+                )
+                value = value.replace(
+                    "$mention",
+                    ", ".join(
+                        [
+                            f'<a href="tg://user?id={x.id}">{html.escape(x.first_name)}</a>'
+                            for x in new_chat_members
+                        ]
+                    ),
+                )
     elif msg.left_chat_member:
-        # lefting/kicked user
+        # leaving/kicked user
         if msg.left_chat_member.is_bot:
             return None
         else:
@@ -795,7 +791,7 @@ def AdjustMarkers(value: str, msg: pyrogram.Message) -> str:
     if msg.reply_to_message:
         # reply
         value = value.replace("$reply_", "$")
-        value = AdjustMarkers(value=value, msg=msg.reply_to_message)
+        value = AdjustMarkers(value=value, msg=msg.reply_to_message, welcome=welcome)
 
     if len(value) > 4096:
         value = value[:4096]

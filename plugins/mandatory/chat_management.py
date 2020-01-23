@@ -41,10 +41,14 @@ def SendWelcome(client: pyrogram.Client, msg: pyrogram.Message):
         .value
     )
     if welcome and msg.chat.settings.welcome_members:
+        # exclude bots and people punished with kick^ from welcome
+        members_to_welcome = [
+            x
+            for x in msg.new_chat_members
+            if not x.is_bot and x.id not in utils.tmp_dicts["kickedPeople"][msg.chat.id]
+        ]
         InstantiateGreetings(chat_id=msg.chat.id)
-        greetings[msg.chat.id]["counter"] += len(msg.new_chat_members) - len(
-            [x for x in msg.new_chat_members if x.is_bot]
-        )
+        greetings[msg.chat.id]["counter"] += len(members_to_welcome)
         if greetings[msg.chat.id]["counter"] >= msg.chat.settings.welcome_members:
             welcome_buttons = (
                 msg.chat.settings.extras.where(
@@ -62,7 +66,7 @@ def SendWelcome(client: pyrogram.Client, msg: pyrogram.Message):
                 if len(welcome) > 1:
                     # join over $ because they could have been removed with the previous split
                     caption = "$".join(welcome[1:])
-                    caption = utils.AdjustMarkers(value=caption, msg=msg)
+                    caption = utils.AdjustMarkers(value=caption, msg=msg, welcome=True)
                 try:
                     client.send_chat_action(
                         chat_id=msg.chat.id, action="upload_document",
@@ -116,7 +120,7 @@ def SendWelcome(client: pyrogram.Client, msg: pyrogram.Message):
                             text=_(msg.chat.settings.language, "tg_error_X").format(ex),
                         )
             else:
-                text = utils.AdjustMarkers(value=welcome, msg=msg)
+                text = utils.AdjustMarkers(value=welcome, msg=msg, welcome=True)
                 if text is not None:
                     tmp: pyrogram.Message = methods.ReplyText(
                         client=client,
@@ -2625,7 +2629,7 @@ def CmdWelcome(client: pyrogram.Client, msg: pyrogram.Message):
                 if len(welcome) > 1:
                     # join over $ because they could have been removed with the previous split
                     caption = "$".join(welcome[1:])
-                    caption = utils.AdjustMarkers(value=caption, msg=msg)
+                    caption = utils.AdjustMarkers(value=caption, msg=msg, welcome=True)
                 msg.reply_cached_media(
                     file_id=media_id,
                     caption=caption,
@@ -2639,7 +2643,7 @@ def CmdWelcome(client: pyrogram.Client, msg: pyrogram.Message):
                     parse_mode="html",
                 )
             else:
-                text = utils.AdjustMarkers(value=welcome, msg=msg)
+                text = utils.AdjustMarkers(value=welcome, msg=msg, welcome=True)
                 if text is not None:
                     methods.ReplyText(
                         client=client,
