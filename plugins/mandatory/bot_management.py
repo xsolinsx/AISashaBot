@@ -426,7 +426,7 @@ def CbQryBotPluginsEnableDisable(
         " "
     )
     page = int(parameters[1])
-    if utils.IsMaster(user_id=cb_qry.from_user.id):
+    if utils.IsMasterOrBot(user_id=cb_qry.from_user.id):
         plugin: db_management.Plugins = db_management.Plugins.get_or_none(
             name=cb_qry.data.replace("botplugins is_enabled ", "")
         )
@@ -492,7 +492,7 @@ def CbQryBotPluginsMandatoryOptional(
         " "
     )
     page = int(parameters[1])
-    if utils.IsMaster(user_id=cb_qry.from_user.id):
+    if utils.IsMasterOrBot(user_id=cb_qry.from_user.id):
         plugin: db_management.Plugins = db_management.Plugins.get_or_none(
             name=cb_qry.data.replace("botplugins is_optional ", "")
         )
@@ -556,7 +556,7 @@ def CbQryBotPluginsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
         " "
     )
     page = int(parameters[1])
-    if utils.IsMaster(user_id=cb_qry.from_user.id):
+    if utils.IsMasterOrBot(user_id=cb_qry.from_user.id):
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry, text=_(cb_qry.from_user.settings.language, "turning_page")
         )
@@ -643,7 +643,7 @@ def CbQryGbannedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         " "
     )
     page = int(parameters[1])
-    if utils.IsMaster(user_id=cb_qry.from_user.id):
+    if utils.IsMasterOrBot(user_id=cb_qry.from_user.id):
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry, text=_(cb_qry.from_user.settings.language, "turning_page")
         )
@@ -691,7 +691,7 @@ def CbQryGbannedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
     my_filters.callback_regex(pattern=r"^gbanned add", flags=re.I)
 )
 def CbQryGbannedAdd(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
-    if utils.IsMaster(user_id=cb_qry.from_user.id):
+    if utils.IsMasterOrBot(user_id=cb_qry.from_user.id):
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
             text=_(cb_qry.from_user.settings.language, "ok"),
@@ -727,7 +727,7 @@ def CbQryGbannedRemove(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         " "
     )
     page = int(parameters[1])
-    if utils.IsMaster(user_id=cb_qry.from_user.id):
+    if utils.IsMasterOrBot(user_id=cb_qry.from_user.id):
         user_id = int(cb_qry.data.replace("gbanned remove ", ""))
         text = methods.Ungban(
             client=client,
@@ -763,7 +763,7 @@ def CbQryGbannedRemove(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
     )
 )
 def CmdGbanned(client: pyrogram.Client, msg: pyrogram.Message):
-    if utils.IsMaster(user_id=msg.from_user.id):
+    if utils.IsMasterOrBot(user_id=msg.from_user.id):
         if msg.command[0].lower().endswith("pvt"):
             methods.SendMessage(
                 client=client,
@@ -825,7 +825,7 @@ def CbQryBlockedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         " "
     )
     page = int(parameters[1])
-    if utils.IsMaster(user_id=cb_qry.from_user.id):
+    if utils.IsMasterOrBot(user_id=cb_qry.from_user.id):
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry, text=_(cb_qry.from_user.settings.language, "turning_page")
         )
@@ -873,7 +873,7 @@ def CbQryBlockedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
     my_filters.callback_regex(pattern=r"^blocked add", flags=re.I)
 )
 def CbQryBlockedAdd(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
-    if utils.IsMaster(user_id=cb_qry.from_user.id):
+    if utils.IsMasterOrBot(user_id=cb_qry.from_user.id):
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
             text=_(cb_qry.from_user.settings.language, "ok"),
@@ -909,7 +909,7 @@ def CbQryBlockedRemove(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         " "
     )
     page = int(parameters[1])
-    if utils.IsMaster(user_id=cb_qry.from_user.id):
+    if utils.IsMasterOrBot(user_id=cb_qry.from_user.id):
         user_id = int(cb_qry.data.replace("blocked remove ", ""))
         text = methods.Unblock(
             client=client,
@@ -945,7 +945,7 @@ def CbQryBlockedRemove(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
     )
 )
 def CmdBlocked(client: pyrogram.Client, msg: pyrogram.Message):
-    if utils.IsMaster(user_id=msg.from_user.id):
+    if utils.IsMasterOrBot(user_id=msg.from_user.id):
         if msg.command[0].lower().endswith("pvt"):
             methods.SendMessage(
                 client=client,

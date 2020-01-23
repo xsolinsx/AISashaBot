@@ -875,8 +875,9 @@ def IsTelegramAdministrator(
                 return True
 
 
-def IsMaster(user_id: int) -> bool:
-    return bool(user_id in config["masters"])
+def IsMasterOrBot(user_id: int) -> bool:
+    bot_id = config["telegram"]["bot_api_key"].split(":")[0]
+    return bool(user_id in config["masters"] or user_id == bot_id)
 
 
 # TODO IMPLEMENT CHECKS FOR NETWORKS AND BOT ADMINISTRATORS
@@ -885,7 +886,7 @@ def IsMaster(user_id: int) -> bool:
 def IsOwnerOrHigher(
     user_id: int, chat_id: int = 0, r_user_chat: db_management.RUserChat = None,
 ) -> bool:
-    if IsMaster(user_id=user_id):
+    if IsMasterOrBot(user_id=user_id):
         return True
     else:
         if chat_id < 0:
@@ -910,7 +911,7 @@ def IsOwnerOrHigher(
 def IsSeniorModOrHigher(
     user_id: int, chat_id: int = 0, r_user_chat: db_management.RUserChat = None,
 ) -> bool:
-    if IsMaster(user_id=user_id):
+    if IsMasterOrBot(user_id=user_id):
         return True
     else:
         if chat_id < 0:
@@ -935,7 +936,7 @@ def IsSeniorModOrHigher(
 def IsJuniorModOrHigher(
     user_id: int, chat_id: int = 0, r_user_chat: db_management.RUserChat = None,
 ) -> bool:
-    if IsMaster(user_id=user_id):
+    if IsMasterOrBot(user_id=user_id):
         return True
     else:
         if chat_id < 0:
@@ -960,7 +961,7 @@ def IsJuniorModOrHigher(
 def IsPrivilegedOrHigher(
     user_id: int, chat_id: int = 0, r_user_chat: db_management.RUserChat = None,
 ) -> bool:
-    if IsMaster(user_id=user_id):
+    if IsMasterOrBot(user_id=user_id):
         return True
     else:
         if chat_id < 0:
@@ -996,7 +997,7 @@ def GetRank(
                 if IsOwnerOrHigher(
                     user_id=user_id, chat_id=chat_id, r_user_chat=r_user_chat,
                 ):
-                    if IsMaster(user_id=user_id):
+                    if IsMasterOrBot(user_id=user_id):
                         return dictionaries.RANKS["master"]
                     else:
                         return dictionaries.RANKS["owner"]

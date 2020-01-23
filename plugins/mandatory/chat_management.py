@@ -2367,7 +2367,7 @@ def CmdSyncAdmins(client: pyrogram.Client, msg: pyrogram.Message):
             utils.tmp_dicts["staffUpdated"].add(msg.chat.id)
             try:
                 db_management.DBChatAdmins(
-                    chat_id=msg.chat.id, client=client, clean_up=True
+                    client=client, chat_id=msg.chat.id, clean_up=True
                 )
             except pyrogram.errors.FloodWait as ex:
                 print(ex)
@@ -2418,7 +2418,7 @@ def CmdSyncAdminsChat(client: pyrogram.Client, msg: pyrogram.Message):
                     utils.tmp_dicts["staffUpdated"].add(chat_id)
                     try:
                         db_management.DBChatAdmins(
-                            chat_id=chat_id, client=client, clean_up=True
+                            client=client, chat_id=chat_id, clean_up=True
                         )
                     except pyrogram.errors.FloodWait as ex:
                         print(ex)

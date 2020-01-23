@@ -1282,7 +1282,7 @@ def CbQryActionAll(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                     traceback.print_exc()
                     text += f"{user_id}: {ex}"
             else:
-                if utils.IsMaster(user_id=cb_qry.from_user.id):
+                if utils.IsMasterOrBot(user_id=cb_qry.from_user.id):
                     if action == "gban":
                         text += f"{user_id}: " + methods.GBan(
                             client=client,
@@ -1467,7 +1467,7 @@ def CbQryActionUser(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                 traceback.print_exc()
                 text = f"{user_id}: {ex}"
         else:
-            if utils.IsMaster(user_id=cb_qry.from_user.id):
+            if utils.IsMasterOrBot(user_id=cb_qry.from_user.id):
                 if action == "gban":
                     text = f"{user_id}: " + methods.GBan(
                         client=client,

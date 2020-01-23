@@ -594,6 +594,8 @@ def Kick(
                     executer,
                     abs(chat_id),
                 )
+                r_target_chat.is_member = False
+                r_target_chat.save()
 
                 utils.Log(
                     client=client,
@@ -909,6 +911,8 @@ def Ban(
                         executer,
                         abs(chat_id),
                     )
+                    r_target_chat.is_member = False
+                    r_target_chat.save()
 
                     utils.Log(
                         client=client,
@@ -1266,18 +1270,17 @@ def Unblock(
 
 def AutoPunish(
     client: pyrogram.Client,
-    executer: typing.Union[int, str],
     target: typing.Union[int, str],
     chat_id: typing.Union[int, str],
     punishment: int,
     reasons: typing.Union[typing.List[str], str] = None,
     message_ids: typing.Union[typing.List[int], int] = None,
     until_date: int = None,
-    r_executer_chat: db_management.RUserChat = None,
     r_target_chat: db_management.RUserChat = None,
     chat_settings: db_management.ChatSettings = None,
     auto_group_notice: bool = False,
 ) -> str:
+    # always executed by bot, never by a user
     if punishment:
         if not reasons:
             reasons = []
@@ -1286,13 +1289,6 @@ def AutoPunish(
         # set is used to remove duplicates
         reasons = list(set(reasons))
 
-        r_executer_chat = r_executer_chat or db_management.RUserChat.get_or_none(
-            user_id=executer, chat_id=chat_id
-        )
-        if not r_executer_chat:
-            r_executer_chat = db_management.RUserChat.create(
-                user_id=executer, chat_id=chat_id
-            )
         r_target_chat = r_target_chat or db_management.RUserChat.get_or_none(
             user_id=target, chat_id=chat_id
         )
@@ -1300,280 +1296,289 @@ def AutoPunish(
             r_target_chat = db_management.RUserChat.create(
                 user_id=target, chat_id=chat_id
             )
-        chat_settings = chat_settings or db_management.ChatSettings.get_or_none(
+        chat_settings: db_management.ChatSettings = chat_settings or db_management.ChatSettings.get_or_none(
             chat_id=chat_id
         )
 
-        if not r_target_chat.is_whitelisted:
-            if utils.CompareRanks(
-                executer=executer,
-                target=target,
-                chat_id=chat_id,
-                r_executer_chat=r_executer_chat,
-                r_target_chat=r_target_chat,
-                min_rank=dictionaries.RANKS["junior_mod"],
-            ):
-                now = int(time.time())
-                hashtags = []
+        now = int(time.time())
+        hashtags = []
 
-                if punishment >= 1 and message_ids:
-                    # delete
-                    if isinstance(message_ids, int):
-                        message_ids = [message_ids]
-                    message_ids = list(set(message_ids))
-                    try:
-                        client.delete_messages(chat_id=chat_id, message_ids=message_ids)
-                        hashtags.append("#delete")
-                    except pyrogram.errors.FloodWait as ex:
-                        print(ex)
-                        traceback.print_exc()
-                        run_date = datetime.datetime.utcnow() + datetime.timedelta(
-                            seconds=ex.x
-                        )
-                        utils.scheduler.add_job(
-                            func=client.delete_messages,
-                            kwargs=dict(chat_id=chat_id, message_ids=message_ids),
-                            trigger=DateTrigger(run_date=run_date),
-                        )
-                        hashtags.append(f"#scheduleddelete UTC {run_date}")
-                    except pyrogram.errors.RPCError as ex:
-                        print(ex)
-                        traceback.print_exc()
-                        return _(chat_settings.language, "tg_error_X").format(ex)
-                if punishment >= 2:
-                    # warn
-                    if chat_settings.max_warns_punishment:
-                        if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
-                            # if user has not been kicked
-                            # atomic update
-                            db_management.RUserChat.update(
-                                {
-                                    db_management.RUserChat.warns: db_management.RUserChat.warns
-                                    + 1
-                                }
-                            ).where(
-                                (db_management.RUserChat.user == target)
-                                & (db_management.RUserChat.chat == chat_id)
-                            ).execute()
-                            r_target_chat = db_management.RUserChat.get_or_none(
-                                user_id=target, chat_id=chat_id
-                            )
-                            if r_target_chat.warns >= chat_settings.max_warns:
-                                punishment = max(
-                                    punishment, chat_settings.max_warns_punishment
-                                )
-                                reasons.append("max_warns_reached")
-                                r_target_chat.warns = 0
-                                r_target_chat.save()
-                            hashtags.append(
-                                f"#warn {r_target_chat.warns}/{chat_settings.max_warns}"
-                            )
-                if punishment == 3:
-                    # kick
-                    if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
-                        # if user has not been kicked
-                        try:
-                            client.kick_chat_member(
-                                chat_id=chat_id, user_id=target, until_date=now + 35
-                            )
-                            hashtags.append("#kick")
-                        except pyrogram.errors.FloodWait as ex:
-                            print(ex)
-                            traceback.print_exc()
-                            run_date = datetime.datetime.utcnow() + datetime.timedelta(
-                                seconds=ex.x
-                            )
-                            utils.scheduler.add_job(
-                                func=client.kick_chat_member,
-                                kwargs=dict(
-                                    chat_id=chat_id,
-                                    user_id=target,
-                                    until_date=run_date
-                                    + datetime.timedelta(seconds=35),
-                                ),
-                                trigger=DateTrigger(run_date=run_date),
-                            )
-                            hashtags.append(f"#scheduledkick UTC {run_date}")
-                        except pyrogram.errors.RPCError as ex:
-                            print(ex)
-                            traceback.print_exc()
-                            return _(chat_settings.language, "tg_error_X").format(ex)
-                elif punishment == 4:
-                    # temprestrict
-                    if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
-                        # if user has not been kicked
-                        until_date = (
-                            until_date
-                            if until_date is not None
-                            else (now + chat_settings.max_temp_restrict)
-                        )
-                        try:
-                            client.restrict_chat_member(
-                                chat_id=chat_id,
-                                user_id=target,
-                                permissions=pyrogram.ChatPermissions(),
-                                until_date=until_date,
-                            )
-                            hashtags.append(
-                                "#temprestrict "
-                                + _(chat_settings.language, "until")
-                                + f" UTC {datetime.datetime.utcfromtimestamp(until_date)}"
-                            )
-                        except pyrogram.errors.FloodWait as ex:
-                            print(ex)
-                            traceback.print_exc()
-                            run_date = datetime.datetime.utcnow() + datetime.timedelta(
-                                seconds=ex.x
-                            )
-                            until_date += ex.x
-                            utils.scheduler.add_job(
-                                func=client.restrict_chat_member,
-                                kwargs=dict(
-                                    chat_id=chat_id,
-                                    user_id=target,
-                                    permissions=pyrogram.ChatPermissions(),
-                                    until_date=until_date,
-                                ),
-                                trigger=DateTrigger(run_date=run_date),
-                            )
-                            hashtags.append(
-                                f"#scheduledtemprestrict UTC {run_date} "
-                                + _(chat_settings.language, "until")
-                                + f" UTC {datetime.datetime.utcfromtimestamp(until_date)}"
-                            )
-                        except pyrogram.errors.RPCError as ex:
-                            print(ex)
-                            traceback.print_exc()
-                            return _(chat_settings.language, "tg_error_X").format(ex)
-                elif punishment == 5:
-                    # restrict
-                    if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
-                        # if user has not been kicked
-                        try:
-                            client.restrict_chat_member(
-                                chat_id=chat_id,
-                                user_id=target,
-                                permissions=pyrogram.ChatPermissions(),
-                            )
-                            hashtags.append("#restrict")
-                        except pyrogram.errors.FloodWait as ex:
-                            print(ex)
-                            traceback.print_exc()
-                            run_date = datetime.datetime.utcnow() + datetime.timedelta(
-                                seconds=ex.x
-                            )
-                            utils.scheduler.add_job(
-                                func=client.restrict_chat_member,
-                                kwargs=dict(
-                                    chat_id=chat_id,
-                                    user_id=target,
-                                    permissions=pyrogram.ChatPermissions(),
-                                ),
-                                trigger=DateTrigger(run_date=run_date),
-                            )
-                            hashtags.append(f"#scheduledrestrict UTC {run_date}")
-                        except pyrogram.errors.RPCError as ex:
-                            print(ex)
-                            traceback.print_exc()
-                            return _(chat_settings.language, "tg_error_X").format(ex)
-                elif punishment == 6:
-                    # tempban
-                    if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
-                        # if user has not been kicked
-                        until_date = (
-                            until_date
-                            if until_date is not None
-                            else (now + chat_settings.max_temp_restrict)
-                        )
-                        try:
-                            client.kick_chat_member(
-                                chat_id=chat_id, user_id=target, until_date=until_date
-                            )
-                            hashtags.append(
-                                "#tempban "
-                                + _(chat_settings.language, "until")
-                                + f" UTC {datetime.datetime.utcfromtimestamp(until_date)}"
-                            )
-                        except pyrogram.errors.FloodWait as ex:
-                            print(ex)
-                            traceback.print_exc()
-                            run_date = datetime.datetime.utcnow() + datetime.timedelta(
-                                seconds=ex.x
-                            )
-                            until_date += ex.x
-                            utils.scheduler.add_job(
-                                func=client.kick_chat_member,
-                                kwargs=dict(
-                                    chat_id=chat_id,
-                                    user_id=target,
-                                    until_date=until_date,
-                                ),
-                                trigger=DateTrigger(run_date=run_date),
-                            )
-                            hashtags.append(
-                                f"#scheduledtempban UTC {run_date} "
-                                + _(chat_settings.language, "until")
-                                + f" UTC {datetime.datetime.utcfromtimestamp(until_date)}"
-                            )
-                        except pyrogram.errors.RPCError as ex:
-                            print(ex)
-                            traceback.print_exc()
-                            return _(chat_settings.language, "tg_error_X").format(ex)
-                elif punishment == 7:
-                    # ban
-                    if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
-                        # if user has not been kicked
-                        try:
-                            client.kick_chat_member(chat_id=chat_id, user_id=target)
-                            hashtags.append("#ban")
-                        except pyrogram.errors.FloodWait as ex:
-                            print(ex)
-                            traceback.print_exc()
-                            run_date = datetime.datetime.utcnow() + datetime.timedelta(
-                                seconds=ex.x
-                            )
-                            utils.scheduler.add_job(
-                                func=client.kick_chat_member,
-                                kwargs=dict(chat_id=chat_id, user_id=target),
-                                trigger=DateTrigger(run_date=run_date),
-                            )
-                            hashtags.append(f"#scheduledban UTC {run_date}")
-                        except pyrogram.errors.RPCError as ex:
-                            print(ex)
-                            traceback.print_exc()
-                            return _(chat_settings.language, "tg_error_X").format(ex)
+        if punishment >= 1 and message_ids:
+            # delete
+            if isinstance(message_ids, int):
+                message_ids = [message_ids]
+            message_ids = list(set(message_ids))
+            try:
+                client.delete_messages(chat_id=chat_id, message_ids=message_ids)
+                hashtags.append("#delete")
+            except pyrogram.errors.FloodWait as ex:
+                print(ex)
+                traceback.print_exc()
+                run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=ex.x)
+                utils.scheduler.add_job(
+                    func=client.delete_messages,
+                    kwargs=dict(chat_id=chat_id, message_ids=message_ids),
+                    trigger=DateTrigger(run_date=run_date),
+                )
+                hashtags.append(f"#scheduleddelete UTC {run_date}")
+            except pyrogram.errors.RPCError as ex:
+                print(ex)
+                traceback.print_exc()
+                return _(chat_settings.language, "tg_error_X").format(ex)
+        if punishment >= 2:
+            # warn
+            if chat_settings.max_warns_punishment:
+                if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
+                    # if user has not been kicked
+                    # atomic update
+                    db_management.RUserChat.update(
+                        {
+                            db_management.RUserChat.warns: db_management.RUserChat.warns
+                            + 1
+                        }
+                    ).where(
+                        (db_management.RUserChat.user == target)
+                        & (db_management.RUserChat.chat == chat_id)
+                    ).execute()
+                    r_target_chat: db_management.RUserChat = db_management.RUserChat.get_or_none(
+                        user_id=target, chat_id=chat_id
+                    )
+                    hashtags.append(
+                        f"#warn {r_target_chat.warns}/{chat_settings.max_warns}"
+                    )
+                    if r_target_chat.warns >= chat_settings.max_warns:
+                        punishment = max(punishment, chat_settings.max_warns_punishment)
+                        reasons.append("max_warns_reached")
+                        r_target_chat.warns = 0
+                        r_target_chat.save()
+        if punishment == 3:
+            # kick
+            if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
+                # if user has not been kicked
+                try:
+                    client.kick_chat_member(
+                        chat_id=chat_id, user_id=target, until_date=now + 35
+                    )
+                    hashtags.append("#kick")
+                except pyrogram.errors.FloodWait as ex:
+                    print(ex)
+                    traceback.print_exc()
+                    run_date = datetime.datetime.utcnow() + datetime.timedelta(
+                        seconds=ex.x
+                    )
+                    utils.scheduler.add_job(
+                        func=Kick,
+                        kwargs=dict(
+                            client=client,
+                            executer=client.ME.id,
+                            target=target,
+                            chat_id=chat_id,
+                            reasons=reasons,
+                            r_target_chat=r_target_chat,
+                            chat_settings=chat_settings,
+                        ),
+                        trigger=DateTrigger(run_date=run_date),
+                    )
+                    hashtags.append(f"#scheduledkick UTC {run_date}")
+                except pyrogram.errors.RPCError as ex:
+                    print(ex)
+                    traceback.print_exc()
+                    return _(chat_settings.language, "tg_error_X").format(ex)
+                else:
+                    r_target_chat.is_member = False
+                    r_target_chat.save()
+        elif punishment == 4:
+            # temprestrict
+            if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
+                # if user has not been kicked
+                until_date = (
+                    until_date
+                    if until_date is not None
+                    else (now + chat_settings.max_temp_restrict)
+                )
+                try:
+                    client.restrict_chat_member(
+                        chat_id=chat_id,
+                        user_id=target,
+                        permissions=pyrogram.ChatPermissions(),
+                        until_date=until_date,
+                    )
+                    hashtags.append(
+                        "#temprestrict "
+                        + _(chat_settings.language, "until")
+                        + f" UTC {datetime.datetime.utcfromtimestamp(until_date)}"
+                    )
+                except pyrogram.errors.FloodWait as ex:
+                    print(ex)
+                    traceback.print_exc()
+                    run_date = datetime.datetime.utcnow() + datetime.timedelta(
+                        seconds=ex.x
+                    )
+                    until_date += ex.x
+                    utils.scheduler.add_job(
+                        func=client.restrict_chat_member,
+                        kwargs=dict(
+                            chat_id=chat_id,
+                            user_id=target,
+                            permissions=pyrogram.ChatPermissions(),
+                            until_date=until_date,
+                        ),
+                        trigger=DateTrigger(run_date=run_date),
+                    )
+                    hashtags.append(
+                        f"#scheduledtemprestrict UTC {run_date} "
+                        + _(chat_settings.language, "until")
+                        + f" UTC {datetime.datetime.utcfromtimestamp(until_date)}"
+                    )
+                except pyrogram.errors.RPCError as ex:
+                    print(ex)
+                    traceback.print_exc()
+                    return _(chat_settings.language, "tg_error_X").format(ex)
+        elif punishment == 5:
+            # restrict
+            if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
+                # if user has not been kicked
+                try:
+                    client.restrict_chat_member(
+                        chat_id=chat_id,
+                        user_id=target,
+                        permissions=pyrogram.ChatPermissions(),
+                    )
+                    hashtags.append("#restrict")
+                except pyrogram.errors.FloodWait as ex:
+                    print(ex)
+                    traceback.print_exc()
+                    run_date = datetime.datetime.utcnow() + datetime.timedelta(
+                        seconds=ex.x
+                    )
+                    utils.scheduler.add_job(
+                        func=client.restrict_chat_member,
+                        kwargs=dict(
+                            chat_id=chat_id,
+                            user_id=target,
+                            permissions=pyrogram.ChatPermissions(),
+                        ),
+                        trigger=DateTrigger(run_date=run_date),
+                    )
+                    hashtags.append(f"#scheduledrestrict UTC {run_date}")
+                except pyrogram.errors.RPCError as ex:
+                    print(ex)
+                    traceback.print_exc()
+                    return _(chat_settings.language, "tg_error_X").format(ex)
+        elif punishment == 6:
+            # tempban
+            if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
+                # if user has not been kicked
+                until_date = (
+                    until_date
+                    if until_date is not None
+                    else (now + chat_settings.max_temp_restrict)
+                )
+                try:
+                    client.kick_chat_member(
+                        chat_id=chat_id, user_id=target, until_date=until_date
+                    )
+                    hashtags.append(
+                        "#tempban "
+                        + _(chat_settings.language, "until")
+                        + f" UTC {datetime.datetime.utcfromtimestamp(until_date)}"
+                    )
+                except pyrogram.errors.FloodWait as ex:
+                    print(ex)
+                    traceback.print_exc()
+                    run_date = datetime.datetime.utcnow() + datetime.timedelta(
+                        seconds=ex.x
+                    )
+                    until_date += ex.x
+                    utils.scheduler.add_job(
+                        func=Ban,
+                        kwargs=dict(
+                            client=client,
+                            executer=client.ME.id,
+                            target=target,
+                            chat_id=chat_id,
+                            until_date=until_date,
+                            reasons=reasons,
+                            r_target_chat=r_target_chat,
+                            chat_settings=chat_settings,
+                        ),
+                        trigger=DateTrigger(run_date=run_date),
+                    )
+                    hashtags.append(
+                        f"#scheduledtempban UTC {run_date} "
+                        + _(chat_settings.language, "until")
+                        + f" UTC {datetime.datetime.utcfromtimestamp(until_date)}"
+                    )
+                except pyrogram.errors.RPCError as ex:
+                    print(ex)
+                    traceback.print_exc()
+                    return _(chat_settings.language, "tg_error_X").format(ex)
+                else:
+                    r_target_chat.is_member = False
+                    r_target_chat.save()
+        elif punishment == 7:
+            # ban
+            if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
+                # if user has not been kicked
+                try:
+                    client.kick_chat_member(chat_id=chat_id, user_id=target)
+                    hashtags.append("#ban")
+                except pyrogram.errors.FloodWait as ex:
+                    print(ex)
+                    traceback.print_exc()
+                    run_date = datetime.datetime.utcnow() + datetime.timedelta(
+                        seconds=ex.x
+                    )
+                    utils.scheduler.add_job(
+                        func=Ban,
+                        kwargs=dict(
+                            client=client,
+                            executer=client.ME.id,
+                            target=target,
+                            chat_id=chat_id,
+                            reasons=reasons,
+                            r_target_chat=r_target_chat,
+                            chat_settings=chat_settings,
+                        ),
+                        trigger=DateTrigger(run_date=run_date),
+                    )
+                    hashtags.append(f"#scheduledban UTC {run_date}")
+                except pyrogram.errors.RPCError as ex:
+                    print(ex)
+                    traceback.print_exc()
+                    return _(chat_settings.language, "tg_error_X").format(ex)
+                else:
+                    r_target_chat.is_member = False
+                    r_target_chat.save()
 
-                # retrieve reasons
-                reasons = [_(chat_settings.language, f"reason_{x}") for x in reasons]
-                hashtags.append("#automatic")
-                hashtags.reverse()
-                text = _(chat_settings.language, "action_on_user").format(
-                    " ".join(hashtags),
-                    target,
-                    "\n".join(reasons),
-                    executer,
-                    abs(chat_id),
-                )
-                utils.Log(
-                    client=client,
-                    chat_id=chat_id,
-                    executer=client.ME.id,
-                    action=text,
-                    target=target,
-                    # don't send messages to log_channel for deletions
-                    log_channel_notice=punishment > 1,
-                )
-                if (
-                    auto_group_notice
-                    and text
-                    and chat_settings.group_notices
-                    and chat_settings.group_notices <= punishment
-                    and target not in utils.tmp_dicts["kickedPeople"][chat_id]
-                ):
-                    if punishment > 2:
-                        utils.tmp_dicts["kickedPeople"][chat_id].add(target)
-                    SendMessage(client=client, chat_id=chat_id, text=text)
-                return text
+        # retrieve reasons
+        reasons = [_(chat_settings.language, f"reason_{x}") for x in reasons]
+        hashtags.append("#automatic")
+        hashtags.reverse()
+        text = _(chat_settings.language, "action_on_user").format(
+            " ".join(hashtags), target, "\n".join(reasons), client.ME.id, abs(chat_id),
+        )
+        utils.Log(
+            client=client,
+            chat_id=chat_id,
+            executer=client.ME.id,
+            action=text,
+            target=target,
+            # don't send messages to log_channel for deletions
+            log_channel_notice=punishment > 1,
+        )
+        if (
+            auto_group_notice
+            and text
+            and chat_settings.group_notices
+            and chat_settings.group_notices <= punishment
+            and target not in utils.tmp_dicts["kickedPeople"][chat_id]
+        ):
+            if punishment > 2:
+                # kick^
+                utils.tmp_dicts["kickedPeople"][chat_id].add(target)
+            SendMessage(client=client, chat_id=chat_id, text=text)
+        return text
 
 
 def CallbackQueryAnswer(

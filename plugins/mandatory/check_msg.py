@@ -154,7 +154,7 @@ def CheckPrivateMessage(client: pyrogram.Client, msg: pyrogram.Message):
             punishments[msg.chat.id].pop(msg.message_id)
         msg.stop_propagation()
     # if user is master skip checks
-    if utils.IsMaster(user_id=msg.from_user.id):
+    if utils.IsMasterOrBot(user_id=msg.from_user.id):
         if msg.message_id in punishments[msg.chat.id]:
             punishments[msg.chat.id].pop(msg.message_id)
         return
@@ -262,7 +262,6 @@ def InitGroupMessage(client: pyrogram.Client, msg: pyrogram.Message):
             punishment = 7
         success = methods.AutoPunish(
             client=client,
-            executer=client.ME.id,
             target=msg.from_user.id,
             chat_id=msg.chat.id,
             punishment=punishment,
@@ -1042,7 +1041,6 @@ def CheckGroupMessagePunish(client: pyrogram.Client, msg: pyrogram.Message):
                 )
         methods.AutoPunish(
             client=client,
-            executer=client.ME.id,
             target=msg.from_user.id,
             chat_id=msg.chat.id,
             punishment=punishments[msg.chat.id][msg.message_id]["punishment"],
@@ -1059,7 +1057,6 @@ def CheckGroupMessagePunish(client: pyrogram.Client, msg: pyrogram.Message):
             # punish user
             methods.AutoPunish(
                 client=client,
-                executer=client.ME.id,
                 target=msg.from_user.id,
                 chat_id=msg.chat.id,
                 punishment=msg.chat.settings.max_warns_punishment,
@@ -1107,7 +1104,6 @@ def CheckGroupMessageAdded(client: pyrogram.Client, msg: pyrogram.Message):
             ):
                 res = methods.AutoPunish(
                     client=client,
-                    executer=client.ME.id,
                     target=user.id,
                     chat_id=msg.chat.id,
                     punishment=7,
@@ -1123,14 +1119,12 @@ def CheckGroupMessageAdded(client: pyrogram.Client, msg: pyrogram.Message):
                         and user.id not in utils.tmp_dicts["kickedPeople"][msg.chat.id]
                         else ""
                     )
-                    utils.tmp_dicts["kickedPeople"][msg.chat.id].add(user.id)
                 continue
 
             # flood invited
             if len(msg.new_chat_members) > max_invites:
                 res = methods.AutoPunish(
                     client=client,
-                    executer=client.ME.id,
                     target=user.id,
                     chat_id=msg.chat.id,
                     punishment=7,
@@ -1146,7 +1140,6 @@ def CheckGroupMessageAdded(client: pyrogram.Client, msg: pyrogram.Message):
                         and user.id not in utils.tmp_dicts["kickedPeople"][msg.chat.id]
                         else ""
                     )
-                    utils.tmp_dicts["kickedPeople"][msg.chat.id].add(user.id)
                 continue
             # pre action
             pre_action: db_management.ChatPreActionList = db_management.ChatPreActionList.get_or_none(
@@ -1160,7 +1153,6 @@ def CheckGroupMessageAdded(client: pyrogram.Client, msg: pyrogram.Message):
                     punishment = 7
                 res = methods.AutoPunish(
                     client=client,
-                    executer=client.ME.id,
                     target=user.id,
                     chat_id=msg.chat.id,
                     punishment=punishment,
@@ -1176,7 +1168,6 @@ def CheckGroupMessageAdded(client: pyrogram.Client, msg: pyrogram.Message):
                         else ""
                     )
                     pre_action.delete_instance()
-                    utils.tmp_dicts["kickedPeople"][msg.chat.id].add(user.id)
                 continue
 
             tmp_highest_added_punishment = 0
@@ -1251,7 +1242,6 @@ def CheckGroupMessageAdded(client: pyrogram.Client, msg: pyrogram.Message):
                         reasons.append("max_warns_reached")
                     res = methods.AutoPunish(
                         client=client,
-                        executer=client.ME.id,
                         target=user.id,
                         chat_id=msg.chat.id,
                         punishment=tmp_highest_added_punishment,
@@ -1268,8 +1258,6 @@ def CheckGroupMessageAdded(client: pyrogram.Client, msg: pyrogram.Message):
                             not in utils.tmp_dicts["kickedPeople"][msg.chat.id]
                             else ""
                         )
-                        if tmp_highest_added_punishment > 2:
-                            utils.tmp_dicts["kickedPeople"][msg.chat.id].add(user.id)
             else:
                 # check if user has reached max_warns
                 if (
@@ -1279,7 +1267,6 @@ def CheckGroupMessageAdded(client: pyrogram.Client, msg: pyrogram.Message):
                     # punish user
                     res = methods.AutoPunish(
                         client=client,
-                        executer=client.ME.id,
                         target=user.id,
                         chat_id=msg.chat.id,
                         punishment=msg.chat.settings.max_warns_punishment,
@@ -1296,8 +1283,8 @@ def CheckGroupMessageAdded(client: pyrogram.Client, msg: pyrogram.Message):
                             not in utils.tmp_dicts["kickedPeople"][msg.chat.id]
                             else ""
                         )
-                        utils.tmp_dicts["kickedPeople"][msg.chat.id].add(user.id)
-            msg.continue_propagation()
+                    R_added_chat.warns = 0
+                    R_added_chat.save()
 
     if text and (
         msg.chat.settings.group_notices
@@ -1340,7 +1327,7 @@ def InitPrivateCallbackQuery(client: pyrogram.Client, cb_qry: pyrogram.CallbackQ
             punishments[cb_qry.message.chat.id].pop(cb_qry.id)
         cb_qry.stop_propagation()
     # if user is master skip checks
-    if utils.IsMaster(user_id=cb_qry.from_user.id):
+    if utils.IsMasterOrBot(user_id=cb_qry.from_user.id):
         if cb_qry.id in punishments[cb_qry.message.chat.id]:
             punishments[cb_qry.message.chat.id].pop(cb_qry.id)
 
@@ -1395,7 +1382,6 @@ def InitGroupCallbackQuery(client: pyrogram.Client, cb_qry: pyrogram.CallbackQue
             punishment = 7
         success = methods.AutoPunish(
             client=client,
-            executer=client.ME.id,
             target=cb_qry.from_user.id,
             chat_id=cb_qry.message.chat.id,
             punishment=punishment,
@@ -1481,7 +1467,6 @@ def InitGroupCallbackQuery(client: pyrogram.Client, cb_qry: pyrogram.CallbackQue
                 )
             methods.AutoPunish(
                 client=client,
-                executer=client.ME.id,
                 target=cb_qry.from_user.id,
                 chat_id=cb_qry.message.chat.id,
                 punishment=punishments[cb_qry.message.chat.id][cb_qry.id]["punishment"],
@@ -1497,7 +1482,6 @@ def InitGroupCallbackQuery(client: pyrogram.Client, cb_qry: pyrogram.CallbackQue
         ):
             methods.AutoPunish(
                 client=client,
-                executer=client.ME.id,
                 target=cb_qry.from_user.id,
                 chat_id=cb_qry.message.chat.id,
                 punishment=cb_qry.message.chat.settings.max_warns_punishment,
@@ -1596,7 +1580,7 @@ def CheckFloodCallbackQuery(client: pyrogram.Client, cb_qry: pyrogram.CallbackQu
                 ]
                 + utils.config["settings"]["flood_surveillance_window"]
             ):
-                if not utils.IsMaster(user_id=cb_qry.from_user.id):
+                if not utils.IsMasterOrBot(user_id=cb_qry.from_user.id):
                     # double previous_flood_wait time
                     flood_wait = (
                         flood[cb_qry.message.chat.id][cb_qry.from_user.id][

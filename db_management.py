@@ -651,6 +651,12 @@ class RUserChat(peewee.Model):
     rank = peewee.IntegerField(
         default=0, null=False, constraints=[peewee.Check(constraint="rank >= 0")]
     )
+    # is member of group? (used for commands requiring a quite accurate member's list, not a reliable indicator on the long run)
+    is_member = peewee.BooleanField(
+        default=False,
+        null=False,
+        constraints=[peewee.Check(constraint="is_admin BETWEEN 0 AND 1")],
+    )
     # is user administrator on telegram?
     is_admin = peewee.BooleanField(
         default=False,
@@ -692,13 +698,6 @@ class RUserChat(peewee.Model):
     can_restrict_members = peewee.BooleanField(
         default=False,
         constraints=[peewee.Check(constraint="can_restrict_members BETWEEN 0 AND 1")],
-    )
-
-    # is user administrator on telegram?
-    is_admin = peewee.BooleanField(
-        default=False,
-        null=False,
-        constraints=[peewee.Check(constraint="is_admin BETWEEN 0 AND 1")],
     )
 
     # is user safe from locks/mutes checks in the chat?
@@ -1048,9 +1047,9 @@ def DBUser(user: typing.Union[pyrogram.Chat, pyrogram.User]):
             is_bot=user.is_bot if isinstance(user, pyrogram.User) else False,
         )
 
-    settings = UserSettings.get_or_none(user_id=user.id)
+    settings: UserSettings = UserSettings.get_or_none(user_id=user.id)
     if not settings:
-        settings = UserSettings.create(user_id=user.id)
+        settings: UserSettings = UserSettings.create(user_id=user.id)
 
     ResolvedObjects.replace(
         id=user.id,
@@ -1086,9 +1085,9 @@ def DBChat(chat: pyrogram.Chat) -> bool:
 
 
 def DBChatSettings(chat: pyrogram.Chat):
-    settings = ChatSettings.get_or_none(chat_id=chat.id)
+    settings: ChatSettings = ChatSettings.get_or_none(chat_id=chat.id)
     if not settings:
-        settings = ChatSettings.create(chat_id=chat.id)
+        settings: ChatSettings = ChatSettings.create(chat_id=chat.id)
         ChatExtras.bulk_create(
             [
                 ChatExtras(
@@ -1111,10 +1110,8 @@ def DBChatSettings(chat: pyrogram.Chat):
             ChatWhitelistedChats.create(
                 chat_id=chat.id, whitelisted_chat=local_config["settings"]["channel"]
             )
-            # @username
-            ChatWhitelistedChats.create(
-                chat_id=chat.id, whitelisted_chat=-1001066197625
-            )
+        # @username
+        ChatWhitelistedChats.create(chat_id=chat.id, whitelisted_chat=-1001066197625)
 
     query: peewee.ModelSelect = Plugins.select().where(Plugins.is_optional).order_by(
         Plugins.name
@@ -1128,12 +1125,14 @@ def DBChatSettings(chat: pyrogram.Chat):
 
 def DBUserChat(user: typing.Union[pyrogram.Chat, pyrogram.User], chat: pyrogram.Chat):
     if chat.type == "group" or chat.type == "supergroup":
-        relationship = RUserChat.get_or_none(user_id=user.id, chat_id=chat.id)
+        relationship: RUserChat = RUserChat.get_or_none(
+            user_id=user.id, chat_id=chat.id
+        )
         if not relationship:
-            relationship = RUserChat.create(user_id=user.id, chat_id=chat.id)
+            RUserChat.create(user_id=user.id, chat_id=chat.id)
 
 
-def DBChatAdmins(chat_id: int, client: pyrogram.Client, clean_up=False):
+def DBChatAdmins(client: pyrogram.Client, chat_id: int, clean_up=False):
     settings: ChatSettings = ChatSettings.get(chat_id=chat_id)
     if clean_up:
         query: peewee.ModelSelect = RUserChat.select().where(
@@ -1141,6 +1140,7 @@ def DBChatAdmins(chat_id: int, client: pyrogram.Client, clean_up=False):
         ).order_by(RUserChat.rank.desc())
         for r_user_chat in query:
             r_user_chat.rank = 0
+            r_user_chat.is_member = False
             r_user_chat.is_admin = False
             r_user_chat.can_be_edited = True
             r_user_chat.can_change_info = False
@@ -1162,6 +1162,7 @@ def DBChatAdmins(chat_id: int, client: pyrogram.Client, clean_up=False):
                     if bool(member.can_promote_members)
                     else (2 if bool(member.can_restrict_members) else 1)
                 ),
+                is_member=True,
                 is_admin=True,
                 can_be_edited=bool(member.can_be_edited),
                 can_change_info=creator or bool(member.can_change_info),
@@ -1184,6 +1185,7 @@ def DBChatAdmins(chat_id: int, client: pyrogram.Client, clean_up=False):
                     if bool(member.can_promote_members)
                     else (2 if bool(member.can_restrict_members) else 1)
                 ),
+                is_member=True,
                 is_admin=True,
                 can_be_edited=bool(member.can_be_edited),
                 can_change_info=creator or bool(member.can_change_info),
@@ -1203,7 +1205,7 @@ def DBObject(
         pyrogram.Message, pyrogram.CallbackQuery, pyrogram.User, pyrogram.Chat
     ],
     client: pyrogram.Client,
-    reply: bool = False,
+    old_seen_message: bool = False,
 ) -> dict:
     """
     Unpack the given object to save them inside the DB
@@ -1219,43 +1221,50 @@ def DBObject(
         if not obj.empty:
             if obj.from_user:
                 DBUser(user=obj.from_user)
-                obj.from_user.settings = UserSettings.get_or_none(
+                obj.from_user.settings: UserSettings = UserSettings.get_or_none(
                     user_id=obj.from_user.id
                 )
 
             if obj.chat.type == "private":
                 DBUser(user=obj.chat)
                 if not client.ME.is_bot:
-                    obj.chat.settings = UserSettings.get_or_none(user_id=obj.chat.id)
+                    obj.chat.settings: UserSettings = UserSettings.get_or_none(
+                        user_id=obj.chat.id
+                    )
                     obj.chat.settings.has_blocked_bot = False
                     obj.chat.settings.save()
                 else:
-                    obj.chat.settings = UserSettings.get_or_none(
+                    obj.chat.settings: UserSettings = UserSettings.get_or_none(
                         user_id=obj.from_user.id
                     )
                     obj.chat.settings.has_blocked_bot = False
                     obj.chat.settings.save()
             else:
                 created = DBChat(chat=obj.chat)
-                obj.chat.settings = ChatSettings.get_or_none(chat_id=obj.chat.id)
+                obj.chat.settings: ChatSettings = ChatSettings.get_or_none(
+                    chat_id=obj.chat.id
+                )
                 if obj.chat.type == "group" or obj.chat.type == "supergroup":
                     if created:
                         try:
                             DBChatAdmins(
-                                chat_id=obj.chat.id, client=client, clean_up=False
+                                client=client, chat_id=obj.chat.id, clean_up=False
                             )
                         except Exception as ex:
                             print(ex)
                             traceback.print_exc()
-                    obj.r_bot_chat = RUserChat.get_or_none(
+                    DBUserChat(user=client.ME, chat=obj.chat)
+                    obj.r_bot_chat: RUserChat = RUserChat.get_or_none(
                         user_id=client.ME.id, chat_id=obj.chat.id
                     )
+                    obj.r_bot_chat.timestamp = datetime.datetime.utcnow()
+                    obj.r_bot_chat.save()
 
             if obj.from_user and (
                 obj.chat.type == "group" or obj.chat.type == "supergroup"
             ):
                 DBUserChat(user=obj.from_user, chat=obj.chat)
-                if not reply:
+                if not old_seen_message:
                     # atomic update
                     RUserChat.update(
                         {
@@ -1266,13 +1275,13 @@ def DBObject(
                         (RUserChat.user == obj.from_user.id)
                         & (RUserChat.chat == obj.chat.id)
                     ).execute()
-                obj.r_user_chat = RUserChat.get_or_none(
+                obj.r_user_chat: RUserChat = RUserChat.get_or_none(
                     user_id=obj.from_user.id, chat_id=obj.chat.id
                 )
 
             if obj.forward_from:
                 DBUser(user=obj.forward_from)
-                obj.forward_from.settings = UserSettings.get_or_none(
+                obj.forward_from.settings: UserSettings = UserSettings.get_or_none(
                     user_id=obj.forward_from.id
                 )
             elif obj.forward_from_chat:
@@ -1280,60 +1289,78 @@ def DBObject(
 
             if obj.service:
                 if obj.new_chat_members:
-                    for i in range(0, len(obj.new_chat_members)):
-                        DBUser(user=obj.new_chat_members[i])
-                        DBUserChat(user=obj.new_chat_members[i], chat=obj.chat)
-                        obj.new_chat_members[i].settings = UserSettings.get_or_none(
-                            user_id=obj.new_chat_members[i].id
+                    for i, user in enumerate(obj.new_chat_members):
+                        DBUser(user=user)
+                        DBUserChat(user=user, chat=obj.chat)
+                        obj.new_chat_members[
+                            i
+                        ].settings: UserSettings = UserSettings.get_or_none(
+                            user_id=user.id
                         )
                 elif obj.left_chat_member:
                     DBUser(user=obj.left_chat_member)
                     DBUserChat(user=obj.left_chat_member, chat=obj.chat)
-                    obj.left_chat_member.settings = UserSettings.get_or_none(
+                    obj.left_chat_member.settings: UserSettings = UserSettings.get_or_none(
                         user_id=obj.left_chat_member.id
                     )
 
             if obj.entities:
-                for i in range(0, len(obj.entities)):
-                    if obj.entities[i].type == "text_mention":
-                        DBUser(user=obj.entities[i].user)
-                        obj.entities[i].user.settings = UserSettings.get_or_none(
-                            user_id=obj.entities[i].user.id
+                for i, entity in enumerate(obj.entities):
+                    if entity.type == "text_mention":
+                        DBUser(user=entity.user)
+                        obj.entities[
+                            i
+                        ].user.settings: UserSettings = UserSettings.get_or_none(
+                            user_id=entity.user.id
                         )
 
             if obj.caption_entities:
-                for entity in obj.caption_entities:
+                for i, entity in enumerate(obj.caption_entities):
                     if entity.type == "text_mention":
                         DBUser(user=entity.user)
-                        obj.entities[i].user.settings = UserSettings.get_or_none(
-                            user_id=obj.entities[i].user.id
+                        obj.caption_entities[
+                            i
+                        ].user.settings: UserSettings = UserSettings.get_or_none(
+                            user_id=entity.user.id
                         )
 
             if obj.reply_to_message:
                 obj.reply_to_message = DBObject(
-                    obj=obj.reply_to_message, client=client, reply=True
+                    obj=obj.reply_to_message, client=client, old_seen_message=True
                 )
     elif isinstance(obj, pyrogram.CallbackQuery):
         if obj.from_user:
             DBUser(user=obj.from_user)
-            obj.from_user.settings = UserSettings.get_or_none(user_id=obj.from_user.id)
+            obj.from_user.settings: UserSettings = UserSettings.get_or_none(
+                user_id=obj.from_user.id
+            )
 
         if obj.message:
-            obj.message = DBObject(obj=obj.message, client=client, reply=True)
+            obj.message = DBObject(
+                obj=obj.message, client=client, old_seen_message=True
+            )
 
         if obj.message.chat.type == "group" or obj.message.chat.type == "supergroup":
             DBUserChat(user=obj.from_user, chat=obj.message.chat)
-            obj.r_user_chat = RUserChat.get_or_none(
+            obj.r_user_chat: RUserChat = RUserChat.get_or_none(
                 user_id=obj.from_user.id, chat_id=obj.message.chat.id
             )
+            obj.r_user_chat.timestamp = datetime.datetime.utcnow()
+            obj.r_user_chat.save()
+            
+            obj.r_bot_chat: RUserChat = RUserChat.get_or_none(
+                user_id=client.ME.id, chat_id=obj.chat.id
+            )
+            obj.r_bot_chat.timestamp = datetime.datetime.utcnow()
+            obj.r_bot_chat.save()
     elif isinstance(obj, pyrogram.User):
         DBUser(user=obj)
-        obj.settings = UserSettings.get_or_none(user_id=obj.id)
+        obj.settings: UserSettings = UserSettings.get_or_none(user_id=obj.id)
     elif isinstance(obj, pyrogram.Chat):
         if obj.type == "private" or obj.type == "bot":
             DBUser(user=obj)
-            obj.settings = UserSettings.get_or_none(user_id=obj.id)
+            obj.settings: UserSettings = UserSettings.get_or_none(user_id=obj.id)
         else:
             DBChat(chat=obj)
-            obj.settings = ChatSettings.get_or_none(chat_id=obj.id)
+            obj.settings: ChatSettings = ChatSettings.get_or_none(chat_id=obj.id)
     return obj
