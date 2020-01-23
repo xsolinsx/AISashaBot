@@ -492,11 +492,9 @@ def CheckGroupMessageTextCaptionName(client: pyrogram.Client, msg: pyrogram.Mess
                     str(msg.chat.id).replace("-100", "").replace("-", "")
                 )
                 for item in msg.chat.settings.whitelisted_chats:
-                    # whitelisted link if the whitelisted_chat_id is equal to the id from the link
+                    # whitelisted link if the whitelisted_chat is equal to the id from the link
                     if link_parameters[1] == int(
-                        str(item.whitelisted_chat_id)
-                        .replace("-100", "")
-                        .replace("-", "")
+                        str(item.whitelisted_chat).replace("-100", "").replace("-", "")
                     ):
                         whitelisted_link = True
 
@@ -534,11 +532,11 @@ def CheckGroupMessageTextCaptionName(client: pyrogram.Client, msg: pyrogram.Mess
                     # whitelisted username if the chat_id is equal to the id of the resolved_obj
                     whitelisted_username = resolved_obj.id == msg.chat.id
                     for item in msg.chat.settings.whitelisted_chats:
-                        # whitelisted username if the whitelisted_chat_id is equal to the id of the resolved_obj
+                        # whitelisted username if the whitelisted_chat is equal to the id of the resolved_obj
                         if int(
                             str(resolved_obj.id).replace("-100", "").replace("-", "")
                         ) == int(
-                            str(item.whitelisted_chat_id)
+                            str(item.whitelisted_chat)
                             .replace("-100", "")
                             .replace("-", "")
                         ):
@@ -573,9 +571,9 @@ def CheckGroupMessageTextCaptionName(client: pyrogram.Client, msg: pyrogram.Mess
                                 str(msg.chat.id).replace("-100", "").replace("-", "")
                             )
                             for item in msg.chat.settings.whitelisted_chats:
-                                # whitelisted link if the whitelisted_chat_id is equal to the id from the link
+                                # whitelisted link if the whitelisted_chat is equal to the id from the link
                                 if link_parameters[1] == int(
-                                    str(item.whitelisted_chat_id)
+                                    str(item.whitelisted_chat)
                                     .replace("-100", "")
                                     .replace("-", "")
                                 ):
@@ -616,13 +614,13 @@ def CheckGroupMessageTextCaptionName(client: pyrogram.Client, msg: pyrogram.Mess
                                 # whitelisted username if the chat_id is equal to the id from the resolved_obj
                                 whitelisted_username = resolved_obj.id == msg.chat.id
                                 for item in msg.chat.settings.whitelisted_chats:
-                                    # whitelisted username if the whitelisted_chat_id is equal to the id from the resolved_obj
+                                    # whitelisted username if the whitelisted_chat is equal to the id from the resolved_obj
                                     if int(
                                         str(resolved_obj.id)
                                         .replace("-100", "")
                                         .replace("-", "")
                                     ) == int(
-                                        str(item.whitelisted_chat_id)
+                                        str(item.whitelisted_chat)
                                         .replace("-100", "")
                                         .replace("-", "")
                                     ):
