@@ -146,15 +146,15 @@ tmp_dicts = dict(
     ),
     # to avoid contacting the admins of a group too much times (just once every X minutes)
     staffContacted=set(
-        # chat_ids = False or True
+        # chat_ids
     ),
     # to avoid flood waits in requesting administrators (just once every X minutes)
     staffUpdated=set(
-        # chat_ids = False or True
+        # chat_ids
     ),
     # to avoid flood waits in requesting members (just once every X minutes)
     membersUpdated=set(
-        # chat_ids = False or True
+        # chat_ids
     ),
 )
 
