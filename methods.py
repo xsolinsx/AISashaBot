@@ -72,7 +72,7 @@ def Info(
                 + _(chat_settings.language, "info_total_messages")
                 + f"{r_target_chat.message_counter}\n"
             )
-            other_info = []
+            other_info = list()
             if r_target_chat.user.is_bot:
                 other_info.append(_(chat_settings.language, "bot").upper())
             # get current chat_member info
@@ -269,6 +269,7 @@ def Invite(
                     )
                     utils.scheduler.add_job(
                         func=Invite,
+                        trigger=DateTrigger(run_date=run_date),
                         kwargs=dict(
                             client=client,
                             executer=executer,
@@ -278,7 +279,6 @@ def Invite(
                             r_target_chat=r_target_chat,
                             chat_settings=chat_settings,
                         ),
-                        trigger=DateTrigger(run_date=run_date),
                     )
                     text = _(
                         chat_settings.language, "tg_flood_wait_X_scheduled_Y"
@@ -351,7 +351,10 @@ def Warn(
                     + "\n"
                 )
                 if r_target_chat.warns >= chat_settings.max_warns:
-                    if chat_settings.max_warns_punishment == 4:
+                    if (
+                        chat_settings.max_warns_punishment
+                        == dictionaries.PUNISHMENT_STRING["temprestrict"]
+                    ):
                         text += Restrict(
                             client=client,
                             executer=executer,
@@ -364,7 +367,10 @@ def Warn(
                             r_target_chat=r_target_chat,
                             chat_settings=chat_settings,
                         )
-                    elif chat_settings.max_warns_punishment == 5:
+                    elif (
+                        chat_settings.max_warns_punishment
+                        == dictionaries.PUNISHMENT_STRING["restrict"]
+                    ):
                         text += Restrict(
                             client=client,
                             executer=executer,
@@ -376,7 +382,10 @@ def Warn(
                             r_target_chat=r_target_chat,
                             chat_settings=chat_settings,
                         )
-                    elif chat_settings.max_warns_punishment == 6:
+                    elif (
+                        chat_settings.max_warns_punishment
+                        == dictionaries.PUNISHMENT_STRING["tempban"]
+                    ):
                         text += Ban(
                             client=client,
                             executer=executer,
@@ -389,7 +398,10 @@ def Warn(
                             r_target_chat=r_target_chat,
                             chat_settings=chat_settings,
                         )
-                    elif chat_settings.max_warns_punishment == 7:
+                    elif (
+                        chat_settings.max_warns_punishment
+                        == dictionaries.PUNISHMENT_STRING["ban"]
+                    ):
                         text += Ban(
                             client=client,
                             executer=executer,
@@ -559,7 +571,10 @@ def Kick(
             text = ""
             try:
                 client.kick_chat_member(
-                    chat_id=chat_id, user_id=target, until_date=int(time.time()) + 35
+                    chat_id=chat_id,
+                    user_id=target,
+                    until_date=int(time.time())
+                    + utils.config["min_temp_punishment_time"],
                 )
             except pyrogram.errors.FloodWait as ex:
                 print(ex)
@@ -567,6 +582,7 @@ def Kick(
                 run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=ex.x)
                 utils.scheduler.add_job(
                     func=Kick,
+                    trigger=DateTrigger(run_date=run_date),
                     kwargs=dict(
                         client=client,
                         executer=executer,
@@ -577,7 +593,6 @@ def Kick(
                         r_target_chat=r_target_chat,
                         chat_settings=chat_settings,
                     ),
-                    trigger=DateTrigger(run_date=run_date),
                 )
                 text = _(chat_settings.language, "tg_flood_wait_X_scheduled_Y").format(
                     ex.x, f"UTC {run_date}"
@@ -660,6 +675,7 @@ def Restrict(
                     )
                     utils.scheduler.add_job(
                         func=Restrict,
+                        trigger=DateTrigger(run_date=run_date),
                         kwargs=dict(
                             client=client,
                             executer=executer,
@@ -671,7 +687,6 @@ def Restrict(
                             r_target_chat=r_target_chat,
                             chat_settings=chat_settings,
                         ),
-                        trigger=DateTrigger(run_date=run_date),
                     )
                     text = _(
                         chat_settings.language, "tg_flood_wait_X_scheduled_Y"
@@ -795,6 +810,7 @@ def Unrestrict(
                 run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=ex.x)
                 utils.scheduler.add_job(
                     func=Unrestrict,
+                    trigger=DateTrigger(run_date=run_date),
                     kwargs=dict(
                         client=client,
                         executer=executer,
@@ -805,7 +821,6 @@ def Unrestrict(
                         r_target_chat=r_target_chat,
                         chat_settings=chat_settings,
                     ),
-                    trigger=DateTrigger(run_date=run_date),
                 )
                 text = _(chat_settings.language, "tg_flood_wait_X_scheduled_Y").format(
                     ex.x, f"UTC {run_date}"
@@ -877,6 +892,7 @@ def Ban(
                     )
                     utils.scheduler.add_job(
                         func=Ban,
+                        trigger=DateTrigger(run_date=run_date),
                         kwargs=dict(
                             client=client,
                             executer=executer,
@@ -888,7 +904,6 @@ def Ban(
                             r_target_chat=r_target_chat,
                             chat_settings=chat_settings,
                         ),
-                        trigger=DateTrigger(run_date=run_date),
                     )
                     text = _(
                         chat_settings.language, "tg_flood_wait_X_scheduled_Y"
@@ -999,6 +1014,7 @@ def Unban(
                 run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=ex.x)
                 utils.scheduler.add_job(
                     func=Unban,
+                    trigger=DateTrigger(run_date=run_date),
                     kwargs=dict(
                         client=client,
                         executer=executer,
@@ -1009,7 +1025,6 @@ def Unban(
                         r_target_chat=r_target_chat,
                         chat_settings=chat_settings,
                     ),
-                    trigger=DateTrigger(run_date=run_date),
                 )
                 text = _(chat_settings.language, "tg_flood_wait_X_scheduled_Y").format(
                     ex.x, f"UTC {run_date}"
@@ -1038,7 +1053,7 @@ def GBan(
     executer: typing.Union[int, str],
     target: typing.Union[int, str],
     chat_id: typing.Union[int, str],
-    seconds: int = 86400,  # 1day
+    seconds: int = utils.config["default_gban"],
     reasons: str = "",
     chat_settings: typing.Union[
         db_management.ChatSettings, db_management.UserSettings
@@ -1095,9 +1110,7 @@ def GBan(
             action=text,
             target=target,
         )
-        SendMessage(
-            client=client, chat_id=utils.config["settings"]["log_chat"], text=text
-        )
+        SendMessage(client=client, chat_id=utils.config["log_chat"], text=text)
         return text
 
 
@@ -1148,9 +1161,7 @@ def Ungban(
             action=text,
             target=target,
         )
-        SendMessage(
-            client=client, chat_id=utils.config["settings"]["log_chat"], text=text
-        )
+        SendMessage(client=client, chat_id=utils.config["log_chat"], text=text)
         return text
 
 
@@ -1159,7 +1170,7 @@ def Block(
     executer: typing.Union[int, str],
     target: typing.Union[int, str],
     chat_id: typing.Union[int, str],
-    seconds: int = 3600,  # 1hour
+    seconds: int = utils.config["default_block"],
     reasons: str = "",
     chat_settings: typing.Union[
         db_management.ChatSettings, db_management.UserSettings
@@ -1209,9 +1220,7 @@ def Block(
             action=text,
             target=target,
         )
-        SendMessage(
-            client=client, chat_id=utils.config["settings"]["log_chat"], text=text
-        )
+        SendMessage(client=client, chat_id=utils.config["log_chat"], text=text)
         return text
 
 
@@ -1262,9 +1271,7 @@ def Unblock(
             action=text,
             target=target,
         )
-        SendMessage(
-            client=client, chat_id=utils.config["settings"]["log_chat"], text=text
-        )
+        SendMessage(client=client, chat_id=utils.config["log_chat"], text=text)
         return text
 
 
@@ -1283,7 +1290,7 @@ def AutoPunish(
     # always executed by bot, never by a user
     if punishment:
         if not reasons:
-            reasons = []
+            reasons = list()
         if isinstance(reasons, str):
             reasons = [reasons]
         # set is used to remove duplicates
@@ -1301,9 +1308,9 @@ def AutoPunish(
         )
 
         now = int(time.time())
-        hashtags = []
+        hashtags = list()
 
-        if punishment >= 1 and message_ids:
+        if punishment > dictionaries.PUNISHMENT_STRING["nothing"] and message_ids:
             # delete
             if isinstance(message_ids, int):
                 message_ids = [message_ids]
@@ -1317,15 +1324,15 @@ def AutoPunish(
                 run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=ex.x)
                 utils.scheduler.add_job(
                     func=client.delete_messages,
-                    kwargs=dict(chat_id=chat_id, message_ids=message_ids),
                     trigger=DateTrigger(run_date=run_date),
+                    kwargs=dict(chat_id=chat_id, message_ids=message_ids),
                 )
                 hashtags.append(f"#scheduleddelete UTC {run_date}")
             except pyrogram.errors.RPCError as ex:
                 print(ex)
                 traceback.print_exc()
                 return _(chat_settings.language, "tg_error_X").format(ex)
-        if punishment >= 2:
+        if punishment > dictionaries.PUNISHMENT_STRING["delete"]:
             # warn
             if chat_settings.max_warns_punishment:
                 if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
@@ -1351,13 +1358,14 @@ def AutoPunish(
                         reasons.append("max_warns_reached")
                         r_target_chat.warns = 0
                         r_target_chat.save()
-        if punishment == 3:
-            # kick
+        if punishment == dictionaries.PUNISHMENT_STRING["kick"]:
             if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
                 # if user has not been kicked
                 try:
                     client.kick_chat_member(
-                        chat_id=chat_id, user_id=target, until_date=now + 35
+                        chat_id=chat_id,
+                        user_id=target,
+                        until_date=now + utils.config["min_temp_punishment_time"],
                     )
                     hashtags.append("#kick")
                 except pyrogram.errors.FloodWait as ex:
@@ -1368,6 +1376,7 @@ def AutoPunish(
                     )
                     utils.scheduler.add_job(
                         func=Kick,
+                        trigger=DateTrigger(run_date=run_date),
                         kwargs=dict(
                             client=client,
                             executer=client.ME.id,
@@ -1377,7 +1386,6 @@ def AutoPunish(
                             r_target_chat=r_target_chat,
                             chat_settings=chat_settings,
                         ),
-                        trigger=DateTrigger(run_date=run_date),
                     )
                     hashtags.append(f"#scheduledkick UTC {run_date}")
                 except pyrogram.errors.RPCError as ex:
@@ -1387,7 +1395,7 @@ def AutoPunish(
                 else:
                     r_target_chat.is_member = False
                     r_target_chat.save()
-        elif punishment == 4:
+        elif punishment == dictionaries.PUNISHMENT_STRING["temprestrict"]:
             # temprestrict
             if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
                 # if user has not been kicked
@@ -1417,13 +1425,13 @@ def AutoPunish(
                     until_date += ex.x
                     utils.scheduler.add_job(
                         func=client.restrict_chat_member,
+                        trigger=DateTrigger(run_date=run_date),
                         kwargs=dict(
                             chat_id=chat_id,
                             user_id=target,
                             permissions=pyrogram.ChatPermissions(),
                             until_date=until_date,
                         ),
-                        trigger=DateTrigger(run_date=run_date),
                     )
                     hashtags.append(
                         f"#scheduledtemprestrict UTC {run_date} "
@@ -1434,7 +1442,7 @@ def AutoPunish(
                     print(ex)
                     traceback.print_exc()
                     return _(chat_settings.language, "tg_error_X").format(ex)
-        elif punishment == 5:
+        elif punishment == dictionaries.PUNISHMENT_STRING["restrict"]:
             # restrict
             if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
                 # if user has not been kicked
@@ -1453,19 +1461,19 @@ def AutoPunish(
                     )
                     utils.scheduler.add_job(
                         func=client.restrict_chat_member,
+                        trigger=DateTrigger(run_date=run_date),
                         kwargs=dict(
                             chat_id=chat_id,
                             user_id=target,
                             permissions=pyrogram.ChatPermissions(),
                         ),
-                        trigger=DateTrigger(run_date=run_date),
                     )
                     hashtags.append(f"#scheduledrestrict UTC {run_date}")
                 except pyrogram.errors.RPCError as ex:
                     print(ex)
                     traceback.print_exc()
                     return _(chat_settings.language, "tg_error_X").format(ex)
-        elif punishment == 6:
+        elif punishment == dictionaries.PUNISHMENT_STRING["tempban"]:
             # tempban
             if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
                 # if user has not been kicked
@@ -1492,6 +1500,7 @@ def AutoPunish(
                     until_date += ex.x
                     utils.scheduler.add_job(
                         func=Ban,
+                        trigger=DateTrigger(run_date=run_date),
                         kwargs=dict(
                             client=client,
                             executer=client.ME.id,
@@ -1502,7 +1511,6 @@ def AutoPunish(
                             r_target_chat=r_target_chat,
                             chat_settings=chat_settings,
                         ),
-                        trigger=DateTrigger(run_date=run_date),
                     )
                     hashtags.append(
                         f"#scheduledtempban UTC {run_date} "
@@ -1516,7 +1524,7 @@ def AutoPunish(
                 else:
                     r_target_chat.is_member = False
                     r_target_chat.save()
-        elif punishment == 7:
+        elif punishment == dictionaries.PUNISHMENT_STRING["ban"]:
             # ban
             if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
                 # if user has not been kicked
@@ -1531,6 +1539,7 @@ def AutoPunish(
                     )
                     utils.scheduler.add_job(
                         func=Ban,
+                        trigger=DateTrigger(run_date=run_date),
                         kwargs=dict(
                             client=client,
                             executer=client.ME.id,
@@ -1540,7 +1549,6 @@ def AutoPunish(
                             r_target_chat=r_target_chat,
                             chat_settings=chat_settings,
                         ),
-                        trigger=DateTrigger(run_date=run_date),
                     )
                     hashtags.append(f"#scheduledban UTC {run_date}")
                 except pyrogram.errors.RPCError as ex:
@@ -1565,7 +1573,7 @@ def AutoPunish(
             action=text,
             target=target,
             # don't send messages to log_channel for deletions
-            log_channel_notice=punishment > 1,
+            log_channel_notice=punishment > dictionaries.PUNISHMENT_STRING["delete"],
         )
         if (
             auto_group_notice
@@ -1574,7 +1582,7 @@ def AutoPunish(
             and chat_settings.group_notices <= punishment
             and target not in utils.tmp_dicts["kickedPeople"][chat_id]
         ):
-            if punishment > 2:
+            if punishment > dictionaries.PUNISHMENT_STRING["warn"]:
                 # kick^
                 utils.tmp_dicts["kickedPeople"][chat_id].add(target)
             SendMessage(client=client, chat_id=chat_id, text=text)
@@ -1619,7 +1627,7 @@ def SendLog(
 ) -> typing.Union[pyrogram.Message, None]:
     try:
         return client.send_message(
-            chat_id=utils.config["settings"]["log_chat"],
+            chat_id=utils.config["log_chat"],
             text=text,
             parse_mode=parse_mode,
             disable_web_page_preview=disable_web_page_preview,
@@ -1634,6 +1642,7 @@ def SendLog(
         run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=ex.x)
         utils.scheduler.add_job(
             func=SendLog,
+            trigger=DateTrigger(run_date=run_date),
             kwargs=dict(
                 client=client,
                 text=text,
@@ -1644,7 +1653,6 @@ def SendLog(
                 schedule_date=schedule_date,
                 reply_markup=reply_markup,
             ),
-            trigger=DateTrigger(run_date=run_date),
         )
     except pyrogram.errors.RPCError as ex:
         print(ex)
@@ -1686,12 +1694,11 @@ def SendMessage(
         chat_settings.save()
         if (
             chat_settings.forbidden_writing_counter
-            >= utils.config["settings"]["max_forbidden_writing_counter"]
+            >= utils.config["max_forbidden_writing_counter"]
         ):
             client.leave_chat(chat_id=chat_id)
         client.send_message(
-            chat_id=utils.config["settings"]["log_chat"],
-            text=_("en", "tg_error_X").format(ex),
+            chat_id=utils.config["log_chat"], text=_("en", "tg_error_X").format(ex),
         )
     except pyrogram.errors.UserIsBlocked as ex:
         print(ex)
@@ -1727,6 +1734,9 @@ def SendMessage(
             traceback.print_exc()
             utils.scheduler.add_job(
                 func=SendMessage,
+                trigger=DateTrigger(
+                    run_date=datetime.datetime.now() + datetime.timedelta(seconds=ex.x)
+                ),
                 kwargs=dict(
                     client=client,
                     chat_id=chat_id,
@@ -1737,9 +1747,6 @@ def SendMessage(
                     reply_to_message_id=reply_to_message_id,
                     schedule_date=schedule_date,
                     reply_markup=reply_markup,
-                ),
-                trigger=DateTrigger(
-                    run_date=datetime.datetime.now() + datetime.timedelta(seconds=ex.x)
                 ),
             )
         except pyrogram.errors.RPCError as ex:
@@ -1786,12 +1793,11 @@ def ReplyText(
         msg.chat.settings.save()
         if (
             msg.chat.settings.forbidden_writing_counter
-            >= utils.config["settings"]["max_forbidden_writing_counter"]
+            >= utils.config["max_forbidden_writing_counter"]
         ):
             client.leave_chat(chat_id=msg.chat.id)
         client.send_message(
-            chat_id=utils.config["settings"]["log_chat"],
-            text=_("en", "tg_error_X").format(ex),
+            chat_id=utils.config["log_chat"], text=_("en", "tg_error_X").format(ex),
         )
     except pyrogram.errors.RPCError as ex:
         print(ex)
@@ -1818,6 +1824,9 @@ def ReplyText(
             traceback.print_exc()
             utils.scheduler.add_job(
                 func=ReplyText,
+                trigger=DateTrigger(
+                    run_date=datetime.datetime.now() + datetime.timedelta(seconds=ex.x)
+                ),
                 kwargs=dict(
                     client=client,
                     msg=msg,
@@ -1827,9 +1836,6 @@ def ReplyText(
                     disable_notification=disable_notification,
                     reply_to_message_id=reply_to_message_id,
                     reply_markup=reply_markup,
-                ),
-                trigger=DateTrigger(
-                    run_date=datetime.datetime.now() + datetime.timedelta(seconds=ex.x)
                 ),
             )
         except pyrogram.errors.RPCError as ex:
@@ -1873,12 +1879,11 @@ def ReplyPhoto(
         msg.chat.settings.save()
         if (
             msg.chat.settings.forbidden_writing_counter
-            >= utils.config["settings"]["max_forbidden_writing_counter"]
+            >= utils.config["max_forbidden_writing_counter"]
         ):
             client.leave_chat(chat_id=msg.chat.id)
         client.send_message(
-            chat_id=utils.config["settings"]["log_chat"],
-            text=_("en", "tg_error_X").format(ex),
+            chat_id=utils.config["log_chat"], text=_("en", "tg_error_X").format(ex),
         )
     except pyrogram.errors.RPCError as ex:
         print(ex)
@@ -1905,6 +1910,9 @@ def ReplyPhoto(
             traceback.print_exc()
             utils.scheduler.add_job(
                 func=ReplyPhoto,
+                trigger=DateTrigger(
+                    run_date=datetime.datetime.now() + datetime.timedelta(seconds=ex.x)
+                ),
                 kwargs=dict(
                     client=client,
                     msg=msg,
@@ -1914,9 +1922,6 @@ def ReplyPhoto(
                     disable_notification=disable_notification,
                     reply_to_message_id=reply_to_message_id,
                     reply_markup=reply_markup,
-                ),
-                trigger=DateTrigger(
-                    run_date=datetime.datetime.now() + datetime.timedelta(seconds=ex.x)
                 ),
             )
         except pyrogram.errors.RPCError as ex:
@@ -1968,12 +1973,11 @@ def SendDocument(
         chat_settings.save()
         if (
             chat_settings.forbidden_writing_counter
-            >= utils.config["settings"]["max_forbidden_writing_counter"]
+            >= utils.config["max_forbidden_writing_counter"]
         ):
             client.leave_chat(chat_id=chat_id)
         client.send_message(
-            chat_id=utils.config["settings"]["log_chat"],
-            text=_("en", "tg_error_X").format(ex),
+            chat_id=utils.config["log_chat"], text=_("en", "tg_error_X").format(ex),
         )
     except pyrogram.errors.RPCError as ex:
         print(ex)
@@ -2006,6 +2010,9 @@ def SendDocument(
             traceback.print_exc()
             utils.scheduler.add_job(
                 func=SendDocument,
+                trigger=DateTrigger(
+                    run_date=datetime.datetime.now() + datetime.timedelta(seconds=ex.x)
+                ),
                 kwargs=dict(
                     client=client,
                     chat_id=chat_id,
@@ -2018,9 +2025,6 @@ def SendDocument(
                     reply_markup=reply_markup,
                     progress=progress,
                     progress_args=progress_args,
-                ),
-                trigger=DateTrigger(
-                    run_date=datetime.datetime.now() + datetime.timedelta(seconds=ex.x)
                 ),
             )
         except pyrogram.errors.RPCError as ex:
@@ -2069,12 +2073,11 @@ def ReplyDocument(
         msg.chat.settings.save()
         if (
             msg.chat.settings.forbidden_writing_counter
-            >= utils.config["settings"]["max_forbidden_writing_counter"]
+            >= utils.config["max_forbidden_writing_counter"]
         ):
             client.leave_chat(chat_id=msg.chat.id)
         client.send_message(
-            chat_id=utils.config["settings"]["log_chat"],
-            text=_("en", "tg_error_X").format(ex),
+            chat_id=utils.config["log_chat"], text=_("en", "tg_error_X").format(ex),
         )
     except pyrogram.errors.RPCError as ex:
         print(ex)
@@ -2103,6 +2106,9 @@ def ReplyDocument(
             traceback.print_exc()
             utils.scheduler.add_job(
                 func=ReplyDocument,
+                trigger=DateTrigger(
+                    run_date=datetime.datetime.now() + datetime.timedelta(seconds=ex.x)
+                ),
                 kwargs=dict(
                     client=client,
                     msg=msg,
@@ -2114,9 +2120,6 @@ def ReplyDocument(
                     reply_markup=reply_markup,
                     progress=progress,
                     progress_args=progress_args,
-                ),
-                trigger=DateTrigger(
-                    run_date=datetime.datetime.now() + datetime.timedelta(seconds=ex.x)
                 ),
             )
         except pyrogram.errors.RPCError as ex:
@@ -2134,7 +2137,7 @@ def ReplyDocument(
 
 
 def SendBackup(client: pyrogram.Client):
-    tmp_msgs = {}
+    tmp_msgs = dict()
     for id_ in utils.config["masters"]:
         try:
             tmp_msgs[id_] = client.send_message(

@@ -58,7 +58,7 @@ print(
     )
 )
 
-loaded_plugins = []
+loaded_plugins = list()
 for dirpath, dirnames, filenames in os.walk(BOT_CLIENT.plugins["root"]):
     # filter out __pycache__ folders
     if "__pycache__" not in dirpath:
@@ -90,9 +90,7 @@ utils.Log(
 )
 # schedule backup at 04:00 with a random delay between ± 10 minutes
 utils.scheduler.add_job(
-    methods.SendBackup,
-    kwargs=dict(client=BOT_CLIENT),
-    trigger=CronTrigger(hour=4, jitter=600),
+    methods.SendBackup, trigger=CronTrigger(hour=4, jitter=600), args=(BOT_CLIENT,),
 )
 BOT_CLIENT.idle()
 BOT_CLIENT.stop()

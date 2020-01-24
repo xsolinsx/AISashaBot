@@ -16,19 +16,6 @@ import utils
 
 _ = utils.GetLocalizedString
 
-greetings = {}
-
-
-def InstantiateGreetings(chat_id: int):
-    if chat_id not in greetings:
-        greetings[chat_id] = {}
-    if "counter" not in greetings[chat_id]:
-        greetings[chat_id]["counter"] = 0
-    if "last_welcome" not in greetings[chat_id]:
-        greetings[chat_id]["last_welcome"] = 0
-    if "last_goodbye" not in greetings[chat_id]:
-        greetings[chat_id]["last_goodbye"] = 0
-
 
 @pyrogram.Client.on_message(pyrogram.Filters.new_chat_members, group=-5)
 def SendWelcome(client: pyrogram.Client, msg: pyrogram.Message):
@@ -47,9 +34,12 @@ def SendWelcome(client: pyrogram.Client, msg: pyrogram.Message):
             for x in msg.new_chat_members
             if not x.is_bot and x.id not in utils.tmp_dicts["kickedPeople"][msg.chat.id]
         ]
-        InstantiateGreetings(chat_id=msg.chat.id)
-        greetings[msg.chat.id]["counter"] += len(members_to_welcome)
-        if greetings[msg.chat.id]["counter"] >= msg.chat.settings.welcome_members:
+        utils.InstantiateGreetingsDictionary(chat_id=msg.chat.id)
+        utils.tmp_dicts["greetings"][msg.chat.id]["counter"] += len(members_to_welcome)
+        if (
+            utils.tmp_dicts["greetings"][msg.chat.id]["counter"]
+            >= msg.chat.settings.welcome_members
+        ):
             welcome_buttons = (
                 msg.chat.settings.extras.where(
                     (db_management.ChatExtras.key == "welcome_buttons")
@@ -78,12 +68,12 @@ def SendWelcome(client: pyrogram.Client, msg: pyrogram.Message):
                     msg.chat.settings.save()
                     if (
                         msg.chat.settings.forbidden_writing_counter
-                        >= utils.config["settings"]["max_forbidden_writing_counter"]
+                        >= utils.config["max_forbidden_writing_counter"]
                     ):
                         client.leave_chat(chat_id=msg.chat.id)
                     methods.SendMessage(
                         client=client,
-                        chat_id=utils.config["settings"]["log_chat"],
+                        chat_id=utils.config["log_chat"],
                         text=_("en", "tg_error_X").format(ex),
                     )
                 except pyrogram.errors.RPCError as ex:
@@ -136,13 +126,17 @@ def SendWelcome(client: pyrogram.Client, msg: pyrogram.Message):
                         parse_mode="html",
                     )
             if tmp:
-                if greetings[msg.chat.id]["last_welcome"]:
+                if utils.tmp_dicts["greetings"][msg.chat.id]["last_welcome"]:
                     client.delete_messages(
                         chat_id=msg.chat.id,
-                        message_ids=greetings[msg.chat.id]["last_welcome"],
+                        message_ids=utils.tmp_dicts["greetings"][msg.chat.id][
+                            "last_welcome"
+                        ],
                     )
-                greetings[msg.chat.id]["counter"] = 0
-                greetings[msg.chat.id]["last_welcome"] = tmp.message_id
+                utils.tmp_dicts["greetings"][msg.chat.id]["counter"] = 0
+                utils.tmp_dicts["greetings"][msg.chat.id][
+                    "last_welcome"
+                ] = tmp.message_id
     msg.continue_propagation()
 
 
@@ -157,7 +151,7 @@ def SendGoodbye(client: pyrogram.Client, msg: pyrogram.Message):
         .value
     )
     if goodbye:
-        InstantiateGreetings(chat_id=msg.chat.id)
+        utils.InstantiateGreetingsDictionary(chat_id=msg.chat.id)
         tmp = None
         if goodbye.startswith("###"):
             goodbye = goodbye.split("$")
@@ -178,12 +172,12 @@ def SendGoodbye(client: pyrogram.Client, msg: pyrogram.Message):
                     msg.chat.settings.save()
                     if (
                         msg.chat.settings.forbidden_writing_counter
-                        >= utils.config["settings"]["max_forbidden_writing_counter"]
+                        >= utils.config["max_forbidden_writing_counter"]
                     ):
                         client.leave_chat(chat_id=msg.chat.id)
                     methods.SendMessage(
                         client=client,
-                        chat_id=utils.config["settings"]["log_chat"],
+                        chat_id=utils.config["log_chat"],
                         text=_("en", "tg_error_X").format(ex),
                     )
                 except pyrogram.errors.RPCError as ex:
@@ -219,12 +213,14 @@ def SendGoodbye(client: pyrogram.Client, msg: pyrogram.Message):
                 parse_mode="html",
             )
         if tmp:
-            if greetings[msg.chat.id]["last_goodbye"]:
+            if utils.tmp_dicts["greetings"][msg.chat.id]["last_goodbye"]:
                 client.delete_messages(
                     chat_id=msg.chat.id,
-                    message_ids=greetings[msg.chat.id]["last_goodbye"],
+                    message_ids=utils.tmp_dicts["greetings"][msg.chat.id][
+                        "last_goodbye"
+                    ],
                 )
-            greetings[msg.chat.id]["last_goodbye"] = tmp.message_id
+            utils.tmp_dicts["greetings"][msg.chat.id]["last_goodbye"] = tmp.message_id
     msg.continue_propagation()
 
 
@@ -246,7 +242,7 @@ def SendGoodbye(client: pyrogram.Client, msg: pyrogram.Message):
     )
 )
 def CbQrySettingsMenu(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
-    parameters = []
+    parameters = list()
     if len(cb_qry.data.split(" ")) > 1 and utils.IsInt(cb_qry.data.split(" ")[1]):
         parameters = cb_qry.data.split(" ")
     else:
@@ -402,7 +398,9 @@ def CbQrySettingsLanguageChange(
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
             text=_(cb_qry.from_user.settings.language, "selected_language").format(
-                utils.GetLanguageFlag(chat_settings.language)
+                dictionaries.LANGUAGE_EMOJI.get(
+                    chat_settings.language, pyrogram.Emoji.PIRATE_FLAG
+                )
             ),
             show_alert=True,
         )
@@ -1582,8 +1580,7 @@ def CbQrySettingsWelcomeMembersPlusMinus(
             chat_settings.welcome_members = max(chat_settings.welcome_members - 1, 0)
         elif "++" in cb_qry.data:
             chat_settings.welcome_members = min(
-                chat_settings.welcome_members + 1,
-                utils.config["settings"]["max_welcome_members"],
+                chat_settings.welcome_members + 1, utils.config["max_welcome_members"],
             )
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
@@ -1639,7 +1636,7 @@ def CbQrySettingsMaxInvitesPlusMinus(
             chat_settings.max_invites = max(chat_settings.max_invites - 1, 0)
         elif "++" in cb_qry.data:
             chat_settings.max_invites = min(
-                chat_settings.max_invites + 1, utils.config["settings"]["max_invites"]
+                chat_settings.max_invites + 1, utils.config["max_invites"]
             )
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
@@ -1692,13 +1689,11 @@ def CbQrySettingsMaxFloodTimePlusMinus(
     if utils.IsSeniorModOrHigher(user_id=cb_qry.from_user.id, chat_id=chat_id):
         if "--" in cb_qry.data:
             chat_settings.max_flood_time = max(
-                chat_settings.max_flood_time - 1,
-                utils.config["settings"]["min_flood_time"],
+                chat_settings.max_flood_time - 1, utils.config["min_flood_time"],
             )
         elif "++" in cb_qry.data:
             chat_settings.max_flood_time = min(
-                chat_settings.max_flood_time + 1,
-                utils.config["settings"]["max_flood_time"],
+                chat_settings.max_flood_time + 1, utils.config["max_flood_time"],
             )
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
@@ -1749,11 +1744,11 @@ def CbQrySettingsMaxFloodPlusMinus(
     if utils.IsSeniorModOrHigher(user_id=cb_qry.from_user.id, chat_id=chat_id):
         if "--" in cb_qry.data:
             chat_settings.max_flood = max(
-                chat_settings.max_flood - 1, utils.config["settings"]["min_flood"]
+                chat_settings.max_flood - 1, utils.config["min_flood"]
             )
         elif "++" in cb_qry.data:
             chat_settings.max_flood = min(
-                chat_settings.max_flood + 1, utils.config["settings"]["max_flood"]
+                chat_settings.max_flood + 1, utils.config["max_flood"]
             )
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
@@ -1806,7 +1801,7 @@ def CbQrySettingsMaxWarnsPlusMinus(
             chat_settings.max_warns = max(chat_settings.max_warns - 1, 1)
         elif "++" in cb_qry.data:
             chat_settings.max_warns = min(
-                chat_settings.max_warns + 1, utils.config["settings"]["max_warns"]
+                chat_settings.max_warns + 1, utils.config["max_warns"]
             )
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
@@ -1876,7 +1871,10 @@ def CbQrySettingsModifyTempPunishmentTime(
         elif match[2] == "seconds":
             seconds = int(match[3])
         max_temp_punishment_time += seconds
-        if max_temp_punishment_time < 35 or max_temp_punishment_time > 31622400:
+        if (
+            max_temp_punishment_time < utils.config["min_temp_punishment_time"]
+            or max_temp_punishment_time > utils.config["max_temp_punishment_time"]
+        ):
             setattr(chat_settings, match[1], 0)
             max_temp_punishment_time = 0
             methods.CallbackQueryAnswer(
@@ -2213,7 +2211,7 @@ def CmdStaff(client: pyrogram.Client, msg: pyrogram.Message):
         (db_management.RUserChat.chat_id == msg.chat.id)
         & (db_management.RUserChat.rank > 1)
     ).order_by(db_management.RUserChat.rank.desc())
-    already_listed = []
+    already_listed = list()
     text = (
         _(msg.chat.settings.language, "staff").upper()
         + f" {utils.PrintChat(chat=msg.chat)}\n\n\n"
@@ -2289,7 +2287,7 @@ def CmdStaffChat(client: pyrogram.Client, msg: pyrogram.Message):
                 (db_management.RUserChat.chat_id == chat_id)
                 & (db_management.RUserChat.rank > 1)
             ).order_by(db_management.RUserChat.rank.desc())
-            already_listed = []
+            already_listed = list()
             text = (
                 _(chat_settings.language, "staff").upper()
                 + f" {utils.PrintChat(chat=chat_settings.chat)}\n\n\n"
@@ -2398,6 +2396,12 @@ def CmdSyncAdmins(client: pyrogram.Client, msg: pyrogram.Message):
                     msg=msg,
                     text=_(msg.chat.settings.language, "admins_updated"),
                 )
+        else:
+            methods.ReplyText(
+                client=client,
+                msg=msg,
+                text=_(msg.chat.settings.language, "command_cooldown"),
+            )
 
 
 @pyrogram.Client.on_message(
@@ -2451,6 +2455,12 @@ def CmdSyncAdminsChat(client: pyrogram.Client, msg: pyrogram.Message):
                             msg=msg,
                             text=_(chat_settings.language, "admins_updated"),
                         )
+                else:
+                    methods.ReplyText(
+                        client=client,
+                        msg=msg,
+                        text=_(msg.chat.settings.language, "command_cooldown"),
+                    )
         else:
             methods.ReplyText(
                 client=client,
@@ -2473,8 +2483,8 @@ def CmdAdmins(client: pyrogram.Client, msg: pyrogram.Message):
             & (db_management.RUserChat.rank > 1)
         ).order_by(db_management.RUserChat.rank.desc())
 
-        admins = []
-        cant_contact = []
+        admins = list()
+        cant_contact = list()
         text = (
             _(msg.chat.settings.language, "chat")
             + f": {utils.PrintChat(chat=msg.chat)}\n"
@@ -2902,12 +2912,12 @@ def CbQryCensorshipsGet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery)
                     chat_settings.save()
                     if (
                         chat_settings.forbidden_writing_counter
-                        >= utils.config["settings"]["max_forbidden_writing_counter"]
+                        >= utils.config["max_forbidden_writing_counter"]
                     ):
                         client.leave_chat(chat_id=cb_qry.message.chat.id)
                     methods.SendMessage(
                         client=client,
-                        chat_id=utils.config["settings"]["log_chat"],
+                        chat_id=utils.config["log_chat"],
                         text=_("en", "tg_error_X").format(ex),
                     )
                 except pyrogram.errors.RPCError as ex:
@@ -4508,12 +4518,10 @@ def CbQryLogsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         page = keyboards.AdjustPage(
             page=page,
             max_n=len(query),
-            max_items_page=utils.config["settings"]["max_items_keyboard"],
+            max_items_page=utils.config["max_items_keyboard"],
         )
-        begin = page * utils.config["settings"]["max_items_keyboard"]
-        end = min(
-            len(query), (page + 1) * utils.config["settings"]["max_items_keyboard"]
-        )
+        begin = page * utils.config["max_items_keyboard"]
+        end = min(len(query), (page + 1) * utils.config["max_items_keyboard"])
         query = query[begin:end]
         text = (
             _(chat_settings.language, "logs_of_X").format(
@@ -4573,7 +4581,7 @@ def CmdLog(client: pyrogram.Client, msg: pyrogram.Message):
         query: peewee.ModelSelect() = db_management.Logs.select().where(
             db_management.Logs.chat_id == msg.chat.id
         ).order_by(db_management.Logs.timestamp.desc())
-        query = query[0 : utils.config["settings"]["max_items_keyboard"]]
+        query = query[0 : utils.config["max_items_keyboard"]]
         text = (
             _(msg.chat.settings.language, "logs_of_X").format(
                 html.escape(utils.PrintChat(chat=msg.chat))
@@ -4648,7 +4656,7 @@ def CmdLogChat(client: pyrogram.Client, msg: pyrogram.Message):
                 query: peewee.ModelSelect() = db_management.Logs.select().where(
                     db_management.Logs.chat_id == chat_id
                 ).order_by(db_management.Logs.timestamp.desc())
-                query = query[0 : utils.config["settings"]["max_items_keyboard"]]
+                query = query[0 : utils.config["max_items_keyboard"]]
                 text = (
                     _(chat_settings.language, "logs_of_X").format(
                         html.escape(utils.PrintChat(chat=chat_settings.chat))

@@ -2,7 +2,6 @@ import base64
 import datetime
 import glob
 import html
-import io
 import json
 import math
 import os
@@ -17,7 +16,9 @@ import typing
 import peewee
 import pyrogram
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
+from apscheduler.triggers.interval import IntervalTrigger
 
 import db_management
 import dictionaries
@@ -97,28 +98,109 @@ with open(file="config.json", encoding="utf-8") as f:
 
 
 # temp dictionary for commands that requires more than one interaction to complete (e.g. set welcome via keyboard or)
-tmp_steps = {
-    # chat_id = { generic unspecified data }
-}
+tmp_steps = dict(
+    # chat_id = generic unspecified data, usually tuple( original_cb_qry, variable )
+)
 
 
-# CLEAN EVERY X MINUTES (WRITTEN IN CONFIG.JSON)
 tmp_dicts = dict(
-    # temp dictionary to stop automatic punishments of user after kick^ (stopping flood or other things)
+    # to stop automatic punishments of user after kick^ (stopping flood or other things)
     kickedPeople=dict(
-        # chat_id = set( user_ids )
+        # chat_id = set(user_ids)
     ),
-    # temp dictionary to not invite the same user again and again (just once every X minutes or if (s)he is kicked)
+    # to not invite the same user again and again (just once every X minutes or if (s)he is kicked)
     invitedPeople=dict(
-        # chat_id = set( user_ids )
+        # chat_id = set(user_ids)
     ),
+    # to prevent shitstorms using messages hashes
+    msgsHashes=dict(
+        # chat_id = dict(
+        #   msgTextHash or mediaId = list(msg_dates)
+        # )
+    ),
+    # to prevent flooding
+    flood=dict(
+        # chat_id = dict(
+        #   user_id = dict(
+        #       cb_qrs_times = list(cb_qry_dates),
+        #       cb_qrs_flood_wait_expiry_date = 0,
+        #       cb_qrs_previous_flood_wait = 0,
+        #       msgs_times = list(msg_dates)
+        #   )
+        # )
+    ),
+    punishments=dict(
+        # chat_id = dict(
+        #   msg.message_id or cb_qry.id = dict(
+        #       punishment = 0,
+        #       reasons = list()
+        #   )
+        # )
+    ),
+    greetings=dict(
+        # chat_id = dict(
+        #   counter = 0,
+        #   last_welcome = last_welcome_msg_id,
+        #   last_goodbye = last_goodbye_msg_id
+        # )
+    ),
+    # to avoid contacting the admins of a group too much times (just once every X minutes)
     staffContacted=set(
-        # chat_ids
+        # chat_ids = False or True
     ),
+    # to avoid flood waits in requesting administrators (just once every X minutes)
     staffUpdated=set(
-        # chat_ids = false/true
+        # chat_ids = False or True
     ),
-    timestamp=time.time(),
+    # to avoid flood waits in requesting members (just once every X minutes)
+    membersUpdated=set(
+        # chat_ids = False or True
+    ),
+)
+
+
+def CleanTempVariable(identifier: str, value: typing.Union[dict, set]):
+    tmp_dicts[identifier] = value
+
+
+# CRON JOBS
+# every day at 3:00
+scheduler.add_job(
+    CleanTempVariable, trigger=CronTrigger(hour=3), args=("msgsHashes", dict()),
+)
+scheduler.add_job(
+    CleanTempVariable, trigger=CronTrigger(hour=3), args=("flood", dict())
+)
+scheduler.add_job(
+    CleanTempVariable, trigger=CronTrigger(hour=3), args=("punishments", dict()),
+)
+scheduler.add_job(
+    CleanTempVariable, trigger=CronTrigger(hour=3), args=("greetings", dict()),
+)
+# every sharp hour
+scheduler.add_job(
+    CleanTempVariable, trigger=CronTrigger(minute=0), args=("membersUpdated", set()),
+)
+# INTERVAL JOBS, see config.json for specific intervals
+scheduler.add_job(
+    CleanTempVariable,
+    trigger=IntervalTrigger(seconds=config["tmp_dicts_expiration"]["kickedPeople"]),
+    args=("kickedPeople", dict()),
+)
+scheduler.add_job(
+    CleanTempVariable,
+    trigger=IntervalTrigger(seconds=config["tmp_dicts_expiration"]["invitedPeople"]),
+    args=("invitedPeople", dict()),
+)
+scheduler.add_job(
+    CleanTempVariable,
+    trigger=IntervalTrigger(seconds=config["tmp_dicts_expiration"]["staffContacted"]),
+    args=("staffContacted", set()),
+)
+scheduler.add_job(
+    CleanTempVariable,
+    trigger=IntervalTrigger(seconds=config["tmp_dicts_expiration"]["staffUpdated"]),
+    args=("staffUpdated", set()),
 )
 
 
@@ -134,18 +216,49 @@ def InstantiateInvitedPeopleDictionary(chat_id: int):
         tmp_dicts["invitedPeople"][chat_id] = set()
 
 
-def CleanTempDictionaries():
-    global tmp_dicts
-    if (
-        time.time() - tmp_dicts["timestamp"]
-        >= config["settings"]["temp_dictionaries_expiration"]
-    ):
-        tmp_dicts = dict(
-            kickedPeople=dict(),
-            invitedPeople=dict(),
-            staffContacted=set(),
-            staffUpdated=set(),
-            timestamp=time.time(),
+def InstantiateMsgsHashesDictionary(chat_id: int, msg_hash: str):
+    # if chat_id not registered into the msgsHashes dictionary register it
+    if chat_id not in tmp_dicts["msgsHashes"]:
+        tmp_dicts["msgsHashes"][chat_id] = dict()
+    if msg_hash not in tmp_dicts["msgsHashes"][chat_id]:
+        tmp_dicts["msgsHashes"][chat_id][msg_hash] = list()
+
+
+def InstantiateFloodDictionary(chat_id: int, user_id: int):
+    # if chat_id not registered into the flood dictionary register it
+    if chat_id not in tmp_dicts["flood"]:
+        tmp_dicts["flood"][chat_id] = dict()
+    if user_id not in tmp_dicts["flood"][chat_id]:
+        tmp_dicts["flood"][chat_id][user_id] = dict(
+            cb_qrs_times=list(),
+            cb_qrs_flood_wait_expiry_date=0,
+            # from 0 to X minutes of wait depending on how much of an idiot is the user
+            cb_qrs_previous_flood_wait=0,
+            # no warned parameter for callback_queries because they have no limit, just one per query and that's all
+            msgs_times=list(),
+        )
+
+
+def InstantiatePunishmentDictionary(chat_id: int, id_: int):
+    # if chat_id not registered into the punishments dictionary register it
+    if chat_id not in tmp_dicts["punishments"]:
+        tmp_dicts["punishments"][chat_id] = dict()
+    if id_ not in tmp_dicts["punishments"][chat_id]:
+        tmp_dicts["punishments"][chat_id][id_] = dict(punishment=0, reasons=list())
+
+
+def ChangePunishmentAddReason(chat_id: int, id_: int, punishment: int, reason: str):
+    tmp_dicts["punishments"][chat_id][id_]["punishment"] = max(
+        punishment, tmp_dicts["punishments"][chat_id][id_]["punishment"]
+    )
+    tmp_dicts["punishments"][chat_id][id_]["reasons"].append(reason)
+    return tmp_dicts["punishments"][chat_id][id_]["punishment"]
+
+
+def InstantiateGreetingsDictionary(chat_id: int):
+    if chat_id not in tmp_dicts["greetings"]:
+        tmp_dicts["greetings"][chat_id] = dict(
+            counter=0, last_welcome=0, last_goodbye=0
         )
 
 
@@ -261,15 +374,6 @@ def PrintCallbackQuery(cb_qry: pyrogram.CallbackQuery) -> str:
         string += f" {cb_qry.data}"
         return string
     return str(None)
-
-
-def GetLanguageFlag(language: str) -> str:
-    if language.lower() == "it":
-        return pyrogram.Emoji.ITALY
-    elif language.lower() == "en":
-        return pyrogram.Emoji.UNITED_KINGDOM
-    else:
-        return pyrogram.Emoji.PIRATE_FLAG
 
 
 def ReloadPlugins(client: pyrogram.Client, msg: pyrogram.Message):
@@ -492,30 +596,6 @@ def TimeFormatter(milliseconds: int) -> str:
     return tmp[:-2]
 
 
-def SplitBinaryFile(
-    f: io.BytesIO, chunk_size: int = 157286400
-) -> typing.Union[bytes, None]:
-    """
-    Use this method to split files over a certain size.
-
-    f (``io.BytesIO``): The file itself.
-
-    chunk_size (``int``, *optional*, default = 150MB): Maximum size of the chunk.
-
-
-    Yields part of f (``bytes``).
-
-    Returns ``None``.
-    """
-    while True:
-        chunk = f.read(chunk_size)
-        if not chunk:
-            # end of file
-            return
-        # return chunk but will continue with the loop as it is (not restarting it)
-        yield chunk
-
-
 def DFromUToTelegramProgress(
     current: int, total: int, msg: pyrogram.Message, text: str, start: float,
 ) -> None:
@@ -683,7 +763,7 @@ def ResolveCommandToId(
 
 
 def GetCommandsVariants(commands: list, del_: bool = False, pvt: bool = False) -> list:
-    tmp = []
+    tmp = list()
     for cmd in commands:
         if del_ and pvt:
             tmp.append(f"del{cmd}pvt")
@@ -1092,6 +1172,10 @@ def Log(
         if log_channel_notice:
             scheduler.add_job(
                 func=client.send_message,
+                trigger=DateTrigger(
+                    run_date=datetime.datetime.now()
+                    + datetime.timedelta(seconds=config["delay_log_channel"]),
+                ),
                 kwargs=dict(
                     chat_id=chat_settings.log_channel,
                     text=_(chat_settings.language, "log_string").format(
@@ -1112,11 +1196,5 @@ def Log(
                         else "",
                     ),
                     disable_notification=True,
-                ),
-                trigger=DateTrigger(
-                    run_date=datetime.datetime.now()
-                    + datetime.timedelta(
-                        seconds=config["settings"]["delay_log_channel"]
-                    ),
                 ),
             )

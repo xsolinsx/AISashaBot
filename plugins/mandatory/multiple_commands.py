@@ -47,6 +47,7 @@ def CmdMultipleInviteUser(client: pyrogram.Client, msg: pyrogram.Message):
             )
             utils.scheduler.add_job(
                 func=MultipleFunctionExecution,
+                trigger=DateTrigger(run_date=run_date),
                 kwargs=dict(
                     msg=msg,
                     value=user,
@@ -59,7 +60,6 @@ def CmdMultipleInviteUser(client: pyrogram.Client, msg: pyrogram.Message):
                         chat_settings=msg.chat.settings,
                     ),
                 ),
-                trigger=DateTrigger(run_date=run_date),
             )
         methods.ReplyText(
             client=client,
@@ -106,6 +106,7 @@ def CmdMultipleInviteChatUser(client: pyrogram.Client, msg: pyrogram.Message):
                     )
                     utils.scheduler.add_job(
                         func=MultipleFunctionExecution,
+                        trigger=DateTrigger(run_date=run_date),
                         kwargs=dict(
                             msg=msg,
                             value=user,
@@ -118,7 +119,6 @@ def CmdMultipleInviteChatUser(client: pyrogram.Client, msg: pyrogram.Message):
                                 chat_settings=chat_settings,
                             ),
                         ),
-                        trigger=DateTrigger(run_date=run_date),
                     )
                 methods.ReplyText(
                     client=client,
@@ -156,6 +156,7 @@ def CmdMultipleWarnUser(client: pyrogram.Client, msg: pyrogram.Message):
             )
             utils.scheduler.add_job(
                 func=MultipleFunctionExecution,
+                trigger=DateTrigger(run_date=run_date),
                 kwargs=dict(
                     msg=msg,
                     value=user,
@@ -168,7 +169,6 @@ def CmdMultipleWarnUser(client: pyrogram.Client, msg: pyrogram.Message):
                         chat_settings=msg.chat.settings,
                     ),
                 ),
-                trigger=DateTrigger(run_date=run_date),
             )
         methods.ReplyText(
             client=client,
@@ -215,6 +215,7 @@ def CmdMultipleWarnChatUser(client: pyrogram.Client, msg: pyrogram.Message):
                     )
                     utils.scheduler.add_job(
                         func=MultipleFunctionExecution,
+                        trigger=DateTrigger(run_date=run_date),
                         kwargs=dict(
                             msg=msg,
                             value=user,
@@ -227,7 +228,6 @@ def CmdMultipleWarnChatUser(client: pyrogram.Client, msg: pyrogram.Message):
                                 chat_settings=chat_settings,
                             ),
                         ),
-                        trigger=DateTrigger(run_date=run_date),
                     )
                 methods.ReplyText(
                     client=client,
@@ -265,6 +265,7 @@ def CmdMultipleUnwarnUser(client: pyrogram.Client, msg: pyrogram.Message):
             )
             utils.scheduler.add_job(
                 func=MultipleFunctionExecution,
+                trigger=DateTrigger(run_date=run_date),
                 kwargs=dict(
                     msg=msg,
                     value=user,
@@ -277,7 +278,6 @@ def CmdMultipleUnwarnUser(client: pyrogram.Client, msg: pyrogram.Message):
                         chat_settings=msg.chat.settings,
                     ),
                 ),
-                trigger=DateTrigger(run_date=run_date),
             )
         methods.ReplyText(
             client=client,
@@ -324,6 +324,7 @@ def CmdMultipleUnwarnChatUser(client: pyrogram.Client, msg: pyrogram.Message):
                     )
                     utils.scheduler.add_job(
                         func=MultipleFunctionExecution,
+                        trigger=DateTrigger(run_date=run_date),
                         kwargs=dict(
                             msg=msg,
                             value=user,
@@ -336,7 +337,6 @@ def CmdMultipleUnwarnChatUser(client: pyrogram.Client, msg: pyrogram.Message):
                                 chat_settings=chat_settings,
                             ),
                         ),
-                        trigger=DateTrigger(run_date=run_date),
                     )
                 methods.ReplyText(
                     client=client,
@@ -374,6 +374,7 @@ def CmdMultipleUnwarnAllUser(client: pyrogram.Client, msg: pyrogram.Message):
             )
             utils.scheduler.add_job(
                 func=MultipleFunctionExecution,
+                trigger=DateTrigger(run_date=run_date),
                 kwargs=dict(
                     msg=msg,
                     value=user,
@@ -386,7 +387,6 @@ def CmdMultipleUnwarnAllUser(client: pyrogram.Client, msg: pyrogram.Message):
                         chat_settings=msg.chat.settings,
                     ),
                 ),
-                trigger=DateTrigger(run_date=run_date),
             )
         methods.ReplyText(
             client=client,
@@ -433,6 +433,7 @@ def CmdMultipleUnwarnAllChatUser(client: pyrogram.Client, msg: pyrogram.Message)
                     )
                     utils.scheduler.add_job(
                         func=MultipleFunctionExecution,
+                        trigger=DateTrigger(run_date=run_date),
                         kwargs=dict(
                             msg=msg,
                             value=user,
@@ -445,7 +446,6 @@ def CmdMultipleUnwarnAllChatUser(client: pyrogram.Client, msg: pyrogram.Message)
                                 chat_settings=chat_settings,
                             ),
                         ),
-                        trigger=DateTrigger(run_date=run_date),
                     )
                 methods.ReplyText(
                     client=client,
@@ -483,6 +483,7 @@ def CmdMultipleKickUser(client: pyrogram.Client, msg: pyrogram.Message):
             )
             utils.scheduler.add_job(
                 func=MultipleFunctionExecution,
+                trigger=DateTrigger(run_date=run_date),
                 kwargs=dict(
                     msg=msg,
                     value=user,
@@ -495,7 +496,6 @@ def CmdMultipleKickUser(client: pyrogram.Client, msg: pyrogram.Message):
                         chat_settings=msg.chat.settings,
                     ),
                 ),
-                trigger=DateTrigger(run_date=run_date),
             )
         methods.ReplyText(
             client=client,
@@ -542,6 +542,7 @@ def CmdMultipleKickChatUser(client: pyrogram.Client, msg: pyrogram.Message):
                     )
                     utils.scheduler.add_job(
                         func=MultipleFunctionExecution,
+                        trigger=DateTrigger(run_date=run_date),
                         kwargs=dict(
                             msg=msg,
                             value=user,
@@ -554,7 +555,6 @@ def CmdMultipleKickChatUser(client: pyrogram.Client, msg: pyrogram.Message):
                                 chat_settings=chat_settings,
                             ),
                         ),
-                        trigger=DateTrigger(run_date=run_date),
                     )
                 methods.ReplyText(
                     client=client,
@@ -594,6 +594,7 @@ def CmdMultipleTempRestrictUser(client: pyrogram.Client, msg: pyrogram.Message):
             )
             utils.scheduler.add_job(
                 func=MultipleFunctionExecution,
+                trigger=DateTrigger(run_date=run_date),
                 kwargs=dict(
                     msg=msg,
                     value=user,
@@ -608,7 +609,6 @@ def CmdMultipleTempRestrictUser(client: pyrogram.Client, msg: pyrogram.Message):
                         chat_settings=msg.chat.settings,
                     ),
                 ),
-                trigger=DateTrigger(run_date=run_date),
             )
         methods.ReplyText(
             client=client,
@@ -657,6 +657,7 @@ def CmdMultipleTempRestrictChatUser(client: pyrogram.Client, msg: pyrogram.Messa
                     )
                     utils.scheduler.add_job(
                         func=MultipleFunctionExecution,
+                        trigger=DateTrigger(run_date=run_date),
                         kwargs=dict(
                             msg=msg,
                             value=user,
@@ -671,7 +672,6 @@ def CmdMultipleTempRestrictChatUser(client: pyrogram.Client, msg: pyrogram.Messa
                                 chat_settings=chat_settings,
                             ),
                         ),
-                        trigger=DateTrigger(run_date=run_date),
                     )
                 methods.ReplyText(
                     client=client,
@@ -709,6 +709,7 @@ def CmdMultipleRestrictUser(client: pyrogram.Client, msg: pyrogram.Message):
             )
             utils.scheduler.add_job(
                 func=MultipleFunctionExecution,
+                trigger=DateTrigger(run_date=run_date),
                 kwargs=dict(
                     msg=msg,
                     value=user,
@@ -721,7 +722,6 @@ def CmdMultipleRestrictUser(client: pyrogram.Client, msg: pyrogram.Message):
                         chat_settings=msg.chat.settings,
                     ),
                 ),
-                trigger=DateTrigger(run_date=run_date),
             )
         methods.ReplyText(
             client=client,
@@ -768,6 +768,7 @@ def CmdMultipleRestrictChatUser(client: pyrogram.Client, msg: pyrogram.Message):
                     )
                     utils.scheduler.add_job(
                         func=MultipleFunctionExecution,
+                        trigger=DateTrigger(run_date=run_date),
                         kwargs=dict(
                             msg=msg,
                             value=user,
@@ -780,7 +781,6 @@ def CmdMultipleRestrictChatUser(client: pyrogram.Client, msg: pyrogram.Message):
                                 chat_settings=chat_settings,
                             ),
                         ),
-                        trigger=DateTrigger(run_date=run_date),
                     )
                 methods.ReplyText(
                     client=client,
@@ -818,6 +818,7 @@ def CmdMultipleUnrestrictUser(client: pyrogram.Client, msg: pyrogram.Message):
             )
             utils.scheduler.add_job(
                 func=MultipleFunctionExecution,
+                trigger=DateTrigger(run_date=run_date),
                 kwargs=dict(
                     msg=msg,
                     value=user,
@@ -830,7 +831,6 @@ def CmdMultipleUnrestrictUser(client: pyrogram.Client, msg: pyrogram.Message):
                         chat_settings=msg.chat.settings,
                     ),
                 ),
-                trigger=DateTrigger(run_date=run_date),
             )
         methods.ReplyText(
             client=client,
@@ -877,6 +877,7 @@ def CmdMultipleUnrestrictChatUser(client: pyrogram.Client, msg: pyrogram.Message
                     )
                     utils.scheduler.add_job(
                         func=MultipleFunctionExecution,
+                        trigger=DateTrigger(run_date=run_date),
                         kwargs=dict(
                             msg=msg,
                             value=user,
@@ -889,7 +890,6 @@ def CmdMultipleUnrestrictChatUser(client: pyrogram.Client, msg: pyrogram.Message
                                 chat_settings=chat_settings,
                             ),
                         ),
-                        trigger=DateTrigger(run_date=run_date),
                     )
                 methods.ReplyText(
                     client=client,
@@ -927,6 +927,7 @@ def CmdMultipleTempBanUser(client: pyrogram.Client, msg: pyrogram.Message):
             )
             utils.scheduler.add_job(
                 func=MultipleFunctionExecution,
+                trigger=DateTrigger(run_date=run_date),
                 kwargs=dict(
                     msg=msg,
                     value=user,
@@ -941,7 +942,6 @@ def CmdMultipleTempBanUser(client: pyrogram.Client, msg: pyrogram.Message):
                         chat_settings=msg.chat.settings,
                     ),
                 ),
-                trigger=DateTrigger(run_date=run_date),
             )
         methods.ReplyText(
             client=client,
@@ -988,6 +988,7 @@ def CmdMultipleTempBanChatUser(client: pyrogram.Client, msg: pyrogram.Message):
                     )
                     utils.scheduler.add_job(
                         func=MultipleFunctionExecution,
+                        trigger=DateTrigger(run_date=run_date),
                         kwargs=dict(
                             msg=msg,
                             value=user,
@@ -1002,7 +1003,6 @@ def CmdMultipleTempBanChatUser(client: pyrogram.Client, msg: pyrogram.Message):
                                 chat_settings=chat_settings,
                             ),
                         ),
-                        trigger=DateTrigger(run_date=run_date),
                     )
                 methods.ReplyText(
                     client=client,
@@ -1040,6 +1040,7 @@ def CmdMultipleBanUser(client: pyrogram.Client, msg: pyrogram.Message):
             )
             utils.scheduler.add_job(
                 func=MultipleFunctionExecution,
+                trigger=DateTrigger(run_date=run_date),
                 kwargs=dict(
                     msg=msg,
                     value=user,
@@ -1052,7 +1053,6 @@ def CmdMultipleBanUser(client: pyrogram.Client, msg: pyrogram.Message):
                         chat_settings=msg.chat.settings,
                     ),
                 ),
-                trigger=DateTrigger(run_date=run_date),
             )
         methods.ReplyText(
             client=client,
@@ -1099,6 +1099,7 @@ def CmdMultipleBanChatUser(client: pyrogram.Client, msg: pyrogram.Message):
                     )
                     utils.scheduler.add_job(
                         func=MultipleFunctionExecution,
+                        trigger=DateTrigger(run_date=run_date),
                         kwargs=dict(
                             msg=msg,
                             value=user,
@@ -1111,7 +1112,6 @@ def CmdMultipleBanChatUser(client: pyrogram.Client, msg: pyrogram.Message):
                                 chat_settings=chat_settings,
                             ),
                         ),
-                        trigger=DateTrigger(run_date=run_date),
                     )
                 methods.ReplyText(
                     client=client,
@@ -1149,6 +1149,7 @@ def CmdMultipleUnbanUser(client: pyrogram.Client, msg: pyrogram.Message):
             )
             utils.scheduler.add_job(
                 func=MultipleFunctionExecution,
+                trigger=DateTrigger(run_date=run_date),
                 kwargs=dict(
                     msg=msg,
                     value=user,
@@ -1161,7 +1162,6 @@ def CmdMultipleUnbanUser(client: pyrogram.Client, msg: pyrogram.Message):
                         chat_settings=msg.chat.settings,
                     ),
                 ),
-                trigger=DateTrigger(run_date=run_date),
             )
         methods.ReplyText(
             client=client,
@@ -1208,6 +1208,7 @@ def CmdMultipleUnbanChatUser(client: pyrogram.Client, msg: pyrogram.Message):
                     )
                     utils.scheduler.add_job(
                         func=MultipleFunctionExecution,
+                        trigger=DateTrigger(run_date=run_date),
                         kwargs=dict(
                             msg=msg,
                             value=user,
@@ -1220,7 +1221,6 @@ def CmdMultipleUnbanChatUser(client: pyrogram.Client, msg: pyrogram.Message):
                                 chat_settings=chat_settings,
                             ),
                         ),
-                        trigger=DateTrigger(run_date=run_date),
                     )
                 methods.ReplyText(
                     client=client,
@@ -1254,6 +1254,7 @@ def CmdMultipleGBanUser(client: pyrogram.Client, msg: pyrogram.Message):
         run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=(i + 1) * 5)
         utils.scheduler.add_job(
             func=MultipleFunctionExecution,
+            trigger=DateTrigger(run_date=run_date),
             kwargs=dict(
                 msg=msg,
                 value=user,
@@ -1267,7 +1268,6 @@ def CmdMultipleGBanUser(client: pyrogram.Client, msg: pyrogram.Message):
                     chat_settings=msg.chat.settings,
                 ),
             ),
-            trigger=DateTrigger(run_date=run_date),
         )
     methods.ReplyText(
         client=client,
@@ -1292,6 +1292,7 @@ def CmdMultipleUngbanUser(client: pyrogram.Client, msg: pyrogram.Message):
         run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=(i + 1) * 5)
         utils.scheduler.add_job(
             func=MultipleFunctionExecution,
+            trigger=DateTrigger(run_date=run_date),
             kwargs=dict(
                 msg=msg,
                 value=user,
@@ -1304,7 +1305,6 @@ def CmdMultipleUngbanUser(client: pyrogram.Client, msg: pyrogram.Message):
                     chat_settings=msg.chat.settings,
                 ),
             ),
-            trigger=DateTrigger(run_date=run_date),
         )
     methods.ReplyText(
         client=client,
@@ -1330,6 +1330,7 @@ def CmdMultipleBlockUser(client: pyrogram.Client, msg: pyrogram.Message):
         run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=(i + 1) * 5)
         utils.scheduler.add_job(
             func=MultipleFunctionExecution,
+            trigger=DateTrigger(run_date=run_date),
             kwargs=dict(
                 msg=msg,
                 value=user,
@@ -1343,7 +1344,6 @@ def CmdMultipleBlockUser(client: pyrogram.Client, msg: pyrogram.Message):
                     chat_settings=msg.chat.settings,
                 ),
             ),
-            trigger=DateTrigger(run_date=run_date),
         )
     methods.ReplyText(
         client=client,
@@ -1368,6 +1368,7 @@ def CmdMultipleUnblockUser(client: pyrogram.Client, msg: pyrogram.Message):
         run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=(i + 1) * 5)
         utils.scheduler.add_job(
             func=MultipleFunctionExecution,
+            trigger=DateTrigger(run_date=run_date),
             kwargs=dict(
                 msg=msg,
                 value=user,
@@ -1380,7 +1381,6 @@ def CmdMultipleUnblockUser(client: pyrogram.Client, msg: pyrogram.Message):
                     chat_settings=msg.chat.settings,
                 ),
             ),
-            trigger=DateTrigger(run_date=run_date),
         )
     methods.ReplyText(
         client=client,

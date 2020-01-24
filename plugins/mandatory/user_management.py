@@ -5,6 +5,7 @@ import peewee
 import pyrogram
 
 import db_management
+import dictionaries
 import keyboards
 import methods
 import my_filters
@@ -97,8 +98,14 @@ def SendTagAlerts(client: pyrogram.Client, msg: pyrogram.Message):
                                                 utils.PrintChat(msg.chat),
                                                 utils.PrintUser(msg.from_user),
                                                 text_to_use
-                                                if len(text_to_use) <= 256
-                                                else f"{text_to_use[:256]}...",
+                                                if len(text_to_use)
+                                                <= utils.config["max_length_tag_text"]
+                                                else text_to_use[
+                                                    : utils.config[
+                                                        "max_length_tag_text"
+                                                    ]
+                                                ]
+                                                + "...",
                                                 user.user_id,
                                             ),
                                             reply_markup=pyrogram.InlineKeyboardMarkup(
@@ -118,8 +125,12 @@ def SendTagAlerts(client: pyrogram.Client, msg: pyrogram.Message):
                                             utils.PrintChat(msg.chat),
                                             utils.PrintUser(msg.from_user),
                                             text_to_use
-                                            if len(text_to_use) <= 256
-                                            else f"{text_to_use[:256]}...",
+                                            if len(text_to_use)
+                                            <= utils.config["max_length_tag_text"]
+                                            else text_to_use[
+                                                : utils.config["max_length_tag_text"]
+                                            ]
+                                            + "...",
                                             user.user_id,
                                         ),
                                         reply_markup=pyrogram.InlineKeyboardMarkup(
@@ -205,7 +216,9 @@ def CbQryMySettingsLanguageChange(
     methods.CallbackQueryAnswer(
         cb_qry=cb_qry,
         text=_(cb_qry.from_user.settings.language, "selected_language").format(
-            utils.GetLanguageFlag(language=cb_qry.from_user.settings.language)
+            dictionaries.LANGUAGE_EMOJI.get(
+                cb_qry.from_user.settings.language, pyrogram.Emoji.PIRATE_FLAG
+            )
         ),
         show_alert=False,
     )
@@ -269,7 +282,7 @@ def CbQryMySettingsSetNickname(client: pyrogram.Client, cb_qry: pyrogram.Callbac
 
     cb_qry.message.edit_text(
         text=_(cb_qry.from_user.settings.language, f"nickname_help").format(
-            utils.config["settings"]["max_nicknames"]
+            utils.config["max_nicknames"]
         ),
         reply_markup=pyrogram.InlineKeyboardMarkup(
             [

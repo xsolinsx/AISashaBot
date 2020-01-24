@@ -96,7 +96,7 @@ def CmdFlameReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                         msg.chat.settings.language
                     )["flame_sentences"]
                     if flame_strings:
-                        limit = 10
+                        limit = utils.config["default_flame_limit"]
                         if len(msg.command) > 1:
                             limit = int(msg.command[1])
                         try:
@@ -197,7 +197,7 @@ def CmdFlameUser(client: pyrogram.Client, msg: pyrogram.Message):
                             msg.chat.settings.language
                         )["flame_sentences"]
                         if flame_strings:
-                            limit = 10
+                            limit = utils.config["default_flame_limit"]
                             if len(msg.command) > 2:
                                 limit = int(msg.command[2])
                             try:
@@ -315,7 +315,7 @@ def CmdFlameChatUser(client: pyrogram.Client, msg: pyrogram.Message):
                                 msg.chat.settings.language
                             )["flame_sentences"]
                             if flame_strings:
-                                limit = 10
+                                limit = utils.config["default_flame_limit"]
                                 if len(msg.command) > 3:
                                     limit = int(msg.command[3])
                                 try:

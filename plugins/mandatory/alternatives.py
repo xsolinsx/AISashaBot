@@ -103,12 +103,12 @@ def CbQryAlternativesGet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
                     chat_settings.save()
                     if (
                         chat_settings.forbidden_writing_counter
-                        >= utils.config["settings"]["max_forbidden_writing_counter"]
+                        >= utils.config["max_forbidden_writing_counter"]
                     ):
                         client.leave_chat(chat_id=cb_qry.message.chat.id)
                     methods.SendMessage(
                         client=client,
-                        chat_id=utils.config["settings"]["log_chat"],
+                        chat_id=utils.config["log_chat"],
                         text=_("en", "tg_error_X").format(ex),
                     )
                 except pyrogram.errors.RPCError as ex:

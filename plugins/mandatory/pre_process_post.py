@@ -552,7 +552,7 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.Message):
             elif variable == "mysettings set_nickname":
                 tmp_nicknames = set()
                 for nickname in msg.text.split("|"):
-                    if len(tmp_nicknames) < utils.config["settings"]["max_nicknames"]:
+                    if len(tmp_nicknames) < utils.config["max_nicknames"]:
                         if len(nickname.strip()) > 2:
                             # escape because people could set a regex as nickname
                             tmp_nicknames.add(re.escape(nickname.strip()))
@@ -835,7 +835,7 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.Message):
                     )
             elif variable == "gbanned add":
                 chat_settings: db_management.UserSettings = msg.from_user.settings
-                seconds = 86400
+                seconds = utils.config["default_gban"]
                 reason = ""
                 splitted = msg.text.split(" ")
                 if len(splitted) > 1:
@@ -866,7 +866,7 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.Message):
                         )
             elif variable == "blocked add":
                 chat_settings: db_management.UserSettings = msg.from_user.settings
-                seconds = 3600
+                seconds = utils.config["default_block"]
                 reason = ""
                 splitted = msg.text.split(" ")
                 if len(splitted) > 1:
@@ -1113,16 +1113,17 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.Message):
 
 @pyrogram.Client.on_message(group=1)
 def PostMessageCleanUp(client: pyrogram.Client, msg: pyrogram.Message):
-    # delete old resolved objects
+    # delete resolved objects older than X minutes
     subquery: peewee.ModelSelect = db_management.ResolvedObjects.select().where(
         db_management.ResolvedObjects.timestamp
-        < datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
+        < datetime.datetime.utcnow()
+        - datetime.timedelta(
+            seconds=utils.config["tmp_dicts_expiration"]["resolvedObjects"]
+        )
     )
     db_management.ResolvedObjects.delete().where(
         db_management.ResolvedObjects.id.in_(subquery)
     ).execute()
-
-    utils.CleanTempDictionaries()
 
     msg.continue_propagation()
 

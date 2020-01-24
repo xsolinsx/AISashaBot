@@ -1456,7 +1456,7 @@ def CmdUnbanChatUser(client: pyrogram.Client, msg: pyrogram.Message):
 )
 def CmdGBanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
     text = ""
-    seconds = 86400
+    seconds = utils.config["default_gban"]
     reason = ""
     if len(msg.command) > 1:
         if utils.IsInt(msg.command[1]):
@@ -1518,7 +1518,7 @@ def CmdGBanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
     & ~pyrogram.Filters.reply
 )
 def CmdGBanUser(client: pyrogram.Client, msg: pyrogram.Message):
-    seconds = 86400
+    seconds = utils.config["default_gban"]
     reason = ""
     if len(msg.command) > 2:
         if utils.IsInt(msg.command[2]):
@@ -1637,7 +1637,7 @@ def CmdUngbanUser(client: pyrogram.Client, msg: pyrogram.Message):
 )
 def CmdBlockReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
     text = ""
-    seconds = 3600
+    seconds = utils.config["default_block"]
     reason = ""
     if len(msg.command) > 1:
         if utils.IsInt(msg.command[1]):
@@ -1699,7 +1699,7 @@ def CmdBlockReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
     & ~pyrogram.Filters.reply
 )
 def CmdBlockUser(client: pyrogram.Client, msg: pyrogram.Message):
-    seconds = 3600
+    seconds = utils.config["default_block"]
     reason = ""
     if len(msg.command) > 2:
         if utils.IsInt(msg.command[2]):

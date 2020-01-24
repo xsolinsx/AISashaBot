@@ -61,7 +61,7 @@ def CmdUptime(client: pyrogram.Client, msg: pyrogram.Message):
     & pyrogram.Filters.command(commands=["leave"], prefixes=["/", "!", "#", "."])
 )
 def CmdLeave(client: pyrogram.Client, msg: pyrogram.Message):
-    client.leave_chat(msg.text)
+    client.leave_chat(msg.command[1])
     methods.ReplyText(
         client=client, msg=msg, text=_(msg.from_user.settings.language, "left_chat_X")
     )
@@ -94,10 +94,10 @@ def CmdTodo(client: pyrogram.Client, msg: pyrogram.Message):
     text = f"#{msg.text[1:]}"
     fwd = None
     if msg.reply_to_message:
-        fwd = msg.reply_to_message.forward(chat_id=utils.config["settings"]["log_chat"])
+        fwd = msg.reply_to_message.forward(chat_id=utils.config["log_chat"])
     methods.SendMessage(
         client=client,
-        chat_id=utils.config["settings"]["log_chat"],
+        chat_id=utils.config["log_chat"],
         text=text,
         reply_to_message_id=fwd.message_id if fwd else None,
     )

@@ -218,10 +218,14 @@ class ChatSettings(peewee.Model):
     max_warns = peewee.IntegerField(
         default=3, null=False, constraints=[peewee.Check(constraint="max_warns > 0")]
     )
-    # measured in seconds, 24h default BETWEEN 30 AND 31622400 but it's better to take some seconds so BETWEEN 35 AND 31622395
-    max_temp_ban = peewee.IntegerField(default=86400, null=False)
-    # measured in seconds, 24h default BETWEEN 30 AND 31622400 but it's better to take some seconds so BETWEEN 35 AND 31622395
-    max_temp_restrict = peewee.IntegerField(default=86400, null=False)
+    # measured in seconds, 24h default BETWEEN 30 AND 31622400 but it's better to take some seconds so BETWEEN X AND Y
+    max_temp_restrict = peewee.IntegerField(
+        default=local_config["default_temp_restrict"], null=False
+    )
+    # measured in seconds, 24h default BETWEEN 30 AND 31622400 but it's better to take some seconds so BETWEEN X AND Y
+    max_temp_ban = peewee.IntegerField(
+        default=local_config["default_temp_ban"], null=False
+    )
     # how many users can be added by someone at the same time BETWEEN 1 AND 20
     max_invites = peewee.IntegerField(
         default=5, null=False, constraints=[peewee.Check(constraint="max_invites >= 1")]
@@ -1105,10 +1109,10 @@ def DBChatSettings(chat: pyrogram.Chat):
                 ),
             ]
         )
-        if local_config["settings"]["channel"]:
+        if local_config["channel"]:
             # bot's channel
             ChatWhitelistedChats.create(
-                chat_id=chat.id, whitelisted_chat=local_config["settings"]["channel"]
+                chat_id=chat.id, whitelisted_chat=local_config["channel"]
             )
         # @username
         ChatWhitelistedChats.create(chat_id=chat.id, whitelisted_chat=-1001066197625)
@@ -1200,7 +1204,7 @@ def DBChatMembers(client: pyrogram.Client, chat_id: int, clean_up=True):
     if clean_up:
         RUserChat.update(is_member=False).where(
             (RUserChat.chat_id == chat_id) & (RUserChat.is_member)
-        )
+        ).execute()
     # check restricted members
     for member in client.iter_chat_members(chat_id=chat_id, filter="restricted"):
         DBUser(user=member.user)
@@ -1374,7 +1378,7 @@ def DBObject(
             obj.r_user_chat.save()
 
             obj.r_bot_chat: RUserChat = RUserChat.get_or_none(
-                user_id=client.ME.id, chat_id=obj.chat.id
+                user_id=client.ME.id, chat_id=obj.message.chat.id
             )
             obj.r_bot_chat.timestamp = datetime.datetime.utcnow()
             obj.r_bot_chat.save()

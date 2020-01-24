@@ -65,7 +65,7 @@ HELP_DICTIONARY = {
         "newlink",
         "setlog",
     ],
-    "help": ["USER", "start", "help", "helpall"],
+    "help": ["USER", "start", "help", "helpall", "about"],
     "info_data": [
         "USER",
         "id",
@@ -75,6 +75,7 @@ HELP_DICTIONARY = {
         "groups",
         "JUNIOR_MOD",
         "ismember",
+        "messages",
     ],
     "multiple_commands": [
         "SENIOR_MOD",
@@ -113,6 +114,7 @@ HELP_DICTIONARY = {
     "webshot": ["USER", "INTRO", "webshot"],
 }
 
+
 PUNISHMENT_EMOJI = {
     0: pyrogram.Emoji.OK_BUTTON,
     1: pyrogram.Emoji.LITTER_IN_BIN_SIGN,
@@ -132,7 +134,6 @@ PUNISHMENT_EMOJI = {
     pyrogram.Emoji.HAMMER: 7,
 }
 
-
 PUNISHMENT_STRING = {
     0: "nothing",
     1: "delete",
@@ -151,6 +152,13 @@ PUNISHMENT_STRING = {
     "tempban": 6,
     "ban": 7,
 }
+
+
+LANGUAGE_EMOJI = {
+    "it": pyrogram.Emoji.ITALY,
+    "en": pyrogram.Emoji.UNITED_KINGDOM,
+}
+
 
 RANKS = {
     0: "user",

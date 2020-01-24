@@ -1,4 +1,3 @@
-import datetime
 import re
 import time
 import traceback
@@ -44,7 +43,7 @@ def CbQryInfoInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
     my_filters.callback_regex(pattern=r"^maininfo (.+)", flags=re.I)
 )
 def CbQryInfoMenu(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
-    parameters = []
+    parameters = list()
     if len(cb_qry.data.split(" ")) > 1 and utils.IsInt(cb_qry.data.split(" ")[1]):
         parameters = cb_qry.data.split(" ")
     else:
@@ -398,14 +397,14 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                 text = None
                 punishment = int(regex_info_select_value.match(cb_qry.data)[2])
                 until_date = None
-                if punishment == 3:
+                if punishment == dictionaries.PUNISHMENT_STRING["kick"]:
                     text = methods.Kick(
                         client=client,
                         executer=cb_qry.from_user.id,
                         target=target_id,
                         chat_id=chat_id,
                     )
-                elif punishment == 4:
+                elif punishment == dictionaries.PUNISHMENT_STRING["temprestrict"]:
                     until_date = int(time.time() + chat_settings.max_temp_restrict)
                     text = methods.Restrict(
                         client=client,
@@ -414,14 +413,14 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                         chat_id=chat_id,
                         until_date=until_date,
                     )
-                elif punishment == 5:
+                elif punishment == dictionaries.PUNISHMENT_STRING["restrict"]:
                     text = methods.Restrict(
                         client=client,
                         executer=cb_qry.from_user.id,
                         target=target_id,
                         chat_id=chat_id,
                     )
-                elif punishment == 6:
+                elif punishment == dictionaries.PUNISHMENT_STRING["tempban"]:
                     until_date = int(time.time() + chat_settings.max_temp_ban)
                     text = methods.Ban(
                         client=client,
@@ -430,7 +429,7 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                         chat_id=chat_id,
                         until_date=until_date,
                     )
-                elif punishment == 7:
+                elif punishment == dictionaries.PUNISHMENT_STRING["ban"]:
                     text = methods.Ban(
                         client=client,
                         executer=cb_qry.from_user.id,
@@ -438,7 +437,7 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                         chat_id=chat_id,
                     )
                 else:
-                    punishment = None
+                    punishment = 0
 
                 if punishment and text:
                     methods.CallbackQueryAnswer(
@@ -785,6 +784,339 @@ def CmdInfo(client: pyrogram.Client, msg: pyrogram.Message):
         )
 
 
+@pyrogram.Client.on_callback_query(
+    my_filters.callback_regex(pattern=r"^\(i\)messages (\d+)", flags=re.I)
+)
+def CbQryMessagesInfoUser(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+    text = ""
+    if cb_qry.data == "(i)messages ":
+        text = _(cb_qry.from_user.settings.language, cb_qry.data)
+    else:
+        user = db_management.Users.get_or_none(
+            id=int(cb_qry.data.replace("(i)messages ", ""))
+        )
+        if user:
+            text = utils.PrintUser(user=user)
+        else:
+            text = int(cb_qry.data.replace("(i)messages ", ""))
+    methods.CallbackQueryAnswer(
+        cb_qry=cb_qry, text=text, show_alert=True,
+    )
+
+
+@pyrogram.Client.on_callback_query(
+    my_filters.callback_regex(pattern=r"^\(i\)messages members_only", flags=re.I)
+)
+def CbQryMessagesInfoOnlyMembers(
+    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+):
+    methods.CallbackQueryAnswer(
+        cb_qry=cb_qry,
+        text=_(cb_qry.from_user.settings.language, cb_qry.data),
+        show_alert=True,
+    )
+
+
+@pyrogram.Client.on_callback_query(
+    my_filters.callback_regex(pattern=r"^messages members_only", flags=re.I)
+)
+def CbQryMessagesOnlyMembers(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+    parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
+        " "
+    )
+    chat_id = int(parameters[1])
+    members_only = not bool(int(parameters[2]))
+    page = int(parameters[3])
+    chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
+        chat_id=chat_id
+    )
+    methods.CallbackQueryAnswer(
+        cb_qry=cb_qry,
+        text=_(cb_qry.from_user.settings.language, "updating"),
+        show_alert=False,
+    )
+    if chat_id not in utils.tmp_dicts["membersUpdated"]:
+        utils.tmp_dicts["membersUpdated"].add(chat_id)
+        try:
+            db_management.DBChatMembers(client=client, chat_id=chat_id, clean_up=True)
+        except pyrogram.errors.FloodWait as ex:
+            print(ex)
+            traceback.print_exc()
+            methods.ReplyText(
+                client=client,
+                msg=cb_qry.message,
+                text=_(chat_settings.language, "tg_flood_wait_X").format(ex.x),
+            )
+        except pyrogram.errors.RPCError as ex:
+            print(ex)
+            traceback.print_exc()
+            methods.ReplyText(
+                client=client,
+                msg=cb_qry.message,
+                text=_(chat_settings.language, "tg_error_X").format(ex),
+            )
+        else:
+            utils.Log(
+                client=client,
+                chat_id=chat_id,
+                executer=cb_qry.from_user.id,
+                action=f"members updated",
+                target=chat_id,
+            )
+    cb_qry.message.edit_reply_markup(
+        reply_markup=pyrogram.InlineKeyboardMarkup(
+            keyboards.BuildMessagesList(
+                chat_settings=chat_settings, members_only=members_only, page=page
+            )
+        )
+    )
+
+
+@pyrogram.Client.on_callback_query(
+    my_filters.callback_regex(pattern=r"^messages PAGES[<<|\-|\+|>>]", flags=re.I)
+)
+def CbQryMessagesPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+    parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
+        " "
+    )
+    chat_id = int(parameters[1])
+    members_only = bool(int(parameters[2]))
+    page = int(parameters[3])
+    chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
+        chat_id=chat_id
+    )
+    if utils.IsJuniorModOrHigher(user_id=cb_qry.from_user.id, chat_id=chat_id):
+        methods.CallbackQueryAnswer(
+            cb_qry=cb_qry, text=_(cb_qry.from_user.settings.language, "turning_page")
+        )
+        if cb_qry.data.endswith("<<"):
+            cb_qry.message.edit_reply_markup(
+                reply_markup=pyrogram.InlineKeyboardMarkup(
+                    keyboards.BuildMessagesList(
+                        chat_settings=chat_settings, members_only=members_only, page=0
+                    )
+                )
+            )
+        elif cb_qry.data.endswith("-"):
+            cb_qry.message.edit_reply_markup(
+                reply_markup=pyrogram.InlineKeyboardMarkup(
+                    keyboards.BuildMessagesList(
+                        chat_settings=chat_settings,
+                        members_only=members_only,
+                        page=page - 1,
+                    )
+                )
+            )
+        elif cb_qry.data.endswith("+"):
+            cb_qry.message.edit_reply_markup(
+                reply_markup=pyrogram.InlineKeyboardMarkup(
+                    keyboards.BuildMessagesList(
+                        chat_settings=chat_settings,
+                        members_only=members_only,
+                        page=page + 1,
+                    )
+                )
+            )
+        elif cb_qry.data.endswith(">>"):
+            cb_qry.message.edit_reply_markup(
+                reply_markup=pyrogram.InlineKeyboardMarkup(
+                    keyboards.BuildMessagesList(
+                        chat_settings=chat_settings, members_only=members_only, page=-1,
+                    )
+                )
+            )
+    else:
+        methods.CallbackQueryAnswer(
+            cb_qry=cb_qry,
+            text=_(cb_qry.from_user.settings.language, "insufficient_rights"),
+            show_alert=True,
+        )
+
+
+@pyrogram.Client.on_callback_query(
+    my_filters.callback_regex(pattern=r"^messages (\-\d+) (\d+)", flags=re.I)
+)
+def CbQryMessages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+    parameters = cb_qry.data.split(" ")
+    chat_id = int(parameters[1])
+    members_only = bool(int(parameters[2]))
+    page = int(parameters[3])
+    chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
+        chat_id=chat_id
+    )
+    if utils.IsJuniorModOrHigher(user_id=cb_qry.from_user.id, chat_id=chat_id):
+        cb_qry.message.edit_text(
+            text=_(cb_qry.message.chat.settings.language, "messages")
+            + f" {utils.PrintChat(chat=chat_settings.chat)}",
+            reply_markup=pyrogram.InlineKeyboardMarkup(
+                keyboards.BuildMessagesList(
+                    chat_settings=chat_settings, members_only=members_only, page=page
+                )
+            ),
+        )
+    else:
+        methods.CallbackQueryAnswer(
+            cb_qry=cb_qry,
+            text=_(cb_qry.from_user.settings.language, "insufficient_rights"),
+            show_alert=True,
+        )
+
+
+@pyrogram.Client.on_message(
+    pyrogram.Filters.command(
+        commands=utils.GetCommandsVariants(commands=["messages"], del_=True, pvt=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.Filters.group
+)
+def CmdMessages(client: pyrogram.Client, msg: pyrogram.Message):
+    if utils.IsJuniorModOrHigher(
+        user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
+    ):
+        if msg.chat.id not in utils.tmp_dicts["membersUpdated"]:
+            utils.tmp_dicts["membersUpdated"].add(msg.chat.id)
+            try:
+                db_management.DBChatMembers(
+                    client=client, chat_id=msg.chat.id, clean_up=True
+                )
+            except pyrogram.errors.FloodWait as ex:
+                print(ex)
+                traceback.print_exc()
+                methods.ReplyText(
+                    client=client,
+                    msg=msg,
+                    text=_(msg.chat.settings.language, "tg_flood_wait_X").format(ex.x),
+                )
+            except pyrogram.errors.RPCError as ex:
+                print(ex)
+                traceback.print_exc()
+                methods.ReplyText(
+                    client=client,
+                    msg=msg,
+                    text=_(msg.chat.settings.language, "tg_error_X").format(ex),
+                )
+            else:
+                utils.Log(
+                    client=client,
+                    chat_id=msg.chat.id,
+                    executer=msg.from_user.id,
+                    action=f"members updated",
+                    target=msg.chat.id,
+                )
+        utils.Log(
+            client=client,
+            chat_id=msg.chat.id,
+            executer=msg.from_user.id,
+            action=f"{msg.command[0]}",
+            target=msg.chat.id,
+        )
+        if msg.command[0].lower().endswith("pvt"):
+            methods.SendMessage(
+                client=client,
+                chat_id=msg.from_user.id,
+                text=_(msg.chat.settings.language, "messages")
+                + f" {utils.PrintChat(chat=msg.chat)}",
+                reply_markup=pyrogram.InlineKeyboardMarkup(
+                    keyboards.BuildMessagesList(
+                        chat_settings=msg.chat.settings, members_only=True, page=0
+                    )
+                ),
+            )
+            if not msg.text.startswith("del", 1):
+                methods.ReplyText(
+                    client=client,
+                    msg=msg,
+                    text=_(msg.from_user.settings.language, "sent_to_pvt").format(
+                        client.ME.id
+                    ),
+                    parse_mode="html",
+                )
+        else:
+            methods.ReplyText(
+                client=client,
+                msg=msg,
+                text=_(msg.chat.settings.language, "messages")
+                + f" {utils.PrintChat(chat=msg.chat)}",
+                reply_markup=pyrogram.InlineKeyboardMarkup(
+                    keyboards.BuildMessagesList(
+                        chat_settings=msg.chat.settings, members_only=True, page=0
+                    )
+                ),
+            )
+
+
+@pyrogram.Client.on_message(
+    pyrogram.Filters.command(commands=["messages"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.Filters.private
+)
+def CmdMessagesChat(client: pyrogram.Client, msg: pyrogram.Message):
+    chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
+    if isinstance(chat_id, str):
+        methods.ReplyText(client=client, msg=msg, text=chat_id)
+    else:
+        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
+            chat_id=chat_id
+        )
+        if chat_settings:
+            if utils.IsJuniorModOrHigher(user_id=msg.from_user.id, chat_id=chat_id):
+                if chat_id not in utils.tmp_dicts["membersUpdated"]:
+                    utils.tmp_dicts["membersUpdated"].add(chat_id)
+                    try:
+                        db_management.DBChatMembers(
+                            client=client, chat_id=chat_id, clean_up=True
+                        )
+                    except pyrogram.errors.FloodWait as ex:
+                        print(ex)
+                        traceback.print_exc()
+                        methods.ReplyText(
+                            client=client,
+                            msg=msg,
+                            text=_(chat_settings.language, "tg_flood_wait_X").format(
+                                ex.x
+                            ),
+                        )
+                    except pyrogram.errors.RPCError as ex:
+                        print(ex)
+                        traceback.print_exc()
+                        methods.ReplyText(
+                            client=client,
+                            msg=msg,
+                            text=_(chat_settings.language, "tg_error_X").format(ex),
+                        )
+                    else:
+                        utils.Log(
+                            client=client,
+                            chat_id=chat_id,
+                            executer=msg.from_user.id,
+                            action=f"members updated",
+                            target=chat_id,
+                        )
+                utils.Log(
+                    client=client,
+                    chat_id=chat_id,
+                    executer=msg.from_user.id,
+                    action=f"{msg.command[0]}",
+                    target=chat_id,
+                )
+                methods.ReplyText(
+                    client=client,
+                    msg=msg,
+                    text=_(chat_settings.language, "messages")
+                    + f" {utils.PrintChat(chat=chat_settings.chat)}",
+                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                        keyboards.BuildMessagesList(
+                            chat_settings=chat_settings, members_only=True, page=0
+                        )
+                    ),
+                )
+        else:
+            methods.ReplyText(
+                client=client,
+                msg=msg,
+                text=_(msg.from_user.settings.language, "no_chat_settings"),
+            )
+
+
 @pyrogram.Client.on_message(
     pyrogram.Filters.command(
         commands=utils.GetCommandsVariants(commands=["id"], del_=True, pvt=True),
@@ -1112,6 +1444,16 @@ def CmdMe(client: pyrogram.Client, msg: pyrogram.Message):
                 msg.r_user_chat.message_counter * 100 / total_chat_messages,
             ),
         )
+
+
+@pyrogram.Client.on_message(
+    pyrogram.Filters.command(commands=["about"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.Filters.private
+)
+def CmdAbout(client: pyrogram.Client, msg: pyrogram.Message):
+    methods.ReplyText(
+        client=client, msg=msg, text=_(msg.chat.settings.language, "about_message")
+    )
 
 
 @pyrogram.Client.on_callback_query(
