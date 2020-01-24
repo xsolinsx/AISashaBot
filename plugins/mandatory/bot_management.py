@@ -10,6 +10,7 @@ import urllib.request
 from threading import Thread
 
 import pyrogram
+from apscheduler.triggers.date import DateTrigger
 
 import db_management
 import keyboards
@@ -118,6 +119,38 @@ def CmdGetIP(client: pyrogram.Client, msg: pyrogram.Message):
         chat_id=client.ME.id,
         executer=msg.from_user.id,
         action=f"{msg.command[0]} = {ip}",
+    )
+
+
+@pyrogram.Client.on_message(
+    pyrogram.Filters.user(utils.config["masters"])
+    & pyrogram.Filters.command(commands=["broadcast"], prefixes=["/", "!", "#", "."],)
+)
+def CmdBroadcast(client: pyrogram.Client, msg: pyrogram.Message):
+    text_to_broadcast = msg.text[len(msg.command[0]) + 2 :]
+    run_date = None
+    for i, chat in enumerate(
+        db_management.ChatSettings.select(db_management.ChatSettings.chat)
+    ):
+        # execute at intervals of 3 seconds (max 20 chats per minute)
+        run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=(i + 1) * 3)
+        utils.scheduler.add_job(
+            func=methods.SendMessage,
+            trigger=DateTrigger(run_date=run_date),
+            kwargs=dict(client=client, chat_id=chat, text=text_to_broadcast),
+        )
+    utils.Log(
+        client=client,
+        chat_id=client.ME.id,
+        executer=msg.from_user.id,
+        action=f"{msg.command[0]}",
+    )
+    methods.ReplyText(
+        client=client,
+        msg=msg,
+        text=_(msg.chat.settings.language, "estimated_completion_time_X").format(
+            run_date
+        ),
     )
 
 
