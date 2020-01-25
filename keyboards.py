@@ -2688,6 +2688,60 @@ def BuildMessagesList(
     )
 
 
+def BuildInactivesConfirmation(
+    chat_settings: db_management.ChatSettings, method: str, min_date: datetime.datetime
+) -> list:
+    header = [
+        [
+            pyrogram.InlineKeyboardButton(
+                text=_(chat_settings.language, method).upper()
+                + " "
+                + _(chat_settings.language, "inactives").upper(),
+                callback_data=f"uselessinactives {chat_settings.chat_id} {method} {min_date}",
+            )
+        ],
+    ]
+
+    keyboard = [
+        [
+            pyrogram.InlineKeyboardButton(
+                text=_(chat_settings.language, "yes"), callback_data="inactives yes",
+            ),
+        ],
+        [
+            pyrogram.InlineKeyboardButton(
+                text=_(chat_settings.language, "yes_send_list"),
+                callback_data="inactives yes_list",
+            ),
+        ],
+        [
+            pyrogram.InlineKeyboardButton(
+                text=_(chat_settings.language, "yes_send_list_pvt"),
+                callback_data="inactives yes_list_pvt",
+            ),
+        ],
+        [
+            pyrogram.InlineKeyboardButton(
+                text=_(chat_settings.language, "no_send_list_pvt"),
+                callback_data="inactives no_list_pvt",
+            ),
+        ],
+        [
+            pyrogram.InlineKeyboardButton(
+                text=_(chat_settings.language, "no_send_list"),
+                callback_data="inactives no_list",
+            ),
+        ],
+        [
+            pyrogram.InlineKeyboardButton(
+                text=_(chat_settings.language, "no"), callback_data="inactives no",
+            ),
+        ],
+    ]
+
+    return BuildKeyboard(main_buttons=keyboard, header_buttons=header)
+
+
 def BuildWhitelistedUsersList(
     chat_settings: db_management.ChatSettings, page: int = 0,
 ) -> list:

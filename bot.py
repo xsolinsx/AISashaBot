@@ -18,6 +18,7 @@ import time
 
 import pyrogram
 from apscheduler.triggers.cron import CronTrigger
+from pytz import utc
 
 import db_management
 import methods
@@ -90,7 +91,9 @@ utils.Log(
 )
 # schedule backup at 04:00 with a random delay between ± 10 minutes
 utils.scheduler.add_job(
-    methods.SendBackup, trigger=CronTrigger(hour=4, jitter=600), args=(BOT_CLIENT,),
+    methods.SendBackup,
+    trigger=CronTrigger(hour=4, jitter=600, timezone=utc),
+    args=(BOT_CLIENT,),
 )
 BOT_CLIENT.idle()
 BOT_CLIENT.stop()

@@ -19,13 +19,14 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
+from pytz import utc
 
 import db_management
 import dictionaries
 
 start_date = datetime.datetime.utcnow()
 
-scheduler = BackgroundScheduler()
+scheduler = BackgroundScheduler(timezone=utc)
 scheduler.start()
 
 
@@ -166,40 +167,56 @@ def CleanTempVariable(identifier: str, value: typing.Union[dict, set]):
 # CRON JOBS
 # every day at 3:00
 scheduler.add_job(
-    CleanTempVariable, trigger=CronTrigger(hour=3), args=("msgsHashes", dict()),
+    CleanTempVariable,
+    trigger=CronTrigger(hour=3, timezone=utc),
+    args=("msgsHashes", dict()),
 )
 scheduler.add_job(
-    CleanTempVariable, trigger=CronTrigger(hour=3), args=("flood", dict())
+    CleanTempVariable, trigger=CronTrigger(hour=3, timezone=utc), args=("flood", dict())
 )
 scheduler.add_job(
-    CleanTempVariable, trigger=CronTrigger(hour=3), args=("punishments", dict()),
+    CleanTempVariable,
+    trigger=CronTrigger(hour=3, timezone=utc),
+    args=("punishments", dict()),
 )
 scheduler.add_job(
-    CleanTempVariable, trigger=CronTrigger(hour=3), args=("greetings", dict()),
+    CleanTempVariable,
+    trigger=CronTrigger(hour=3, timezone=utc),
+    args=("greetings", dict()),
 )
 # every sharp hour
 scheduler.add_job(
-    CleanTempVariable, trigger=CronTrigger(minute=0), args=("membersUpdated", set()),
+    CleanTempVariable,
+    trigger=CronTrigger(minute=0, timezone=utc),
+    args=("membersUpdated", set()),
 )
 # INTERVAL JOBS, see config.json for specific intervals
 scheduler.add_job(
     CleanTempVariable,
-    trigger=IntervalTrigger(seconds=config["tmp_dicts_expiration"]["kickedPeople"]),
+    trigger=IntervalTrigger(
+        seconds=config["tmp_dicts_expiration"]["kickedPeople"], timezone=utc
+    ),
     args=("kickedPeople", dict()),
 )
 scheduler.add_job(
     CleanTempVariable,
-    trigger=IntervalTrigger(seconds=config["tmp_dicts_expiration"]["invitedPeople"]),
+    trigger=IntervalTrigger(
+        seconds=config["tmp_dicts_expiration"]["invitedPeople"], timezone=utc
+    ),
     args=("invitedPeople", dict()),
 )
 scheduler.add_job(
     CleanTempVariable,
-    trigger=IntervalTrigger(seconds=config["tmp_dicts_expiration"]["staffContacted"]),
+    trigger=IntervalTrigger(
+        seconds=config["tmp_dicts_expiration"]["staffContacted"], timezone=utc
+    ),
     args=("staffContacted", set()),
 )
 scheduler.add_job(
     CleanTempVariable,
-    trigger=IntervalTrigger(seconds=config["tmp_dicts_expiration"]["staffUpdated"]),
+    trigger=IntervalTrigger(
+        seconds=config["tmp_dicts_expiration"]["staffUpdated"], timezone=utc
+    ),
     args=("staffUpdated", set()),
 )
 
@@ -1173,8 +1190,9 @@ def Log(
             scheduler.add_job(
                 func=client.send_message,
                 trigger=DateTrigger(
-                    run_date=datetime.datetime.now()
+                    run_date=datetime.datetime.utcnow()
                     + datetime.timedelta(seconds=config["delay_log_channel"]),
+                    timezone=utc,
                 ),
                 kwargs=dict(
                     chat_id=chat_settings.log_channel,

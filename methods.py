@@ -7,6 +7,7 @@ import typing
 import peewee
 import pyrogram
 from apscheduler.triggers.date import DateTrigger
+from pytz import utc
 
 import db_management
 import dictionaries
@@ -269,7 +270,7 @@ def Invite(
                     )
                     utils.scheduler.add_job(
                         func=Invite,
-                        trigger=DateTrigger(run_date=run_date),
+                        trigger=DateTrigger(run_date=run_date, timezone=utc),
                         kwargs=dict(
                             client=client,
                             executer=executer,
@@ -282,7 +283,7 @@ def Invite(
                     )
                     text = _(
                         chat_settings.language, "tg_flood_wait_X_scheduled_Y"
-                    ).format(ex.x, f"UTC {run_date}")
+                    ).format(ex.x, run_date)
                 except pyrogram.errors.RPCError as ex:
                     print(ex)
                     traceback.print_exc()
@@ -582,7 +583,7 @@ def Kick(
                 run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=ex.x)
                 utils.scheduler.add_job(
                     func=Kick,
-                    trigger=DateTrigger(run_date=run_date),
+                    trigger=DateTrigger(run_date=run_date, timezone=utc),
                     kwargs=dict(
                         client=client,
                         executer=executer,
@@ -595,7 +596,7 @@ def Kick(
                     ),
                 )
                 text = _(chat_settings.language, "tg_flood_wait_X_scheduled_Y").format(
-                    ex.x, f"UTC {run_date}"
+                    ex.x, run_date
                 )
             except pyrogram.errors.RPCError as ex:
                 print(ex)
@@ -675,7 +676,7 @@ def Restrict(
                     )
                     utils.scheduler.add_job(
                         func=Restrict,
-                        trigger=DateTrigger(run_date=run_date),
+                        trigger=DateTrigger(run_date=run_date, timezone=utc),
                         kwargs=dict(
                             client=client,
                             executer=executer,
@@ -690,7 +691,7 @@ def Restrict(
                     )
                     text = _(
                         chat_settings.language, "tg_flood_wait_X_scheduled_Y"
-                    ).format(ex.x, f"UTC {run_date}")
+                    ).format(ex.x, run_date)
                 except pyrogram.errors.RPCError as ex:
                     print(ex)
                     traceback.print_exc()
@@ -810,7 +811,7 @@ def Unrestrict(
                 run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=ex.x)
                 utils.scheduler.add_job(
                     func=Unrestrict,
-                    trigger=DateTrigger(run_date=run_date),
+                    trigger=DateTrigger(run_date=run_date, timezone=utc),
                     kwargs=dict(
                         client=client,
                         executer=executer,
@@ -823,7 +824,7 @@ def Unrestrict(
                     ),
                 )
                 text = _(chat_settings.language, "tg_flood_wait_X_scheduled_Y").format(
-                    ex.x, f"UTC {run_date}"
+                    ex.x, run_date
                 )
             except pyrogram.errors.RPCError as ex:
                 print(ex)
@@ -892,7 +893,7 @@ def Ban(
                     )
                     utils.scheduler.add_job(
                         func=Ban,
-                        trigger=DateTrigger(run_date=run_date),
+                        trigger=DateTrigger(run_date=run_date, timezone=utc),
                         kwargs=dict(
                             client=client,
                             executer=executer,
@@ -907,7 +908,7 @@ def Ban(
                     )
                     text = _(
                         chat_settings.language, "tg_flood_wait_X_scheduled_Y"
-                    ).format(ex.x, f"UTC {run_date}")
+                    ).format(ex.x, run_date)
                 except pyrogram.errors.RPCError as ex:
                     print(ex)
                     traceback.print_exc()
@@ -1014,7 +1015,7 @@ def Unban(
                 run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=ex.x)
                 utils.scheduler.add_job(
                     func=Unban,
-                    trigger=DateTrigger(run_date=run_date),
+                    trigger=DateTrigger(run_date=run_date, timezone=utc),
                     kwargs=dict(
                         client=client,
                         executer=executer,
@@ -1027,7 +1028,7 @@ def Unban(
                     ),
                 )
                 text = _(chat_settings.language, "tg_flood_wait_X_scheduled_Y").format(
-                    ex.x, f"UTC {run_date}"
+                    ex.x, run_date
                 )
             except pyrogram.errors.RPCError as ex:
                 print(ex)
@@ -1324,7 +1325,7 @@ def AutoPunish(
                 run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=ex.x)
                 utils.scheduler.add_job(
                     func=client.delete_messages,
-                    trigger=DateTrigger(run_date=run_date),
+                    trigger=DateTrigger(run_date=run_date, timezone=utc),
                     kwargs=dict(chat_id=chat_id, message_ids=message_ids),
                 )
                 hashtags.append(f"#scheduleddelete UTC {run_date}")
@@ -1376,7 +1377,7 @@ def AutoPunish(
                     )
                     utils.scheduler.add_job(
                         func=Kick,
-                        trigger=DateTrigger(run_date=run_date),
+                        trigger=DateTrigger(run_date=run_date, timezone=utc),
                         kwargs=dict(
                             client=client,
                             executer=client.ME.id,
@@ -1425,7 +1426,7 @@ def AutoPunish(
                     until_date += ex.x
                     utils.scheduler.add_job(
                         func=client.restrict_chat_member,
-                        trigger=DateTrigger(run_date=run_date),
+                        trigger=DateTrigger(run_date=run_date, timezone=utc),
                         kwargs=dict(
                             chat_id=chat_id,
                             user_id=target,
@@ -1461,7 +1462,7 @@ def AutoPunish(
                     )
                     utils.scheduler.add_job(
                         func=client.restrict_chat_member,
-                        trigger=DateTrigger(run_date=run_date),
+                        trigger=DateTrigger(run_date=run_date, timezone=utc),
                         kwargs=dict(
                             chat_id=chat_id,
                             user_id=target,
@@ -1500,7 +1501,7 @@ def AutoPunish(
                     until_date += ex.x
                     utils.scheduler.add_job(
                         func=Ban,
-                        trigger=DateTrigger(run_date=run_date),
+                        trigger=DateTrigger(run_date=run_date, timezone=utc),
                         kwargs=dict(
                             client=client,
                             executer=client.ME.id,
@@ -1539,7 +1540,7 @@ def AutoPunish(
                     )
                     utils.scheduler.add_job(
                         func=Ban,
-                        trigger=DateTrigger(run_date=run_date),
+                        trigger=DateTrigger(run_date=run_date, timezone=utc),
                         kwargs=dict(
                             client=client,
                             executer=client.ME.id,
@@ -1642,7 +1643,7 @@ def SendLog(
         run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=ex.x)
         utils.scheduler.add_job(
             func=SendLog,
-            trigger=DateTrigger(run_date=run_date),
+            trigger=DateTrigger(run_date=run_date, timezone=utc),
             kwargs=dict(
                 client=client,
                 text=text,
@@ -1735,7 +1736,9 @@ def SendMessage(
             utils.scheduler.add_job(
                 func=SendMessage,
                 trigger=DateTrigger(
-                    run_date=datetime.datetime.now() + datetime.timedelta(seconds=ex.x)
+                    run_date=datetime.datetime.utcnow()
+                    + datetime.timedelta(seconds=ex.x),
+                    timezone=utc,
                 ),
                 kwargs=dict(
                     client=client,
@@ -1825,7 +1828,9 @@ def ReplyText(
             utils.scheduler.add_job(
                 func=ReplyText,
                 trigger=DateTrigger(
-                    run_date=datetime.datetime.now() + datetime.timedelta(seconds=ex.x)
+                    run_date=datetime.datetime.utcnow()
+                    + datetime.timedelta(seconds=ex.x),
+                    timezone=utc,
                 ),
                 kwargs=dict(
                     client=client,
@@ -1911,7 +1916,9 @@ def ReplyPhoto(
             utils.scheduler.add_job(
                 func=ReplyPhoto,
                 trigger=DateTrigger(
-                    run_date=datetime.datetime.now() + datetime.timedelta(seconds=ex.x)
+                    run_date=datetime.datetime.utcnow()
+                    + datetime.timedelta(seconds=ex.x),
+                    timezone=utc,
                 ),
                 kwargs=dict(
                     client=client,
@@ -2011,7 +2018,9 @@ def SendDocument(
             utils.scheduler.add_job(
                 func=SendDocument,
                 trigger=DateTrigger(
-                    run_date=datetime.datetime.now() + datetime.timedelta(seconds=ex.x)
+                    run_date=datetime.datetime.utcnow()
+                    + datetime.timedelta(seconds=ex.x),
+                    timezone=utc,
                 ),
                 kwargs=dict(
                     client=client,
@@ -2107,7 +2116,9 @@ def ReplyDocument(
             utils.scheduler.add_job(
                 func=ReplyDocument,
                 trigger=DateTrigger(
-                    run_date=datetime.datetime.now() + datetime.timedelta(seconds=ex.x)
+                    run_date=datetime.datetime.utcnow()
+                    + datetime.timedelta(seconds=ex.x),
+                    timezone=utc,
                 ),
                 kwargs=dict(
                     client=client,

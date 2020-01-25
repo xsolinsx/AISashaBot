@@ -11,6 +11,7 @@ from threading import Thread
 
 import pyrogram
 from apscheduler.triggers.date import DateTrigger
+from pytz import utc
 
 import db_management
 import keyboards
@@ -136,7 +137,7 @@ def CmdBroadcast(client: pyrogram.Client, msg: pyrogram.Message):
         run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=(i + 1) * 3)
         utils.scheduler.add_job(
             func=methods.SendMessage,
-            trigger=DateTrigger(run_date=run_date),
+            trigger=DateTrigger(run_date=run_date, timezone=utc),
             kwargs=dict(client=client, chat_id=chat, text=text_to_broadcast),
         )
     utils.Log(
