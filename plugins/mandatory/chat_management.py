@@ -4503,7 +4503,7 @@ def CbQryLogsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry, text=_(cb_qry.from_user.settings.language, "turning_page")
         )
-        query: peewee.ModelSelect() = db_management.Logs.select().where(
+        query: peewee.ModelSelect = db_management.Logs.select().where(
             db_management.Logs.chat_id == chat_id
         ).order_by(db_management.Logs.timestamp.desc())
 
@@ -4578,7 +4578,7 @@ def CmdLog(client: pyrogram.Client, msg: pyrogram.Message):
             action=f"{msg.command[0]}",
             target=msg.chat.id,
         )
-        query: peewee.ModelSelect() = db_management.Logs.select().where(
+        query: peewee.ModelSelect = db_management.Logs.select().where(
             db_management.Logs.chat_id == msg.chat.id
         ).order_by(db_management.Logs.timestamp.desc())
         query = query[0 : utils.config["max_items_keyboard"]]
@@ -4653,7 +4653,7 @@ def CmdLogChat(client: pyrogram.Client, msg: pyrogram.Message):
                     action=f"{msg.command[0]}",
                     target=chat_id,
                 )
-                query: peewee.ModelSelect() = db_management.Logs.select().where(
+                query: peewee.ModelSelect = db_management.Logs.select().where(
                     db_management.Logs.chat_id == chat_id
                 ).order_by(db_management.Logs.timestamp.desc())
                 query = query[0 : utils.config["max_items_keyboard"]]
@@ -4731,7 +4731,7 @@ def CmdSendLog(client: pyrogram.Client, msg: pyrogram.Message):
                 lower_bound = datetime.datetime.strptime(msg.command[1], "%Y-%m-%d")
                 higher_bound = lower_bound + datetime.timedelta(days=1)
 
-        query: peewee.ModelSelect() = (
+        query: peewee.ModelSelect = (
             db_management.Logs.select()
             .where(
                 (db_management.Logs.chat_id == msg.chat.id)
@@ -4825,7 +4825,7 @@ def CmdSendLogChat(client: pyrogram.Client, msg: pyrogram.Message):
                         )
                         higher_bound = lower_bound + datetime.timedelta(days=1)
 
-                query: peewee.ModelSelect() = (
+                query: peewee.ModelSelect = (
                     db_management.Logs.select()
                     .where(
                         (db_management.Logs.chat_id == chat_id)
