@@ -336,3 +336,21 @@ def CmdHelpAll(client: pyrogram.Client, msg: pyrogram.Message):
         f.write(text)
 
     methods.SendDocument(client=client, chat_id=msg.from_user.id, document=file_name)
+
+
+@pyrogram.Client.on_message(
+    pyrogram.Filters.command(commands=["about"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.Filters.private
+)
+def CmdAbout(client: pyrogram.Client, msg: pyrogram.Message):
+    methods.ReplyText(
+        client=client,
+        msg=msg,
+        text=_(msg.chat.settings.language, "about_message"),
+        reply_markup=pyrogram.InlineKeyboardMarkup(
+            [
+                [pyrogram.InlineKeyboardButton(text=service, url=url)]
+                for service, url in utils.config["donations"].items()
+            ]
+        ),
+    )

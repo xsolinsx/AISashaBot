@@ -1446,16 +1446,6 @@ def CmdMe(client: pyrogram.Client, msg: pyrogram.Message):
         )
 
 
-@pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["about"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
-)
-def CmdAbout(client: pyrogram.Client, msg: pyrogram.Message):
-    methods.ReplyText(
-        client=client, msg=msg, text=_(msg.chat.settings.language, "about_message")
-    )
-
-
 @pyrogram.Client.on_callback_query(
     my_filters.callback_regex(pattern=r"^groups PAGES[<<|\-|\+|>>]", flags=re.I)
     & my_filters.callback_private

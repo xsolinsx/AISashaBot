@@ -11,6 +11,10 @@
     "available_languages": [
         "en"
     ],
+    "donations": {
+        "service1": "link1",
+        "service2": "link2"
+    },
     "log_chat": -100123456789,
     "channel": -100123456789,
     "delay_log_channel": 10,
