@@ -2224,7 +2224,7 @@ def CmdStaff(client: pyrogram.Client, msg: pyrogram.Message):
     # useless loop as there's always one and only one owner
     for r_user_chat in subquery:
         if r_user_chat.user_id not in already_listed:
-            text += f"{utils.PrintUser(user=r_user_chat.user)}\n\n"
+            text += f"{utils.PrintUser(user=r_user_chat.user, tag=False)}\n\n"
             already_listed.append(r_user_chat.user_id)
     # senior and junior mods
     for i in range(3, 1, -1):
@@ -2240,7 +2240,7 @@ def CmdStaff(client: pyrogram.Client, msg: pyrogram.Message):
                 text += (
                     "  "
                     + (pyrogram.Emoji.MAN_GUARD if r_user_chat.is_admin else "")
-                    + f"{utils.PrintUser(user=r_user_chat.user)}\n"
+                    + f"{utils.PrintUser(user=r_user_chat.user, tag=False)}\n"
                 )
                 already_listed.append(r_user_chat.user_id)
     # tg admins
@@ -2258,10 +2258,10 @@ def CmdStaff(client: pyrogram.Client, msg: pyrogram.Message):
                     ).upper()
                     + f" {pyrogram.Emoji.MAN_GUARD}\n"
                 )
-            text += f"  {utils.PrintUser(user=r_user_chat.user)}\n"
+            text += f"  {utils.PrintUser(user=r_user_chat.user, tag=False)}\n"
             already_listed.append(r_user_chat.user_id)
 
-    methods.ReplyText(client=client, msg=msg, text=text)
+    methods.ReplyText(client=client, msg=msg, text=text, parse_mode="html")
 
 
 @pyrogram.Client.on_message(
@@ -2297,7 +2297,7 @@ def CmdStaffChat(client: pyrogram.Client, msg: pyrogram.Message):
             # useless loop as there's always one and only one owner
             for r_user_chat in subquery:
                 if r_user_chat.user_id not in already_listed:
-                    text += f"  {utils.PrintUser(user=r_user_chat.user)}\n\n"
+                    text += f"  {utils.PrintUser(user=r_user_chat.user, tag=False)}\n\n"
                     already_listed.append(r_user_chat.user_id)
             # senior and junior mods
             for i in range(3, 1, -1):
@@ -2313,7 +2313,7 @@ def CmdStaffChat(client: pyrogram.Client, msg: pyrogram.Message):
                         text += (
                             "  "
                             + (pyrogram.Emoji.MAN_GUARD if r_user_chat.is_admin else "")
-                            + f"{utils.PrintUser(user=r_user_chat.user)}\n"
+                            + f"{utils.PrintUser(user=r_user_chat.user, tag=False)}\n"
                         )
                         already_listed.append(r_user_chat.user_id)
             # tg admins
@@ -2332,10 +2332,10 @@ def CmdStaffChat(client: pyrogram.Client, msg: pyrogram.Message):
                             ).upper()
                             + f" {pyrogram.Emoji.MAN_GUARD}\n"
                         )
-                    text += f"  {utils.PrintUser(user=r_user_chat.user)}\n\n"
+                    text += f"  {utils.PrintUser(user=r_user_chat.user, tag=False)}\n\n"
                     already_listed.append(r_user_chat.user_id)
 
-            methods.ReplyText(client=client, msg=msg, text=text)
+            methods.ReplyText(client=client, msg=msg, text=text, parse_mode="html")
         else:
             methods.ReplyText(
                 client=client,

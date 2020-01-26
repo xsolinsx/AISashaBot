@@ -279,20 +279,28 @@ def InstantiateGreetingsDictionary(chat_id: int):
         )
 
 
-def PrintUser(user: pyrogram.User) -> str:
+def PrintUser(user: pyrogram.User, tag=True) -> str:
     return (
         (user.first_name + (f" {user.last_name}" if user.last_name else ""))
         + " ("
-        + (f"@{user.username} " if user.username else "")
+        + (
+            (f"@{user.username} " if tag else f"<code>@{user.username}</code> ")
+            if user.username
+            else ""
+        )
         + f"#user{user.id})"
     )
 
 
-def PrintChat(chat: pyrogram.Chat) -> str:
+def PrintChat(chat: pyrogram.Chat, tag=True) -> str:
     return (
         chat.title
         + " ("
-        + (f"@{chat.username} " if chat.username else "")
+        + (
+            (f"@{chat.username} " if tag else f"<code>@{chat.username}</code> ")
+            if chat.username
+            else ""
+        )
         + f"#chat{abs(chat.id)})"
     )
 

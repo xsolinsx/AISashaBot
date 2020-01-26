@@ -90,6 +90,10 @@ def Info(
             else:
                 # update telegram data saved on db
                 db_management.RUserChat.update(
+                    is_member=member.status == "creator"
+                    or member.status == "administrator"
+                    or member.status == "member"
+                    or (member.status == "restricted" and member.is_member),
                     is_admin=member.status == "administrator",
                     can_be_edited=bool(member.can_be_edited),
                     can_change_info=member.status == "creator"
@@ -110,10 +114,9 @@ def Info(
                 ).execute()
                 other_info.append(_(chat_settings.language, member.status).upper())
 
-            if other_info:
-                user_info += _(chat_settings.language, "info_other") + ", ".join(
-                    other_info
-                )
+            user_info += _(chat_settings.language, "info_other") + (
+                ", ".join(other_info) if other_info else "/"
+            )
             chat_info = GetObjInfo(
                 client=client,
                 value=chat_id,
@@ -181,7 +184,7 @@ def GetObjInfo(
                     + _(language, "info_title")
                     + f"{html.escape(chat.title)}\n"
                     + _(language, "info_username")
-                    + (f"@{chat.username}" if chat.username else "/")
+                    + (f"<code>@{chat.username}</code>" if chat.username else "/")
                     + "\n"
                 )
             else:
@@ -202,7 +205,7 @@ def GetObjInfo(
                     + (user.last_name if user.last_name else "/")
                     + "\n"
                     + _(language, "info_username")
-                    + (f"@{user.username}" if user.username else "/")
+                    + (f"<code>@{user.username}</code>" if user.username else "/")
                     + "\n"
                     + _(language, "info_nickname")
                     + (user_settings.nickname if user_settings.nickname else "/")
