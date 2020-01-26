@@ -168,10 +168,10 @@ def CbQryChatPluginsMinRank(client: pyrogram.Client, cb_qry: pyrogram.CallbackQu
         if r_chat_plugin:
             i = r_chat_plugin.min_rank + 1
             if utils.IsOwnerOrHigher(user_id=cb_qry.from_user.id, chat_id=chat_id):
-                if i > dictionaries.RANKS["owner"]:
+                if i > dictionaries.RANK_STRING["owner"]:
                     i = 0
             else:
-                if i > dictionaries.RANKS["senior_mod"]:
+                if i > dictionaries.RANK_STRING["senior_mod"]:
                     i = 0
             r_chat_plugin.min_rank = i
             try:
@@ -193,7 +193,7 @@ def CbQryChatPluginsMinRank(client: pyrogram.Client, cb_qry: pyrogram.CallbackQu
                         _(cb_qry.from_user.settings.language, r_chat_plugin.plugin),
                         _(
                             cb_qry.from_user.settings.language,
-                            dictionaries.RANKS[r_chat_plugin.min_rank],
+                            dictionaries.RANK_STRING[r_chat_plugin.min_rank],
                         ),
                     ),
                     show_alert=True,

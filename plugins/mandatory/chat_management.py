@@ -2209,57 +2209,78 @@ def CmdSettingsChat(client: pyrogram.Client, msg: pyrogram.Message):
 def CmdStaff(client: pyrogram.Client, msg: pyrogram.Message):
     query: peewee.ModelSelect = db_management.RUserChat.select().where(
         (db_management.RUserChat.chat_id == msg.chat.id)
-        & (db_management.RUserChat.rank > 1)
+        & ((db_management.RUserChat.rank > 1) | (db_management.RUserChat.is_admin))
     ).order_by(db_management.RUserChat.rank.desc())
     already_listed = list()
     text = (
-        _(msg.chat.settings.language, "staff").upper()
+        "<b>"
+        + _(msg.chat.settings.language, "staff").upper()
+        + "</b>"
         + f" {utils.PrintChat(chat=msg.chat)}\n\n\n"
     )
 
-    text += f"{_(msg.chat.settings.language, dictionaries.RANKS[4]).upper()}\n"
+    # owner
+    text += f"<b>{_(msg.chat.settings.language, dictionaries.RANK_STRING[4]).upper()}</b> {dictionaries.RANK_EMOJI[4]}\n"
     subquery: peewee.ModelSelect = query.select().where(
         db_management.RUserChat.rank == 4
     )
-    # useless loop as there's always one and only one owner
     for r_user_chat in subquery:
         if r_user_chat.user_id not in already_listed:
-            text += f"{utils.PrintUser(user=r_user_chat.user, tag=False)}\n\n"
+            text += f"  {utils.PrintUser(user=r_user_chat.user, use_html=True)}\n"
             already_listed.append(r_user_chat.user_id)
     # senior and junior mods
     for i in range(3, 1, -1):
-        label_written = False
         subquery: peewee.ModelSelect = query.select().where(
             db_management.RUserChat.rank == i
         )
-        for r_user_chat in subquery:
-            if r_user_chat.user_id not in already_listed:
-                if not label_written:
-                    label_written = True
-                    text += f"\n{_(msg.chat.settings.language, dictionaries.RANKS[i]).upper()}\n"
-                text += (
-                    "  "
-                    + (pyrogram.Emoji.MAN_GUARD if r_user_chat.is_admin else "")
-                    + f"{utils.PrintUser(user=r_user_chat.user, tag=False)}\n"
-                )
-                already_listed.append(r_user_chat.user_id)
+        if len(subquery) > 0:
+            text += f"\n<b>{_(msg.chat.settings.language, dictionaries.RANK_STRING[i]).upper()}</b> {dictionaries.RANK_EMOJI[i]}\n"
+            for r_user_chat in subquery:
+                if r_user_chat.user_id not in already_listed:
+                    text += (
+                        "  "
+                        + (
+                            dictionaries.RANK_EMOJI["administrator"]
+                            if r_user_chat.is_admin
+                            else ""
+                        )
+                        + f"{utils.PrintUser(user=r_user_chat.user, use_html=True)}\n"
+                    )
+                    already_listed.append(r_user_chat.user_id)
     # tg admins
-    label_written = False
     subquery: peewee.ModelSelect = query.select().where(
         db_management.RUserChat.is_admin
     )
-    for r_user_chat in subquery:
-        if r_user_chat.user_id not in already_listed:
-            if not label_written:
-                label_written = True
-                text += (
-                    _(
-                        msg.chat.settings.language, dictionaries.RANKS["administrator"]
-                    ).upper()
-                    + f" {pyrogram.Emoji.MAN_GUARD}\n"
+    if len(subquery) > 0:
+        tmp_text = ""
+        for r_user_chat in subquery:
+            if r_user_chat.user_id not in already_listed:
+                tmp_text += (
+                    f"  {utils.PrintUser(user=r_user_chat.user, use_html=True)}\n"
                 )
-            text += f"  {utils.PrintUser(user=r_user_chat.user, tag=False)}\n"
-            already_listed.append(r_user_chat.user_id)
+                already_listed.append(r_user_chat.user_id)
+        if tmp_text:
+            text += (
+                "\n<b>"
+                + _(
+                    msg.chat.settings.language,
+                    dictionaries.RANK_STRING["administrator"],
+                ).upper()
+                + "</b> "
+                + dictionaries.RANK_EMOJI["administrator"]
+                + f"\n{tmp_text}"
+            )
+        else:
+            text += (
+                "\n"
+                + dictionaries.RANK_EMOJI["administrator"]
+                + " = <b>"
+                + _(
+                    msg.chat.settings.language,
+                    dictionaries.RANK_STRING["administrator"],
+                ).capitalize()
+                + "</b>"
+            )
 
     methods.ReplyText(client=client, msg=msg, text=text, parse_mode="html")
 
@@ -2282,7 +2303,10 @@ def CmdStaffChat(client: pyrogram.Client, msg: pyrogram.Message):
         if chat_settings:
             query: peewee.ModelSelect = db_management.RUserChat.select().where(
                 (db_management.RUserChat.chat_id == chat_id)
-                & (db_management.RUserChat.rank > 1)
+                & (
+                    (db_management.RUserChat.rank > 1)
+                    | (db_management.RUserChat.is_admin)
+                )
             ).order_by(db_management.RUserChat.rank.desc())
             already_listed = list()
             text = (
@@ -2290,50 +2314,68 @@ def CmdStaffChat(client: pyrogram.Client, msg: pyrogram.Message):
                 + f" {utils.PrintChat(chat=chat_settings.chat)}\n\n\n"
             )
 
-            text += f"{_(chat_settings.language, dictionaries.RANKS[4]).upper()}\n"
+            # owner
+            text += f"<b>{_(chat_settings.language, dictionaries.RANK_STRING[4]).upper()}</b> {dictionaries.RANK_EMOJI[4]}\n"
             subquery: peewee.ModelSelect = query.select().where(
                 db_management.RUserChat.rank == 4
             )
-            # useless loop as there's always one and only one owner
             for r_user_chat in subquery:
                 if r_user_chat.user_id not in already_listed:
-                    text += f"  {utils.PrintUser(user=r_user_chat.user, tag=False)}\n\n"
+                    text += f"  {utils.PrintUser(user=r_user_chat.user, tag=False)}\n"
                     already_listed.append(r_user_chat.user_id)
             # senior and junior mods
             for i in range(3, 1, -1):
-                label_written = False
                 subquery: peewee.ModelSelect = query.select().where(
                     db_management.RUserChat.rank == i
                 )
-                for r_user_chat in subquery:
-                    if r_user_chat.user_id not in already_listed:
-                        if not label_written:
-                            label_written = True
-                            text += f"\n{_(chat_settings.language, dictionaries.RANKS[i]).upper()}\n"
-                        text += (
-                            "  "
-                            + (pyrogram.Emoji.MAN_GUARD if r_user_chat.is_admin else "")
-                            + f"{utils.PrintUser(user=r_user_chat.user, tag=False)}\n"
-                        )
-                        already_listed.append(r_user_chat.user_id)
+                if len(subquery) > 0:
+                    text += f"\n<b>{_(chat_settings.language, dictionaries.RANK_STRING[i]).upper()}</b>\n"
+                    for r_user_chat in subquery:
+                        if r_user_chat.user_id not in already_listed:
+                            text += (
+                                "  "
+                                + (
+                                    dictionaries.RANK_EMOJI["administrator"]
+                                    if r_user_chat.is_admin
+                                    else ""
+                                )
+                                + f"{utils.PrintUser(user=r_user_chat.user, tag=False)}\n"
+                            )
+                            already_listed.append(r_user_chat.user_id)
             # tg admins
-            label_written = False
             subquery: peewee.ModelSelect = query.select().where(
                 db_management.RUserChat.is_admin
             )
-            for r_user_chat in subquery:
-                if r_user_chat.user_id not in already_listed:
-                    if not label_written:
-                        label_written = True
-                        text += (
-                            _(
-                                chat_settings.language,
-                                dictionaries.RANKS["administrator"],
-                            ).upper()
-                            + f" {pyrogram.Emoji.MAN_GUARD}\n"
+            if len(subquery) > 0:
+                tmp_text = ""
+                for r_user_chat in subquery:
+                    if r_user_chat.user_id not in already_listed:
+                        tmp_text += (
+                            f"  {utils.PrintUser(user=r_user_chat.user, tag=False)}\n"
                         )
-                    text += f"  {utils.PrintUser(user=r_user_chat.user, tag=False)}\n\n"
-                    already_listed.append(r_user_chat.user_id)
+                        already_listed.append(r_user_chat.user_id)
+                if tmp_text:
+                    text += (
+                        "\n<b>"
+                        + _(
+                            chat_settings.language,
+                            dictionaries.RANK_STRING["administrator"],
+                        ).upper()
+                        + "</b> "
+                        + dictionaries.RANK_EMOJI["administrator"]
+                        + f"\n{tmp_text}"
+                    )
+                else:
+                    text += (
+                        "\n"
+                        + dictionaries.RANK_EMOJI["administrator"]
+                        + " = <b>"
+                        + _(
+                            chat_settings.language,
+                            dictionaries.RANK_STRING["administrator"],
+                        ).capitalize()
+                        + "</b>"
+                    )
 
             methods.ReplyText(client=client, msg=msg, text=text, parse_mode="html")
         else:
@@ -2474,7 +2516,7 @@ def CmdAdmins(client: pyrogram.Client, msg: pyrogram.Message):
         utils.tmp_dicts["staffContacted"].add(msg.chat.id)
         query: peewee.ModelSelect = db_management.RUserChat.select().where(
             (db_management.RUserChat.chat_id == msg.chat.id)
-            & (db_management.RUserChat.rank > 1)
+            & ((db_management.RUserChat.rank > 1) | (db_management.RUserChat.is_admin))
         ).order_by(db_management.RUserChat.rank.desc())
 
         admins = list()
@@ -2496,7 +2538,6 @@ def CmdAdmins(client: pyrogram.Client, msg: pyrogram.Message):
         subquery: peewee.ModelSelect = query.select().where(
             db_management.RUserChat.rank == 4
         )
-        # useless loop as there's always one and only one owner
         for r_user_chat in subquery:
             if r_user_chat.user_id not in admins:
                 admins.append(r_user_chat.user_id)

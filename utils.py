@@ -279,12 +279,18 @@ def InstantiateGreetingsDictionary(chat_id: int):
         )
 
 
-def PrintUser(user: pyrogram.User, tag=True) -> str:
+def PrintUser(user: pyrogram.User, use_html=False) -> str:
     return (
-        (user.first_name + (f" {user.last_name}" if user.last_name else ""))
+        (
+            html.escape(
+                user.first_name + (f" {user.last_name}" if user.last_name else "")
+            )
+            if use_html
+            else (user.first_name + (f" {user.last_name}" if user.last_name else ""))
+        )
         + " ("
         + (
-            (f"@{user.username} " if tag else f"<code>@{user.username}</code> ")
+            (f"<code>@{user.username}</code> " if use_html else f"@{user.username} ")
             if user.username
             else ""
         )
@@ -292,15 +298,11 @@ def PrintUser(user: pyrogram.User, tag=True) -> str:
     )
 
 
-def PrintChat(chat: pyrogram.Chat, tag=True) -> str:
+def PrintChat(chat: pyrogram.Chat) -> str:
     return (
         chat.title
         + " ("
-        + (
-            (f"@{chat.username} " if tag else f"<code>@{chat.username}</code> ")
-            if chat.username
-            else ""
-        )
+        + (f"@{chat.username} " if chat.username else "")
         + f"#chat{abs(chat.id)})"
     )
 
@@ -1103,17 +1105,17 @@ def GetRank(
                     user_id=user_id, chat_id=chat_id, r_user_chat=r_user_chat,
                 ):
                     if IsMasterOrBot(user_id=user_id):
-                        return dictionaries.RANKS["master"]
+                        return dictionaries.RANK_STRING["master"]
                     else:
-                        return dictionaries.RANKS["owner"]
+                        return dictionaries.RANK_STRING["owner"]
                 else:
-                    return dictionaries.RANKS["senior_mod"]
+                    return dictionaries.RANK_STRING["senior_mod"]
             else:
-                return dictionaries.RANKS["junior_mod"]
+                return dictionaries.RANK_STRING["junior_mod"]
         else:
-            return dictionaries.RANKS["privileged_user"]
+            return dictionaries.RANK_STRING["privileged_user"]
     else:
-        return dictionaries.RANKS["user"]
+        return dictionaries.RANK_STRING["user"]
 
 
 def CompareRanks(

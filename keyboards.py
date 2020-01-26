@@ -3420,7 +3420,7 @@ def BuildInfoMenu(
                             text=dictionaries.RADIOBUTTON_EMOJI[
                                 int(
                                     r_target_chat.rank
-                                    == dictionaries.RANKS["privileged_user"]
+                                    == dictionaries.RANK_STRING["privileged_user"]
                                 )
                             ],
                             callback_data="info privileged_user",
@@ -3429,7 +3429,7 @@ def BuildInfoMenu(
                             text=dictionaries.RADIOBUTTON_EMOJI[
                                 int(
                                     r_target_chat.rank
-                                    == dictionaries.RANKS["junior_mod"]
+                                    == dictionaries.RANK_STRING["junior_mod"]
                                 )
                             ],
                             callback_data="info junior_mod",
@@ -3438,7 +3438,7 @@ def BuildInfoMenu(
                             text=dictionaries.RADIOBUTTON_EMOJI[
                                 int(
                                     r_target_chat.rank
-                                    == dictionaries.RANKS["senior_mod"]
+                                    == dictionaries.RANK_STRING["senior_mod"]
                                 )
                             ],
                             callback_data="info senior_mod",
@@ -3671,9 +3671,10 @@ def BuildHelpMenu(
             .where(db_management.Plugins.is_enabled)
             .order_by(peewee.fn.LOWER(db_management.Plugins.name))
             if p.name in dictionaries.HELP_DICTIONARY
-            and dictionaries.HELP_DICTIONARY[p.name][0].lower() in dictionaries.RANKS
+            and dictionaries.HELP_DICTIONARY[p.name][0].lower()
+            in dictionaries.RANK_STRING
             and rank
-            >= dictionaries.RANKS[dictionaries.HELP_DICTIONARY[p.name][0].lower()]
+            >= dictionaries.RANK_STRING[dictionaries.HELP_DICTIONARY[p.name][0].lower()]
         ]
         max_columns = 2
         page = AdjustPage(
@@ -3848,7 +3849,7 @@ def BuildChatPluginsMenu(
                     callback_data=f"chatplugins is_enabled_on_chat {query[i].plugin}",
                 ),
                 pyrogram.InlineKeyboardButton(
-                    text=f"{dictionaries.RANKS[query[i].min_rank]}^",
+                    text=f"{dictionaries.RANK_STRING[query[i].min_rank]}^",
                     callback_data=f"chatplugins min_rank {query[i].plugin}",
                 ),
             ]
@@ -3978,7 +3979,7 @@ def BuildActionOnAddedUsersList(
         keyboard.append(
             [
                 pyrogram.InlineKeyboardButton(
-                    text=f"{utils.PrintUser(user=user)}",
+                    text=f"{user.id} - {user.first_name}",
                     callback_data=f"useless{action} {user.id}",
                 ),
                 pyrogram.InlineKeyboardButton(

@@ -60,7 +60,7 @@ def Info(
                 + _(
                     chat_settings.language,
                     str(
-                        dictionaries.RANKS[
+                        dictionaries.RANK_STRING[
                             utils.GetRank(
                                 user_id=target,
                                 chat_id=chat_id,
@@ -125,7 +125,7 @@ def Info(
 
             return (
                 _(chat_settings.language, "info_of_X_in_Y").format(
-                    f"{utils.PrintUser(r_target_chat.user)}",
+                    f"{utils.PrintUser(user=r_target_chat.user, use_html=True)}",
                     f"{utils.PrintChat(chat=chat_settings.chat)}",
                 )
                 + f"{user_info}\n\n{chat_info}"
@@ -339,7 +339,7 @@ def Warn(
             chat_id=chat_id,
             r_executer_chat=r_executer_chat,
             r_target_chat=r_target_chat,
-            min_rank=dictionaries.RANKS["junior_mod"],
+            min_rank=dictionaries.RANK_STRING["junior_mod"],
         ):
             if chat_settings.max_warns_punishment:
                 r_target_chat.warns += 1
@@ -463,7 +463,7 @@ def Unwarn(
             chat_id=chat_id,
             r_executer_chat=r_executer_chat,
             r_target_chat=r_target_chat,
-            min_rank=dictionaries.RANKS["junior_mod"],
+            min_rank=dictionaries.RANK_STRING["junior_mod"],
         ):
             if r_target_chat.warns > 0:
                 r_target_chat.warns -= 1
@@ -519,7 +519,7 @@ def UnwarnAll(
             chat_id=chat_id,
             r_executer_chat=r_executer_chat,
             r_target_chat=r_target_chat,
-            min_rank=dictionaries.RANKS["junior_mod"],
+            min_rank=dictionaries.RANK_STRING["junior_mod"],
         ):
             r_target_chat.warns = 0
             r_target_chat.save()
@@ -570,7 +570,7 @@ def Kick(
             chat_id=chat_id,
             r_executer_chat=r_executer_chat,
             r_target_chat=r_target_chat,
-            min_rank=dictionaries.RANKS["junior_mod"],
+            min_rank=dictionaries.RANK_STRING["junior_mod"],
         ):
             text = ""
             try:
@@ -661,7 +661,7 @@ def Restrict(
                 chat_id=chat_id,
                 r_executer_chat=r_executer_chat,
                 r_target_chat=r_target_chat,
-                min_rank=dictionaries.RANKS["junior_mod"],
+                min_rank=dictionaries.RANK_STRING["junior_mod"],
             ):
                 text = ""
                 try:
@@ -790,7 +790,7 @@ def Unrestrict(
             chat_id=chat_id,
             r_executer_chat=r_executer_chat,
             r_target_chat=r_target_chat,
-            min_rank=dictionaries.RANKS["junior_mod"],
+            min_rank=dictionaries.RANK_STRING["junior_mod"],
         ):
             text = ""
             try:
@@ -881,7 +881,7 @@ def Ban(
                 chat_id=chat_id,
                 r_executer_chat=r_executer_chat,
                 r_target_chat=r_target_chat,
-                min_rank=dictionaries.RANKS["junior_mod"],
+                min_rank=dictionaries.RANK_STRING["junior_mod"],
             ):
                 text = ""
                 try:
@@ -1007,7 +1007,7 @@ def Unban(
             chat_id=chat_id,
             r_executer_chat=r_executer_chat,
             r_target_chat=r_target_chat,
-            min_rank=dictionaries.RANKS["junior_mod"],
+            min_rank=dictionaries.RANK_STRING["junior_mod"],
         ):
             text = ""
             try:
@@ -1084,7 +1084,7 @@ def GBan(
         executer=executer,
         target=target,
         chat_id=chat_id,
-        min_rank=dictionaries.RANKS["master"],
+        min_rank=dictionaries.RANK_STRING["master"],
     ):
         today = datetime.date.today()
         expiration = today + datetime.timedelta(seconds=seconds)
@@ -1149,7 +1149,7 @@ def Ungban(
         executer=executer,
         target=target,
         chat_id=chat_id,
-        min_rank=dictionaries.RANKS["master"],
+        min_rank=dictionaries.RANK_STRING["master"],
     ):
         target_settings.global_ban_counter -= 1
         target_settings.global_ban_expiration = datetime.date.today()
@@ -1201,7 +1201,7 @@ def Block(
         executer=executer,
         target=target,
         chat_id=chat_id,
-        min_rank=dictionaries.RANKS["master"],
+        min_rank=dictionaries.RANK_STRING["master"],
     ):
         now = datetime.datetime.utcnow()
         expiration = now + datetime.timedelta(seconds=seconds)
@@ -1259,7 +1259,7 @@ def Unblock(
         executer=executer,
         target=target,
         chat_id=chat_id,
-        min_rank=dictionaries.RANKS["master"],
+        min_rank=dictionaries.RANK_STRING["master"],
     ):
         target_settings.block_counter -= 1
         target_settings.block_expiration = datetime.datetime.utcnow()

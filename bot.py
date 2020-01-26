@@ -55,7 +55,7 @@ BOT_CLIENT.ME = BOT_CLIENT.get_me()
 print(
     start_string.format(
         bot_version=f"Pyrogram {BOT_CLIENT.ME.first_name}",
-        bot_data=utils.PrintUser(BOT_CLIENT.ME),
+        bot_data=utils.PrintUser(user=BOT_CLIENT.ME),
     )
 )
 

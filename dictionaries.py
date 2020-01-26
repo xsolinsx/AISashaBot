@@ -163,7 +163,29 @@ LANGUAGE_EMOJI = {
 }
 
 
-RANKS = {
+RANK_EMOJI = {
+    0: pyrogram.Emoji.BUST_IN_SILHOUETTE,
+    1: pyrogram.Emoji.ADULT_MEDIUM_SKIN_TONE,
+    2: pyrogram.Emoji.DETECTIVE,
+    3: pyrogram.Emoji.POLICE_OFFICER,
+    4: pyrogram.Emoji.CROWN,
+    5: pyrogram.Emoji.GLOBE_WITH_MERIDIANS + pyrogram.Emoji.POLICE_OFFICER,
+    6: pyrogram.Emoji.GLOBE_WITH_MERIDIANS + pyrogram.Emoji.CROWN,
+    7: pyrogram.Emoji.SUPERHERO,
+    "administrator": pyrogram.Emoji.MAN_GUARD,
+    pyrogram.Emoji.BUST_IN_SILHOUETTE: 0,
+    pyrogram.Emoji.ADULT_MEDIUM_SKIN_TONE: 1,
+    pyrogram.Emoji.DETECTIVE: 2,
+    pyrogram.Emoji.POLICE_OFFICER: 3,
+    pyrogram.Emoji.CROWN: 4,
+    pyrogram.Emoji.GLOBE_WITH_MERIDIANS + pyrogram.Emoji.POLICE_OFFICER: 5,
+    pyrogram.Emoji.GLOBE_WITH_MERIDIANS + pyrogram.Emoji.CROWN: 6,
+    pyrogram.Emoji.SUPERHERO: 7,
+    pyrogram.Emoji.MAN_GUARD: "administrator",
+}
+
+
+RANK_STRING = {
     0: "user",
     1: "privileged_user",
     2: "junior_mod",

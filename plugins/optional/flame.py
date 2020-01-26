@@ -86,7 +86,7 @@ def CmdFlameReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                 chat_id=msg.chat.id,
                 r_executer_chat=msg.r_user_chat,
                 r_target_chat=msg.reply_to_message.r_user_chat,
-                min_rank=dictionaries.RANKS["junior_mod"],
+                min_rank=dictionaries.RANK_STRING["junior_mod"],
             ):
                 if not db_management.RFlamedUserChat.get_or_none(
                     chat_id=msg.chat.id,
@@ -188,7 +188,7 @@ def CmdFlameUser(client: pyrogram.Client, msg: pyrogram.Message):
                     chat_id=msg.chat.id,
                     r_executer_chat=msg.r_user_chat,
                     r_target_chat=r_target_chat,
-                    min_rank=dictionaries.RANKS["junior_mod"],
+                    min_rank=dictionaries.RANK_STRING["junior_mod"],
                 ):
                     if not db_management.RFlamedUserChat.get_or_none(
                         chat_id=msg.chat.id, flamed_user_id=user_id,
@@ -306,7 +306,7 @@ def CmdFlameChatUser(client: pyrogram.Client, msg: pyrogram.Message):
                         chat_id=chat_id,
                         r_executer_chat=r_executer_chat,
                         r_target_chat=r_target_chat,
-                        min_rank=dictionaries.RANKS["junior_mod"],
+                        min_rank=dictionaries.RANK_STRING["junior_mod"],
                     ):
                         if not db_management.RFlamedUserChat.get_or_none(
                             chat_id=chat_id, flamed_user_id=user_id,
@@ -408,7 +408,7 @@ def CmdStopFlameReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                 chat_id=msg.chat.id,
                 r_executer_chat=msg.r_user_chat,
                 r_target_chat=msg.reply_to_message.r_user_chat,
-                min_rank=dictionaries.RANKS["junior_mod"],
+                min_rank=dictionaries.RANK_STRING["junior_mod"],
             ):
                 r_flameduser_chat: db_management.RFlamedUserChat = db_management.RFlamedUserChat.get_or_none(
                     chat_id=msg.chat.id,
@@ -468,7 +468,7 @@ def CmdStopFlameUser(client: pyrogram.Client, msg: pyrogram.Message):
                     chat_id=msg.chat.id,
                     r_executer_chat=msg.r_user_chat,
                     r_target_chat=r_target_chat,
-                    min_rank=dictionaries.RANKS["junior_mod"],
+                    min_rank=dictionaries.RANK_STRING["junior_mod"],
                 ):
                     r_flameduser_chat: db_management.RFlamedUserChat = db_management.RFlamedUserChat.get_or_none(
                         chat_id=msg.chat.id, flamed_user_id=user_id,
@@ -538,7 +538,7 @@ def CmdStopFlameChatUser(client: pyrogram.Client, msg: pyrogram.Message):
                         chat_id=chat_id,
                         r_executer_chat=r_executer_chat,
                         r_target_chat=r_target_chat,
-                        min_rank=dictionaries.RANKS["junior_mod"],
+                        min_rank=dictionaries.RANK_STRING["junior_mod"],
                     ):
                         r_flameduser_chat: db_management.RFlamedUserChat = db_management.RFlamedUserChat.get_or_none(
                             chat_id=chat_id, flamed_user_id=user_id,

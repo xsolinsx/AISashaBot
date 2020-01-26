@@ -146,11 +146,11 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             chat_id=chat_id,
             r_executer_chat=r_executer_chat,
             r_target_chat=r_target_chat,
-            min_rank=dictionaries.RANKS["senior_mod"],
+            min_rank=dictionaries.RANK_STRING["senior_mod"],
         ):
             r_target_chat.rank = (
-                dictionaries.RANKS["privileged_user"]
-                if r_target_chat.rank != dictionaries.RANKS["privileged_user"]
+                dictionaries.RANK_STRING["privileged_user"]
+                if r_target_chat.rank != dictionaries.RANK_STRING["privileged_user"]
                 else 0
             )
             try:
@@ -187,11 +187,11 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             chat_id=chat_id,
             r_executer_chat=r_executer_chat,
             r_target_chat=r_target_chat,
-            min_rank=dictionaries.RANKS["senior_mod"],
+            min_rank=dictionaries.RANK_STRING["senior_mod"],
         ):
             r_target_chat.rank = (
-                dictionaries.RANKS["junior_mod"]
-                if r_target_chat.rank != dictionaries.RANKS["junior_mod"]
+                dictionaries.RANK_STRING["junior_mod"]
+                if r_target_chat.rank != dictionaries.RANK_STRING["junior_mod"]
                 else 0
             )
             try:
@@ -228,11 +228,11 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             chat_id=chat_id,
             r_executer_chat=r_executer_chat,
             r_target_chat=r_target_chat,
-            min_rank=dictionaries.RANKS["owner"],
+            min_rank=dictionaries.RANK_STRING["owner"],
         ):
             r_target_chat.rank = (
-                dictionaries.RANKS["senior_mod"]
-                if r_target_chat.rank != dictionaries.RANKS["senior_mod"]
+                dictionaries.RANK_STRING["senior_mod"]
+                if r_target_chat.rank != dictionaries.RANK_STRING["senior_mod"]
                 else 0
             )
             try:
@@ -272,7 +272,7 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             and utils.GetRank(
                 user_id=target_id, chat_id=chat_id, r_user_chat=r_target_chat
             )
-            < dictionaries.RANKS["junior_mod"]
+            < dictionaries.RANK_STRING["junior_mod"]
         ):
             r_target_chat.is_whitelisted = not r_target_chat.is_whitelisted
             try:
@@ -343,7 +343,7 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             chat_id=chat_id,
             r_executer_chat=r_executer_chat,
             r_target_chat=r_target_chat,
-            min_rank=dictionaries.RANKS["junior_mod"],
+            min_rank=dictionaries.RANK_STRING["junior_mod"],
         ):
             text = None
             if "--" in cb_qry.data:
@@ -391,7 +391,7 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             chat_id=chat_id,
             r_executer_chat=r_executer_chat,
             r_target_chat=r_target_chat,
-            min_rank=dictionaries.RANKS["junior_mod"],
+            min_rank=dictionaries.RANK_STRING["junior_mod"],
         ):
             if "selectvalue" in cb_qry.data:
                 text = None

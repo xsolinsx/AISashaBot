@@ -33,11 +33,11 @@ def CmdStartPrivate(client: pyrogram.Client, msg: pyrogram.Message):
                 ],
                 [
                     pyrogram.InlineKeyboardButton(
-                        text=pyrogram.Emoji.GLOBE_WITH_MERIDIANS
+                        text=pyrogram.Emoji.WORLD_MAP
                         + " "
                         + _(msg.chat.settings.language, "set_your_language")
                         + " "
-                        + pyrogram.Emoji.GLOBE_WITH_MERIDIANS,
+                        + pyrogram.Emoji.WORLD_MAP,
                         callback_data="mysettings start",
                     )
                 ],
@@ -123,8 +123,8 @@ def CbQryHelpPlugin(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
     else:
         tmp_text = ""
         for cmd in dictionaries.HELP_DICTIONARY[plugin]:
-            if cmd.isupper() and cmd.lower() in dictionaries.RANKS:
-                if rank < dictionaries.RANKS[cmd.lower()]:
+            if cmd.isupper() and cmd.lower() in dictionaries.RANK_STRING:
+                if rank < dictionaries.RANK_STRING[cmd.lower()]:
                     break
                 else:
                     # print rank
@@ -175,8 +175,9 @@ def CbQryHelp(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         .where(db_management.Plugins.is_enabled)
         .order_by(peewee.fn.LOWER(db_management.Plugins.name))
         if p.name in dictionaries.HELP_DICTIONARY
-        and dictionaries.HELP_DICTIONARY[p.name][0].lower() in dictionaries.RANKS
-        and rank >= dictionaries.RANKS[dictionaries.HELP_DICTIONARY[p.name][0].lower()]
+        and dictionaries.HELP_DICTIONARY[p.name][0].lower() in dictionaries.RANK_STRING
+        and rank
+        >= dictionaries.RANK_STRING[dictionaries.HELP_DICTIONARY[p.name][0].lower()]
     ]
     for plugin in user_viewable_plugins:
         text += (
@@ -208,9 +209,10 @@ def CmdHelp(client: pyrogram.Client, msg: pyrogram.Message):
             .where(db_management.Plugins.is_enabled)
             .order_by(peewee.fn.LOWER(db_management.Plugins.name))
             if p.name in dictionaries.HELP_DICTIONARY
-            and dictionaries.HELP_DICTIONARY[p.name][0].lower() in dictionaries.RANKS
+            and dictionaries.HELP_DICTIONARY[p.name][0].lower()
+            in dictionaries.RANK_STRING
             and rank
-            >= dictionaries.RANKS[dictionaries.HELP_DICTIONARY[p.name][0].lower()]
+            >= dictionaries.RANK_STRING[dictionaries.HELP_DICTIONARY[p.name][0].lower()]
         ]
         for plugin in user_viewable_plugins:
             text += (
@@ -237,8 +239,8 @@ def CmdHelp(client: pyrogram.Client, msg: pyrogram.Message):
         else:
             tmp_text = ""
             for cmd in dictionaries.HELP_DICTIONARY[plugin]:
-                if cmd.isupper() and cmd.lower() in dictionaries.RANKS:
-                    if rank < dictionaries.RANKS[cmd.lower()]:
+                if cmd.isupper() and cmd.lower() in dictionaries.RANK_STRING:
+                    if rank < dictionaries.RANK_STRING[cmd.lower()]:
                         break
                     else:
                         # print rank
@@ -289,8 +291,9 @@ def CmdHelpAll(client: pyrogram.Client, msg: pyrogram.Message):
         .where(db_management.Plugins.is_enabled)
         .order_by(peewee.fn.LOWER(db_management.Plugins.name))
         if p.name in dictionaries.HELP_DICTIONARY
-        and dictionaries.HELP_DICTIONARY[p.name][0].lower() in dictionaries.RANKS
-        and rank >= dictionaries.RANKS[dictionaries.HELP_DICTIONARY[p.name][0].lower()]
+        and dictionaries.HELP_DICTIONARY[p.name][0].lower() in dictionaries.RANK_STRING
+        and rank
+        >= dictionaries.RANK_STRING[dictionaries.HELP_DICTIONARY[p.name][0].lower()]
     ]
     for plugin in user_viewable_plugins:
         text += (
@@ -304,8 +307,8 @@ def CmdHelpAll(client: pyrogram.Client, msg: pyrogram.Message):
     for plugin, list_of_commands in dictionaries.HELP_DICTIONARY.items():
         tmp_text = ""
         for cmd in list_of_commands:
-            if cmd.isupper() and cmd.lower() in dictionaries.RANKS:
-                if rank < dictionaries.RANKS[cmd.lower()]:
+            if cmd.isupper() and cmd.lower() in dictionaries.RANK_STRING:
+                if rank < dictionaries.RANK_STRING[cmd.lower()]:
                     # next plugin
                     break
                 else:
