@@ -174,7 +174,7 @@ def CbQryMySettingsStart(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
                         text=_(
                             cb_qry.from_user.settings.language, "add_me_to_your_group",
                         ),
-                        url="t.me/aisashabetabot?startgroup=new_group",
+                        url="t.me/aisashabot?startgroup=new_group",
                     )
                 ]
             ]

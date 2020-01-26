@@ -28,7 +28,7 @@ def CmdStartPrivate(client: pyrogram.Client, msg: pyrogram.Message):
                 [
                     pyrogram.InlineKeyboardButton(
                         text=_(msg.chat.settings.language, "add_me_to_your_group"),
-                        url="t.me/aisashabetabot?startgroup=new_group",
+                        url="t.me/aisashabot?startgroup=new_group",
                     )
                 ],
                 [
@@ -49,7 +49,7 @@ def CmdStartPrivate(client: pyrogram.Client, msg: pyrogram.Message):
 @pyrogram.Client.on_message(
     (
         pyrogram.Filters.command(
-            commands=["start@AISashaBetaBot new_group"], prefixes=["/", "!", "#", "."]
+            commands=["start@AISashaBot new_group"], prefixes=["/", "!", "#", "."]
         )
         | pyrogram.Filters.group_chat_created
     )
