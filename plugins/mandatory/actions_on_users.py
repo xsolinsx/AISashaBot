@@ -1470,13 +1470,17 @@ def CbQryInactives(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             show_alert=False,
         )
         action = cb_qry.data.replace("inactives ", "")
-        query: peewee.ModelSelect = db_management.RUserChat.select().where(
+        query: peewee.ModelSelect = db_management.RUserChat.select().join(
+            db_management.Users,
+            on=(db_management.RUserChat.user_id == db_management.Users.id),
+        ).where(
             (db_management.RUserChat.chat == chat_id)
             & (db_management.RUserChat.timestamp < min_date)
             & (db_management.RUserChat.is_member)
             & (db_management.RUserChat.rank < 1)
             & (~db_management.RUserChat.is_admin)
             & (~db_management.RUserChat.is_whitelisted)
+            & (~db_management.Users.is_bot)
         )
         if "list" in action:
             file_name = f"./downloads/{method}inactives_{abs(chat_id)}_{secrets.token_hex(5)}_{time.time()}.txt"
@@ -1600,13 +1604,17 @@ def CmdKickInactives(client: pyrogram.Client, msg: pyrogram.Message):
                 text=_(msg.chat.settings.language, "error_try_again"),
             )
         else:
-            query: peewee.ModelSelect = db_management.RUserChat.select().where(
+            query: peewee.ModelSelect = db_management.RUserChat.select().join(
+                db_management.Users,
+                on=(db_management.RUserChat.user_id == db_management.Users.id),
+            ).where(
                 (db_management.RUserChat.chat == msg.chat.id)
                 & (db_management.RUserChat.timestamp < min_date)
                 & (db_management.RUserChat.is_member)
                 & (db_management.RUserChat.rank < 1)
                 & (~db_management.RUserChat.is_admin)
                 & (~db_management.RUserChat.is_whitelisted)
+                & (~db_management.Users.is_bot)
             )
             if len(query) > 0:
                 methods.ReplyText(
@@ -1684,13 +1692,17 @@ def CmdKickInactivesChat(client: pyrogram.Client, msg: pyrogram.Message):
                         text=_(chat_settings.language, "error_try_again"),
                     )
                 else:
-                    query: peewee.ModelSelect = db_management.RUserChat.select().where(
+                    query: peewee.ModelSelect = db_management.RUserChat.select().join(
+                        db_management.Users,
+                        on=(db_management.RUserChat.user_id == db_management.Users.id),
+                    ).where(
                         (db_management.RUserChat.chat == chat_id)
                         & (db_management.RUserChat.timestamp < min_date)
                         & (db_management.RUserChat.is_member)
                         & (db_management.RUserChat.rank < 1)
                         & (~db_management.RUserChat.is_admin)
                         & (~db_management.RUserChat.is_whitelisted)
+                        & (~db_management.Users.is_bot)
                     )
                     if len(query) > 0:
                         methods.ReplyText(
@@ -1766,13 +1778,17 @@ def CmdBanInactives(client: pyrogram.Client, msg: pyrogram.Message):
                 text=_(msg.chat.settings.language, "error_try_again"),
             )
         else:
-            query: peewee.ModelSelect = db_management.RUserChat.select().where(
+            query: peewee.ModelSelect = db_management.RUserChat.select().join(
+                db_management.Users,
+                on=(db_management.RUserChat.user_id == db_management.Users.id),
+            ).where(
                 (db_management.RUserChat.chat == msg.chat.id)
                 & (db_management.RUserChat.timestamp < min_date)
                 & (db_management.RUserChat.is_member)
                 & (db_management.RUserChat.rank < 1)
                 & (~db_management.RUserChat.is_admin)
                 & (~db_management.RUserChat.is_whitelisted)
+                & (~db_management.Users.is_bot)
             )
             if len(query) > 0:
                 methods.ReplyText(
@@ -1850,13 +1866,17 @@ def CmdBanInactivesChat(client: pyrogram.Client, msg: pyrogram.Message):
                         text=_(chat_settings.language, "error_try_again"),
                     )
                 else:
-                    query: peewee.ModelSelect = db_management.RUserChat.select().where(
+                    query: peewee.ModelSelect = db_management.RUserChat.select().join(
+                        db_management.Users,
+                        on=(db_management.RUserChat.user_id == db_management.Users.id),
+                    ).where(
                         (db_management.RUserChat.chat == chat_id)
                         & (db_management.RUserChat.timestamp < min_date)
                         & (db_management.RUserChat.is_member)
                         & (db_management.RUserChat.rank < 1)
                         & (~db_management.RUserChat.is_admin)
                         & (~db_management.RUserChat.is_whitelisted)
+                        & (~db_management.Users.is_bot)
                     )
                     if len(query) > 0:
                         methods.ReplyText(
