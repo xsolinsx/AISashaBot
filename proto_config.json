@@ -37,6 +37,7 @@
     "flood_surveillance_window": 120,
     "max_temp_punishment_time": 31622395,
     "min_temp_punishment_time": 35,
+    "text_spam_punishment_length": 2048,
     "edited_message_expiration": 20,
     "message_expiration": 30,
     "max_length_tag_text": 256,
