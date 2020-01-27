@@ -60,17 +60,6 @@ def CmdUptime(client: pyrogram.Client, msg: pyrogram.Message):
 
 @pyrogram.Client.on_message(
     pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(commands=["leave"], prefixes=["/", "!", "#", "."])
-)
-def CmdLeave(client: pyrogram.Client, msg: pyrogram.Message):
-    client.leave_chat(msg.command[1])
-    methods.ReplyText(
-        client=client, msg=msg, text=_(msg.from_user.settings.language, "left_chat_X")
-    )
-
-
-@pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
     & pyrogram.Filters.command(commands=["pm"], prefixes=["/", "!", "#", "."])
 )
 def CmdPm(client: pyrogram.Client, msg: pyrogram.Message):

@@ -481,7 +481,7 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.Message):
                 media_variable = None
                 if msg.media:
                     media, type_ = utils.ExtractMedia(msg=msg)
-                    if hasattr(media, "file_id"):
+                    if media and hasattr(media, "file_id") and media.file_id:
                         media_variable = f"###{media.file_id}"
                         if msg.caption:
                             media_variable += f"${msg.caption}"
@@ -691,7 +691,7 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.Message):
                     value = None
                     if value_type == "media":
                         media, type_ = utils.ExtractMedia(msg=msg)
-                        if hasattr(media, "file_id"):
+                        if media and hasattr(media, "file_id") and media.file_id:
                             value = f"###{media.file_id}"
                             if msg.caption:
                                 value += f"${msg.caption}"
@@ -929,7 +929,7 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.Message):
                     is_media = False
                     if msg.media:
                         media, type_ = utils.ExtractMedia(msg=msg)
-                        if hasattr(media, "file_id"):
+                        if media and hasattr(media, "file_id") and media.file_id:
                             alternative = media.file_id
                             is_media = True
                     else:

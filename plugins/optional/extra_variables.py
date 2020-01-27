@@ -63,7 +63,7 @@ def SendExtra(client: pyrogram.Client, msg: pyrogram.Message):
                             type_, media = utils.ExtractMedia(
                                 msg=original_media_message
                             )
-                            if media and hasattr(media, "file_ref"):
+                            if media and hasattr(media, "file_ref") and media.file_ref:
                                 msg.reply_cached_media(
                                     file_id=media_id,
                                     file_ref=media.file_ref,
@@ -241,7 +241,7 @@ def CbQryExtrasGet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                             message_id=element.original_message_id,
                         )
                         type_, media = utils.ExtractMedia(msg=original_media_message)
-                        if media and hasattr(media, "file_ref"):
+                        if media and hasattr(media, "file_ref") and media.file_ref:
                             cb_qry.message.reply_cached_media(
                                 file_id=media_id,
                                 file_ref=media.file_ref,

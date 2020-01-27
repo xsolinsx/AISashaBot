@@ -2977,7 +2977,7 @@ def CbQryCensorshipsGet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery)
                             type_, media = utils.ExtractMedia(
                                 msg=original_media_message
                             )
-                            if media and hasattr(media, "file_ref"):
+                            if media and hasattr(media, "file_ref") and media.file_ref:
                                 cb_qry.message.reply_cached_media(
                                     file_id=element.value, file_ref=media.file_ref
                                 )
@@ -4508,6 +4508,45 @@ def CmdDel(client: pyrogram.Client, msg: pyrogram.Message):
                     msg=msg,
                     text=_(msg.chat.settings.language, "cant_delete_message"),
                 )
+
+
+@pyrogram.Client.on_message(
+    pyrogram.Filters.command(commands=["leave"], prefixes=["/", "!", "#", "."])
+    & pyrogram.Filters.group,
+)
+def CmdLeave(client: pyrogram.Client, msg: pyrogram.Message):
+    if utils.IsSeniorModOrHigher(
+        user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
+    ):
+        client.leave_chat(chat_id=msg.chat.id)
+
+
+@pyrogram.Client.on_message(
+    pyrogram.Filters.command(commands=["leave"], prefixes=["/", "!", "#", "."])
+    & pyrogram.Filters.private,
+)
+def CmdLeaveChat(client: pyrogram.Client, msg: pyrogram.Message):
+    chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
+    if isinstance(chat_id, str):
+        methods.ReplyText(client=client, msg=msg, text=chat_id)
+    else:
+        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
+            chat_id=chat_id
+        )
+        if chat_settings:
+            if utils.IsSeniorModOrHigher(user_id=msg.from_user.id, chat_id=chat_id):
+                client.leave_chat(chat_id=chat_id)
+                methods.ReplyText(
+                    client=client,
+                    msg=msg,
+                    text=_(chat_settings.language, "left_chat_X"),
+                )
+        else:
+            methods.ReplyText(
+                client=client,
+                msg=msg,
+                text=_(msg.from_user.settings.language, "no_chat_settings"),
+            )
 
 
 @pyrogram.Client.on_message(

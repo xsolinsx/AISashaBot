@@ -1135,11 +1135,18 @@ def DBChatSettings(chat: pyrogram.Chat):
     query: peewee.ModelSelect = Plugins.select().where(Plugins.is_optional).order_by(
         Plugins.name
     )
-    for plugin in query:
-        if not RChatPlugin.get_or_none(chat=chat.id, plugin=plugin.name):
-            RChatPlugin.create(
+    try:
+        RChatPlugin.bulk_create(
+            RChatPlugin(
                 chat=chat.id, plugin=plugin.name, min_rank=1, is_enabled_on_chat=False,
             )
+            for plugin in query
+        )
+    except peewee.IntegrityError:
+        pass
+    except Exception as ex:
+        print(ex)
+        traceback.print_exc()
 
 
 def DBUserChat(user: typing.Union[pyrogram.Chat, pyrogram.User], chat: pyrogram.Chat):

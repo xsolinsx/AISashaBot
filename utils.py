@@ -948,7 +948,7 @@ def AdjustChatMarkers(value: str, chat: pyrogram.Chat) -> str:
     value = value.replace(
         "$chat_username", f"@{chat.username}" if chat.username else "@USERNAME"
     )
-    if hasattr(chat, "settings"):
+    if hasattr(chat, "settings") and chat.settings:
         value = value.replace(
             "$link",
             chat.settings.link

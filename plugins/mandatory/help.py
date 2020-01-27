@@ -14,6 +14,61 @@ import utils
 _ = utils.GetLocalizedString
 
 
+@pyrogram.Client.on_message(
+    pyrogram.Filters.group
+    & (
+        pyrogram.Filters.regex(pattern="[/!#.]start@(\\w+) new_group", flags=re.I)
+        | pyrogram.Filters.group_chat_created
+        | pyrogram.Filters.new_chat_members
+    ),
+    group=-10,
+)
+def AddGroup(client: pyrogram.Client, msg: pyrogram.Message):
+    if msg.new_chat_members:
+        if client.ME.id in map(lambda new_member: new_member.id, msg.new_chat_members):
+            methods.ReplyText(
+                client=client,
+                msg=msg,
+                text=_(msg.chat.settings.language, "group_start_message"),
+                reply_markup=pyrogram.InlineKeyboardMarkup(
+                    [
+                        [
+                            pyrogram.InlineKeyboardButton(
+                                text=_(msg.chat.settings.language, "start_private"),
+                                url=f"t.me/{client.ME.username}",
+                            )
+                        ]
+                    ]
+                ),
+            )
+    else:
+        methods.ReplyText(
+            client=client,
+            msg=msg,
+            text=_(msg.chat.settings.language, "group_start_message"),
+            reply_markup=pyrogram.InlineKeyboardMarkup(
+                [
+                    [
+                        pyrogram.InlineKeyboardButton(
+                            text=_(msg.chat.settings.language, "start_private"),
+                            url=f"t.me/{client.ME.username}",
+                        )
+                    ]
+                ]
+            ),
+        )
+    msg.stop_propagation()
+
+
+@pyrogram.Client.on_message(
+    pyrogram.Filters.left_chat_member, group=-10,
+)
+def DeleteGroup(client: pyrogram.Client, msg: pyrogram.Message):
+    if client.ME.id == msg.left_chat_member.id:
+        msg.chat.settings.chat.delete_instance()
+    msg.stop_propagation()
+
+
 @pyrogram.Client.on_callback_query(
     my_filters.callback_regex(pattern=r"^start", flags=re.I)
 )
@@ -63,33 +118,6 @@ def CmdStartPrivate(client: pyrogram.Client, msg: pyrogram.Message):
                 bot_username=client.ME.username,
                 channel_username=utils.config["channel"]["username"],
             )
-        ),
-    )
-
-
-@pyrogram.Client.on_message(
-    (
-        pyrogram.Filters.command(
-            commands=["start@AISashaBot new_group"], prefixes=["/", "!", "#", "."]
-        )
-        | pyrogram.Filters.group_chat_created
-    )
-    & pyrogram.Filters.group
-)
-def CmdStartGroup(client: pyrogram.Client, msg: pyrogram.Message):
-    methods.ReplyText(
-        client=client,
-        msg=msg,
-        text=_(msg.chat.settings.language, "group_start_message"),
-        reply_markup=pyrogram.InlineKeyboardMarkup(
-            [
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=_(msg.chat.settings.language, "start_private"),
-                        url=f"t.me/{client.ME.username}",
-                    )
-                ]
-            ]
         ),
     )
 

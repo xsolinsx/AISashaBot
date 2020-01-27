@@ -17,17 +17,6 @@ import utils
 _ = utils.GetLocalizedString
 
 
-@pyrogram.Client.on_message(
-    pyrogram.Filters.group & pyrogram.Filters.new_chat_members, group=-10,
-)
-def RemoveKickedPeople(client: pyrogram.Client, msg: pyrogram.Message):
-    # remove user from this list if already kicked^ in this chat
-    for user in msg.new_chat_members:
-        if msg.chat.id in utils.tmp_dicts["kickedPeople"]:
-            if user.id in utils.tmp_dicts["kickedPeople"][msg.chat.id]:
-                utils.tmp_dicts["kickedPeople"][msg.chat.id].remove(user.id)
-
-
 # @pyrogram.Client.on_message(pyrogram.Filters.linked_channel, group=-9) # TODO uncomment this line and remove check inside pre_process_post.py
 def MessageFromConnectedChannel(client: pyrogram.Client, msg: pyrogram.Message):
     msg.stop_propagation()
@@ -173,6 +162,12 @@ def CheckPrivateMessage(client: pyrogram.Client, msg: pyrogram.Message):
 
 @pyrogram.Client.on_message(pyrogram.Filters.group, group=-9)
 def InitGroupMessage(client: pyrogram.Client, msg: pyrogram.Message):
+    if msg.new_chat_members:
+        # remove user from this list if already kicked^ in this chat
+        for user in msg.new_chat_members:
+            if msg.chat.id in utils.tmp_dicts["kickedPeople"]:
+                if user.id in utils.tmp_dicts["kickedPeople"][msg.chat.id]:
+                    utils.tmp_dicts["kickedPeople"][msg.chat.id].remove(user.id)
     utils.InstantiatePunishmentDictionary(chat_id=msg.chat.id, id_=msg.message_id)
     utils.InstantiateKickedPeopleDictionary(chat_id=msg.chat.id)
 
@@ -386,8 +381,10 @@ def CheckGroupMessageTextCaptionName(client: pyrogram.Client, msg: pyrogram.Mess
                 else:
                     found = element.value.lower() in text_to_use.lower()
                 if not found:
-                    if msg.reply_markup and hasattr(
-                        msg.reply_markup, "inline_keyboard"
+                    if (
+                        msg.reply_markup
+                        and hasattr(msg.reply_markup, "inline_keyboard")
+                        and msg.reply_markup.inline_keyboard
                     ):
                         for row in msg.reply_markup.inline_keyboard:
                             for button in row:
@@ -395,17 +392,21 @@ def CheckGroupMessageTextCaptionName(client: pyrogram.Client, msg: pyrogram.Mess
                                     regex_check_item = re.compile(element.value, re.I)
                                     found = (
                                         hasattr(button, "url")
+                                        and button.url
                                         and regex_check_item.match(button.url)
                                     ) or (
                                         hasattr(button, "text")
+                                        and button.text
                                         and regex_check_item.search(button.text)
                                     )
                                 else:
                                     found = (
                                         hasattr(button, "url")
+                                        and button.url
                                         and element.value.lower() in button.url.lower()
                                     ) or (
                                         hasattr(button, "text")
+                                        and button.text
                                         and element.value.lower() in button.text.lower()
                                     )
                                 if found:
@@ -518,10 +519,14 @@ def CheckGroupMessageTextCaptionName(client: pyrogram.Client, msg: pyrogram.Mess
                             reason="public_chat_username",
                         )
         # reply_markup (buttons)
-        if msg.reply_markup and hasattr(msg.reply_markup, "inline_keyboard"):
+        if (
+            msg.reply_markup
+            and hasattr(msg.reply_markup, "inline_keyboard")
+            and msg.reply_markup.inline_keyboard
+        ):
             for row in msg.reply_markup.inline_keyboard:
                 for button in row:
-                    if hasattr(button, "url"):
+                    if hasattr(button, "url") and button.url:
                         tmp = str(utils.CleanLink(button.url))
                         if "t.me/joinchat" not in tmp.lower():
                             # t.me/username

@@ -1,6 +1,7 @@
 # PREPROCESS ORDER MESSAGES
 # pre_process_post(-11, -7, -1)
-# check_msg(-10, -9, -8, -1)
+# help (-10)
+# check_msg(-9, -8, -1)
 # alternatives(-6)
 # chat_management(-5)
 # user_management(-4)

@@ -20,7 +20,7 @@ def TranslateAlternativeIntoCommand(client: pyrogram.Client, msg: pyrogram.Messa
     for element in msg.chat.settings.alternative_commands:
         if msg.media and element.is_media:
             media, type_ = utils.ExtractMedia(msg=msg)
-            if hasattr(media, "file_id"):
+            if media and hasattr(media, "file_id") and media.file_id:
                 if element.alternative == media.file_id:
                     msg.text = f"/{element.original}"
                     if msg.caption:
@@ -133,7 +133,7 @@ def CbQryAlternativesGet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
                             type_, media = utils.ExtractMedia(
                                 msg=original_media_message
                             )
-                            if media and hasattr(media, "file_ref"):
+                            if media and hasattr(media, "file_ref") and media.file_ref:
                                 cb_qry.message.reply_cached_media(
                                     file_id=element.alternative, file_ref=media.file_ref
                                 )
