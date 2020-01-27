@@ -72,7 +72,11 @@ def CmdQrDecode(client: pyrogram.Client, msg: pyrogram.Message):
         except Exception as ex:
             print(ex)
             traceback.print_exc()
-            methods.ReplyText(client=client, msg=msg, text=str(ex))
+            methods.ReplyText(
+                client=client,
+                msg=msg,
+                text=_(msg.chat.settings.language, "error_try_again") + f"\n{ex}",
+            )
         else:
             data = r.json()[0]["symbol"][0]["data"]
             methods.ReplyText(client=client, msg=msg, text=data)

@@ -462,7 +462,7 @@ def CbQryBotPluginsEnableDisable(
                 traceback.print_exc()
                 methods.CallbackQueryAnswer(
                     cb_qry=cb_qry,
-                    text=_(cb_qry.from_user.settings.language, "tg_error_X").format(ex),
+                    text=_(cb_qry.from_user.settings.language, "error_try_again"),
                     show_alert=True,
                 )
             else:
@@ -528,7 +528,7 @@ def CbQryBotPluginsMandatoryOptional(
                 traceback.print_exc()
                 methods.CallbackQueryAnswer(
                     cb_qry=cb_qry,
-                    text=_(cb_qry.from_user.settings.language, "tg_error_X").format(ex),
+                    text=_(cb_qry.from_user.settings.language, "error_try_again"),
                     show_alert=True,
                 )
             else:

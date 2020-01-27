@@ -201,7 +201,11 @@ def CmdChatAction(client: pyrogram.Client, msg: pyrogram.Message):
         except Exception as ex:
             print(ex)
             traceback.print_exc()
-            methods.ReplyText(client=client, msg=msg, text=str(ex))
+            methods.ReplyText(
+                client=client,
+                msg=msg,
+                text=_(msg.chat.settings.language, "tg_error_X").format(ex),
+            )
 
 
 @pyrogram.Client.on_message(
@@ -253,7 +257,11 @@ def CmdTestReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                 except Exception as ex:
                     print(ex)
                     traceback.print_exc()
-                    methods.ReplyText(client=client, msg=msg, text=str(ex))
+                    methods.ReplyText(
+                        client=client,
+                        msg=msg,
+                        text=_(msg.chat.settings.language, "tg_error_X").format(ex),
+                    )
         else:
             try:
                 client.send_chat_action(
@@ -262,7 +270,11 @@ def CmdTestReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
             except Exception as ex:
                 print(ex)
                 traceback.print_exc()
-                methods.ReplyText(client=client, msg=msg, text=str(ex))
+                methods.ReplyText(
+                    client=client,
+                    msg=msg,
+                    text=_(msg.chat.settings.language, "tg_error_X").format(ex),
+                )
 
 
 @pyrogram.Client.on_message(
@@ -294,4 +306,8 @@ def CmdTestChat(client: pyrogram.Client, msg: pyrogram.Message):
             except Exception as ex:
                 print(ex)
                 traceback.print_exc()
-                methods.ReplyText(client=client, msg=msg, text=str(ex))
+                methods.ReplyText(
+                    client=client,
+                    msg=msg,
+                    text=_(msg.chat.settings.language, "tg_error_X").format(ex),
+                )
