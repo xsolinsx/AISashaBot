@@ -298,12 +298,21 @@ def PrintUser(user: pyrogram.User, use_html=False) -> str:
     )
 
 
-def PrintChat(chat: pyrogram.Chat) -> str:
+def PrintChat(chat: pyrogram.Chat, use_html=False) -> str:
     return (
-        chat.title
-        + " ("
-        + (f"@{chat.username} " if chat.username else "")
-        + f"#chat{abs(chat.id)})"
+        html.escape(
+            chat.title
+            + " ("
+            + (f"@{chat.username} " if chat.username else "")
+            + f"#chat{abs(chat.id)})"
+        )
+        if use_html
+        else (
+            chat.title
+            + " ("
+            + (f"@{chat.username} " if chat.username else "")
+            + f"#chat{abs(chat.id)})"
+        )
     )
 
 

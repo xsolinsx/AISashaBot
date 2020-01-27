@@ -14,6 +14,40 @@ import utils
 _ = utils.GetLocalizedString
 
 
+@pyrogram.Client.on_callback_query(
+    my_filters.callback_regex(pattern=r"^start", flags=re.I)
+)
+def CbQryStart(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+    methods.CallbackQueryAnswer(
+        cb_qry=cb_qry,
+        text=_(cb_qry.from_user.settings.language, "updating"),
+        show_alert=False,
+    )
+    services = [
+        [pyrogram.InlineKeyboardButton(text=service, url=url)]
+        for service, url in utils.config["donations"].items()
+    ]
+    services.append(
+        [
+            pyrogram.InlineKeyboardButton(
+                text=_(cb_qry.from_user.settings.language, "back_to_main_menu"),
+                callback_data="start",
+            )
+        ]
+    )
+    cb_qry.message.edit_text(
+        text=_(cb_qry.from_user.settings.language, "private_start_message"),
+        reply_markup=pyrogram.InlineKeyboardMarkup(
+            keyboards.BuildStartMenu(
+                user_settings=cb_qry.from_user.settings,
+                bot_username=client.ME.username,
+                channel_username=utils.config["channel"]["username"],
+            )
+        ),
+        parse_mode="html",
+    )
+
+
 @pyrogram.Client.on_message(
     pyrogram.Filters.command(commands=["start"], prefixes=["/", "!", "#", "."])
     & pyrogram.Filters.private
@@ -22,26 +56,13 @@ def CmdStartPrivate(client: pyrogram.Client, msg: pyrogram.Message):
     methods.ReplyText(
         client=client,
         msg=msg,
-        text=_(msg.chat.settings.language, "private_start_message"),
+        text=_(msg.from_user.settings.language, "private_start_message"),
         reply_markup=pyrogram.InlineKeyboardMarkup(
-            [
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=_(msg.chat.settings.language, "add_me_to_your_group"),
-                        url="t.me/aisashabot?startgroup=new_group",
-                    )
-                ],
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=pyrogram.Emoji.WORLD_MAP
-                        + " "
-                        + _(msg.chat.settings.language, "set_your_language")
-                        + " "
-                        + pyrogram.Emoji.WORLD_MAP,
-                        callback_data="mysettings start",
-                    )
-                ],
-            ]
+            keyboards.BuildStartMenu(
+                user_settings=msg.from_user.settings,
+                bot_username=client.ME.username,
+                channel_username=utils.config["channel"]["username"],
+            )
         ),
     )
 
@@ -60,6 +81,16 @@ def CmdStartGroup(client: pyrogram.Client, msg: pyrogram.Message):
         client=client,
         msg=msg,
         text=_(msg.chat.settings.language, "group_start_message"),
+        reply_markup=pyrogram.InlineKeyboardMarkup(
+            [
+                [
+                    pyrogram.InlineKeyboardButton(
+                        text=_(msg.chat.settings.language, "start_private"),
+                        url=f"t.me/{client.ME.username}",
+                    )
+                ]
+            ]
+        ),
     )
 
 
@@ -341,19 +372,29 @@ def CmdHelpAll(client: pyrogram.Client, msg: pyrogram.Message):
     methods.SendDocument(client=client, chat_id=msg.from_user.id, document=file_name)
 
 
-@pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["about"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+@pyrogram.Client.on_callback_query(
+    my_filters.callback_regex(pattern=r"^about", flags=re.I)
 )
-def CmdAbout(client: pyrogram.Client, msg: pyrogram.Message):
-    methods.ReplyText(
-        client=client,
-        msg=msg,
-        text=_(msg.chat.settings.language, "about_message"),
-        reply_markup=pyrogram.InlineKeyboardMarkup(
-            [
-                [pyrogram.InlineKeyboardButton(text=service, url=url)]
-                for service, url in utils.config["donations"].items()
-            ]
-        ),
+def CbQryAbout(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+    methods.CallbackQueryAnswer(
+        cb_qry=cb_qry,
+        text=_(cb_qry.from_user.settings.language, "updating"),
+        show_alert=False,
+    )
+    services = [
+        [pyrogram.InlineKeyboardButton(text=service, url=url)]
+        for service, url in utils.config["donations"].items()
+    ]
+    services.append(
+        [
+            pyrogram.InlineKeyboardButton(
+                text=_(cb_qry.from_user.settings.language, "back_to_main_menu"),
+                callback_data="start",
+            )
+        ]
+    )
+    cb_qry.message.edit_text(
+        text=_(cb_qry.from_user.settings.language, "about_message"),
+        reply_markup=pyrogram.InlineKeyboardMarkup(services),
+        parse_mode="html",
     )

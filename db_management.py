@@ -142,6 +142,7 @@ class Chats(peewee.Model):
 
     title = peewee.CharField(null=False)
     username = peewee.CharField(default=None, null=True)
+    is_channel = peewee.BooleanField(null=False)
     timestamp = peewee.DateTimeField(default=datetime.datetime.utcnow, null=False)
 
     class Meta:
@@ -1039,7 +1040,9 @@ def DBUser(user: typing.Union[pyrogram.Chat, pyrogram.User]):
             first_name=user.first_name if user.first_name else "",
             last_name=user.last_name,
             username=user.username,
-            is_bot=user.is_bot if isinstance(user, pyrogram.User) else False,
+            is_bot=user.is_bot
+            if isinstance(user, pyrogram.User)
+            else (user.type == "bot" if isinstance(user, pyrogram.Chat) else False),
             timestamp=datetime.datetime.utcnow(),
         ).where(Users.id == user.id).execute()
     else:
@@ -1048,7 +1051,9 @@ def DBUser(user: typing.Union[pyrogram.Chat, pyrogram.User]):
             first_name=user.first_name if user.first_name else "",
             last_name=user.last_name,
             username=user.username,
-            is_bot=user.is_bot if isinstance(user, pyrogram.User) else False,
+            is_bot=user.is_bot
+            if isinstance(user, pyrogram.User)
+            else (user.type == "bot" if isinstance(user, pyrogram.Chat) else False),
         )
 
     settings: UserSettings = UserSettings.get_or_none(user_id=user.id)
@@ -1059,7 +1064,13 @@ def DBUser(user: typing.Union[pyrogram.Chat, pyrogram.User]):
         id=user.id,
         username=user.username.lower() if user.username else None,
         timestamp=datetime.datetime.utcnow(),
-        type="bot" if isinstance(user, pyrogram.User) and user.is_bot else "private",
+        type="bot"
+        if isinstance(user, pyrogram.User) and user.is_bot
+        else (
+            "bot"
+            if isinstance(user, pyrogram.Chat) and user.type == "bot"
+            else "private"
+        ),
     ).execute()
 
 
@@ -1069,12 +1080,16 @@ def DBChat(chat: pyrogram.Chat) -> bool:
         Chats.update(
             title=chat.title,
             username=chat.username,
+            is_channel=chat.type == "channel",
             timestamp=datetime.datetime.utcnow(),
         ).where(Chats.id == chat.id).execute()
     else:
         created = True
         Chats.create(
-            id=chat.id, title=chat.title, username=chat.username,
+            id=chat.id,
+            title=chat.title,
+            username=chat.username,
+            is_channel=chat.type == "channel",
         )
     if chat.type == "group" or chat.type == "supergroup":
         DBChatSettings(chat=chat)
@@ -1109,10 +1124,10 @@ def DBChatSettings(chat: pyrogram.Chat):
                 ),
             ]
         )
-        if local_config["channel"]:
+        if local_config["channel"]["id"]:
             # bot's channel
             ChatWhitelistedChats.create(
-                chat_id=chat.id, whitelisted_chat=local_config["channel"]
+                chat_id=chat.id, whitelisted_chat=local_config["channel"]["id"]
             )
         # @username
         ChatWhitelistedChats.create(chat_id=chat.id, whitelisted_chat=-1001066197625)

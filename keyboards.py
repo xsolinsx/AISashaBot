@@ -114,6 +114,54 @@ def BuildPager(
     return pager
 
 
+def BuildStartMenu(
+    user_settings: db_management.UserSettings, bot_username: str, channel_username: str
+) -> list:
+    channel_username = channel_username.replace("@", "")
+    keyboard = list()
+    keyboard.append(
+        [
+            pyrogram.InlineKeyboardButton(
+                text=_(user_settings.language, "add_me_to_group"),
+                url=f"t.me/{bot_username}?startgroup=new_group",
+            )
+        ]
+    )
+    keyboard.append(
+        [
+            pyrogram.InlineKeyboardButton(
+                text=pyrogram.Emoji.INFORMATION
+                + " "
+                + _(user_settings.language, "about"),
+                callback_data="about",
+            ),
+            pyrogram.InlineKeyboardButton(
+                text=pyrogram.Emoji.MEGAPHONE
+                + " "
+                + _(user_settings.language, "channel"),
+                url=f"t.me/{channel_username}",
+            ),
+        ]
+    )
+    keyboard.append(
+        [
+            pyrogram.InlineKeyboardButton(
+                text=pyrogram.Emoji.WORLD_MAP
+                + " "
+                + _(user_settings.language, "set_your_language"),
+                callback_data="mysettings",
+            ),
+            pyrogram.InlineKeyboardButton(
+                text=pyrogram.Emoji.OPEN_BOOK
+                + " "
+                + _(user_settings.language, "commands"),
+                callback_data="mainhelp",
+            ),
+        ]
+    )
+    return BuildKeyboard(main_buttons=keyboard)
+
+
 def BuildPrivateSettingsMenu(user_settings: db_management.UserSettings) -> list:
     keyboard = list()
     keyboard.append(
@@ -174,6 +222,14 @@ def BuildPrivateSettingsMenu(user_settings: db_management.UserSettings) -> list:
                 text=pyrogram.Emoji.CROSS_MARK + _(user_settings.language, "unset"),
                 callback_data="mysettings unset_nickname",
             ),
+        ]
+    )
+    keyboard.append(
+        [
+            pyrogram.InlineKeyboardButton(
+                text=_(user_settings.language, "back_to_main_menu"),
+                callback_data="start",
+            )
         ]
     )
     return BuildKeyboard(main_buttons=keyboard)
@@ -3706,6 +3762,14 @@ def BuildHelpMenu(
             page=page,
             n_items=len(user_viewable_plugins),
             max_items_keyboard=utils.config["max_items_keyboard"],
+        )
+        footer_buttons.append(
+            [
+                pyrogram.InlineKeyboardButton(
+                    text=_(user_settings.language, "back_to_main_menu"),
+                    callback_data="start",
+                )
+            ]
         )
 
         return BuildKeyboard(

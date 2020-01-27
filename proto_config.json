@@ -16,7 +16,10 @@
         "service2": "link2"
     },
     "log_chat": -100123456789,
-    "channel": -100123456789,
+    "channel": {
+        "id": -100123456789,
+        "username": "@Username"
+    },
     "delay_log_channel": 10,
     "min_flood": 3,
     "max_flood": 10,

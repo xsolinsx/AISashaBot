@@ -157,40 +157,6 @@ def CbQryMySettingsInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery)
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^mysettings start", flags=re.I)
-    & my_filters.callback_private
-)
-def CbQryMySettingsStart(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
-    methods.CallbackQueryAnswer(
-        cb_qry=cb_qry,
-        text=_(cb_qry.from_user.settings.language, "updating"),
-        show_alert=False,
-    )
-    cb_qry.message.edit_reply_markup(
-        reply_markup=pyrogram.InlineKeyboardMarkup(
-            [
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=_(
-                            cb_qry.from_user.settings.language, "add_me_to_your_group",
-                        ),
-                        url="t.me/aisashabot?startgroup=new_group",
-                    )
-                ]
-            ]
-        ),
-    )
-    methods.ReplyText(
-        client=client,
-        msg=cb_qry.message,
-        text=_(cb_qry.from_user.settings.language, "mysettings"),
-        reply_markup=pyrogram.InlineKeyboardMarkup(
-            keyboards.BuildPrivateSettingsMenu(user_settings=cb_qry.from_user.settings)
-        ),
-    )
-
-
-@pyrogram.Client.on_callback_query(
     my_filters.callback_regex(pattern=r"^mysettings language", flags=re.I)
     & my_filters.callback_private
 )
@@ -339,6 +305,23 @@ def CbQryMySettingsUnsetNickname(
         reply_markup=pyrogram.InlineKeyboardMarkup(
             keyboards.BuildPrivateSettingsMenu(user_settings=cb_qry.from_user.settings)
         )
+    )
+
+
+@pyrogram.Client.on_callback_query(
+    my_filters.callback_command(commands=["mysettings"]) & my_filters.callback_private
+)
+def CbQryMySettings(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+    methods.CallbackQueryAnswer(
+        cb_qry=cb_qry,
+        text=_(cb_qry.from_user.settings.language, "updating"),
+        show_alert=False,
+    )
+    cb_qry.message.edit_text(
+        text=_(cb_qry.from_user.settings.language, "mysettings"),
+        reply_markup=pyrogram.InlineKeyboardMarkup(
+            keyboards.BuildPrivateSettingsMenu(user_settings=cb_qry.from_user.settings)
+        ),
     )
 
 

@@ -23,7 +23,9 @@ def Info(
     chat_settings: db_management.ChatSettings,
     r_target_chat: db_management.RUserChat = None,
 ) -> str:
+    target_obj = None
     if target < 0:
+        target_obj: db_management.Chats = db_management.Chats.get_or_none(id=target)
         # chat
         chat_info = GetObjInfo(
             client=client,
@@ -32,12 +34,14 @@ def Info(
         )
         return (
             _(chat_settings.language, "info_of_X").format(
-                f"{utils.PrintChat(chat=chat_settings.chat)}",
+                f"{utils.PrintChat(chat=target_obj, use_html=True)}",
             )
             + chat_info
         )
     else:
+        target_obj: db_management.Users = db_management.Users.get_or_none(id=target)
         if chat_id < 0:
+            chat_obj = db_management.Chats = db_management.Chats.get_or_none(id=chat_id)
             # info of target in chat_id
             chat_settings: db_management.ChatSettings = chat_settings if chat_settings else db_management.ChatSettings.get_or_none(
                 chat_id=chat_id
@@ -74,8 +78,6 @@ def Info(
                 + f"{r_target_chat.message_counter}\n"
             )
             other_info = list()
-            if r_target_chat.user.is_bot:
-                other_info.append(_(chat_settings.language, "bot").upper())
             # get current chat_member info
             try:
                 member: pyrogram.ChatMember = client.get_chat_member(
@@ -125,8 +127,8 @@ def Info(
 
             return (
                 _(chat_settings.language, "info_of_X_in_Y").format(
-                    f"{utils.PrintUser(user=r_target_chat.user, use_html=True)}",
-                    f"{utils.PrintChat(chat=chat_settings.chat)}",
+                    f"{utils.PrintUser(user=target_obj, use_html=True)}",
+                    f"{utils.PrintChat(chat=chat_obj, use_html=True)}",
                 )
                 + f"{user_info}\n\n{chat_info}"
             )
@@ -138,7 +140,9 @@ def Info(
                 language=chat_settings.language if chat_settings else "en",
             )
             return (
-                _(chat_settings.language, "info_of_X").format(f"(#user{target})")
+                _(chat_settings.language, "info_of_X").format(
+                    utils.PrintUser(user=target_obj)
+                )
                 + user_info
             )
 
@@ -173,11 +177,8 @@ def GetObjInfo(
     if value:
         if value < 0:
             # chat
-            chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-                chat_id=value
-            )
-            if chat_settings:
-                chat = chat_settings.chat
+            chat: db_management.Chats = db_management.Chats.get_or_none(id=value)
+            if chat:
                 return (
                     _(language, "info_id")
                     + f"<code>{chat.id}</code>\n"
@@ -186,30 +187,55 @@ def GetObjInfo(
                     + _(language, "info_username")
                     + (f"<code>@{chat.username}</code>" if chat.username else "/")
                     + "\n"
+                    + _(language, "info_type")
+                    + (
+                        _(language, "channel")
+                        if chat.is_channel
+                        else _(language, "chat")
+                    )
                 )
             else:
                 return _(language, "X_not_in_database")
         else:
             # user
-            user_settings: db_management.UserSettings = db_management.UserSettings.get_or_none(
-                user_id=value
-            )
-            if user_settings:
-                user = user_settings.user
-                return (
-                    _(language, "info_id")
-                    + f"<code>{user.id}</code>\n"
-                    + _(language, "info_first_name")
-                    + f"{html.escape(user.first_name)}\n"
-                    + _(language, "info_last_name")
-                    + (user.last_name if user.last_name else "/")
-                    + "\n"
-                    + _(language, "info_username")
-                    + (f"<code>@{user.username}</code>" if user.username else "/")
-                    + "\n"
-                    + _(language, "info_nickname")
-                    + (user_settings.nickname if user_settings.nickname else "/")
+            user: db_management.Users = db_management.Users.get_or_none(id=value)
+            if user:
+                user_settings: db_management.UserSettings = db_management.UserSettings.get_or_none(
+                    user_id=value
                 )
+                if user_settings:
+                    return (
+                        _(language, "info_id")
+                        + f"<code>{user.id}</code>\n"
+                        + _(language, "info_first_name")
+                        + f"{html.escape(user.first_name)}\n"
+                        + _(language, "info_last_name")
+                        + (user.last_name if user.last_name else "/")
+                        + "\n"
+                        + _(language, "info_username")
+                        + (f"<code>@{user.username}</code>" if user.username else "/")
+                        + "\n"
+                        + _(language, "info_nickname")
+                        + (user_settings.nickname if user_settings.nickname else "/")
+                        + "\n"
+                        + _(language, "info_type")
+                        + (_(language, "bot") if user.is_bot else _(language, "user"))
+                    )
+                else:
+                    return (
+                        _(language, "info_id")
+                        + f"<code>{user.id}</code>\n"
+                        + _(language, "info_first_name")
+                        + f"{html.escape(user.first_name)}\n"
+                        + _(language, "info_last_name")
+                        + (user.last_name if user.last_name else "/")
+                        + "\n"
+                        + _(language, "info_username")
+                        + (f"<code>@{user.username}</code>" if user.username else "/")
+                        + "\n"
+                        + _(language, "info_type")
+                        + (_(language, "bot") if user.is_bot else _(language, "user"))
+                    )
             else:
                 return _(language, "X_not_in_database")
     else:
