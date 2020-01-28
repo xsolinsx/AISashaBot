@@ -294,7 +294,6 @@ def CbQryCheckSettingsLocked(client: pyrogram.Client, cb_qry: pyrogram.CallbackQ
         if chat_settings.are_locked and not utils.IsOwnerOrHigher(
             user_id=cb_qry.from_user.id, chat_id=chat_id
         ):
-            print("locked_settings")
             methods.CallbackQueryAnswer(
                 cb_qry=cb_qry,
                 text=_(cb_qry.from_user.settings.language, "locked_settings"),

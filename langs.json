@@ -21,7 +21,7 @@
         "start_private": "Start me in private",
         "private_start_message": "Hello! I am Sasha, an administration bot used to help admins in the management of their groups.\n\nAdd me to your group with the button below and promote me ad Administrator, otherwise I will be of little use.\n\nDo you need help with commands? Use /help (in private) to see what I can do.",
         "group_start_message": "Hello everyone! I am Sasha, an administration bot used to help admins in the management of their groups.\n\nDo you need help with commands? Use /help (in private) to see what I can do.",
-        "about_message": "I want to thank everyone who helped me developing this bot during the years: le laide, Ganjalf, umbit, all the users who gave me feedback and helped me during the years.\nSasha has been online as a userbot from 2016/02/15 since 2020/01/18, and as a bot since 2016/09/27.\n\n@AISashaBot is written in Python3 using @Pyrogram and peewee, it runs on a Raspberry Pi 3 and it is developed by @EricSolinas.",
+        "about_message": "I want to thank everyone who helped me developing this bot during the years: le laide, Ganjalf, umbit, all the users who gave me feedback and helped me during the years.\nSasha has been online from 2016/02/15 since 2020/01/18 as a userbot, and since 2016/09/27 as a bot.\n\n@AISashaBot is written in Python3 using @Pyrogram and peewee, it runs on a Raspberry Pi 3 and it is developed by @EricSolinas.",
         "add_me_to_group": "Click here to add me!",
         "set_your_language": "Set your language",
         "selected_language": "Selected language: {0}",

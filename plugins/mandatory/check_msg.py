@@ -663,7 +663,6 @@ def InitCheckGroupMessageMedia(client: pyrogram.Client, msg: pyrogram.Message):
     # anti shitstorm (media)
     if msg.chat.settings.shitstorm_punishment:
         media, type_ = utils.ExtractMedia(msg=msg)
-        print(media.media_id)
         utils.InstantiateMsgsHashesDictionary(
             chat_id=msg.chat.id, msg_hash=media.media_id
         )
