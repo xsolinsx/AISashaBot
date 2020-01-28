@@ -41,6 +41,7 @@ def AddGroup(client: pyrogram.Client, msg: pyrogram.Message):
                     ]
                 ),
             )
+            msg.stop_propagation()
     else:
         methods.ReplyText(
             client=client,
@@ -57,7 +58,7 @@ def AddGroup(client: pyrogram.Client, msg: pyrogram.Message):
                 ]
             ),
         )
-    msg.stop_propagation()
+        msg.stop_propagation()
 
 
 @pyrogram.Client.on_message(
@@ -66,7 +67,7 @@ def AddGroup(client: pyrogram.Client, msg: pyrogram.Message):
 def DeleteGroup(client: pyrogram.Client, msg: pyrogram.Message):
     if client.ME.id == msg.left_chat_member.id:
         msg.chat.settings.chat.delete_instance()
-    msg.stop_propagation()
+        msg.stop_propagation()
 
 
 @pyrogram.Client.on_callback_query(
