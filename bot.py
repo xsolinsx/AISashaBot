@@ -90,10 +90,10 @@ utils.Log(
     action="start",
     target=BOT_CLIENT.ME.id,
 )
-# schedule backup at 04:00 with a random delay between ± 10 minutes
+# schedule backup at UTC 02:30 with a random delay between ± 10 minutes
 utils.scheduler.add_job(
     methods.SendBackup,
-    trigger=CronTrigger(hour=4, jitter=600, timezone=utc),
+    trigger=CronTrigger(hour=2, minute=30, jitter=600, timezone=utc),
     args=(BOT_CLIENT,),
 )
 BOT_CLIENT.idle()
