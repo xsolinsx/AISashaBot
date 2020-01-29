@@ -303,7 +303,7 @@ def CheckGroupMessageForwardFromChat(client: pyrogram.Client, msg: pyrogram.Mess
     # forward from chat
     if msg.chat.settings.forward_punishment and msg.forward_from_chat:
         if not db_management.ChatWhitelistedChats.get_or_none(
-            chat_id=msg.chat.id, linked_chat_id=msg.forward_from_chat.id
+            chat=msg.chat.id, whitelisted_chat=msg.forward_from_chat.id
         ):
             utils.ChangePunishmentAddReason(
                 chat_id=msg.chat.id,
