@@ -17,7 +17,13 @@ import utils
 _ = utils.GetLocalizedString
 
 
-# @pyrogram.Client.on_message(pyrogram.Filters.linked_channel, group=-9) # TODO uncomment this line and remove check inside pre_process_post.py
+@pyrogram.Client.on_message(
+    pyrogram.Filters.create(
+        lambda _, m: bool(m.forward_from_chat and not m.from_user),
+        name="LinkedChannelFilter",
+    ),
+    group=-9,
+)  # TODO use pyrogram's built-in filter as soon as it is implemented
 def MessageFromConnectedChannel(client: pyrogram.Client, msg: pyrogram.Message):
     msg.stop_propagation()
 

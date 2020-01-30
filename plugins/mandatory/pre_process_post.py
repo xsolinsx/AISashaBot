@@ -27,9 +27,6 @@ def PreMessage(client: pyrogram.Client, msg: pyrogram.Message):
     utils.InstantiateInvitedPeopleDictionary(chat_id=msg.chat.id)
     # print("######################\nMESSAGE")
     print(utils.PrintMessage(msg))
-    # check for linked channel, ignore message
-    if msg.from_user is None:
-        msg.stop_propagation()
 
 
 @pyrogram.Client.on_callback_query(group=-11)
