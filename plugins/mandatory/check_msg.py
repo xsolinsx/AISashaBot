@@ -168,14 +168,14 @@ def CheckPrivateMessage(client: pyrogram.Client, msg: pyrogram.Message):
 
 @pyrogram.Client.on_message(pyrogram.Filters.group, group=-9)
 def InitGroupMessage(client: pyrogram.Client, msg: pyrogram.Message):
-    if msg.new_chat_members:
-        # remove user from this list if already kicked^ in this chat
-        for user in msg.new_chat_members:
-            if msg.chat.id in utils.tmp_dicts["kickedPeople"]:
-                if user.id in utils.tmp_dicts["kickedPeople"][msg.chat.id]:
-                    utils.tmp_dicts["kickedPeople"][msg.chat.id].remove(user.id)
     utils.InstantiatePunishmentDictionary(chat_id=msg.chat.id, id_=msg.message_id)
     utils.InstantiateKickedPeopleDictionary(chat_id=msg.chat.id)
+
+    if msg.new_chat_members:
+        # remove user from already kicked list if new member of this chat
+        for user in msg.new_chat_members:
+            if user.id in utils.tmp_dicts["kickedPeople"][msg.chat.id]:
+                utils.tmp_dicts["kickedPeople"][msg.chat.id].remove(user.id)
 
     # if chat is banned don't process
     if msg.chat.settings.is_banned:
