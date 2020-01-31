@@ -981,14 +981,12 @@ def IsTelegramAdministrator(
             # includes telegram admins
             return True
     else:
-        relationships = (
-            db_management.RUserChat.select()
-            .where(db_management.RUserChat.user_id == user_id)
-            .execute()
+        return any(
+            x.is_admin
+            for x in db_management.RUserChat.select().where(
+                db_management.RUserChat.user_id == user_id
             )
-        for relationship in relationships:
-            if relationship.is_admin:
-                return True
+        )
 
 
 def IsMasterOrBot(user_id: int) -> bool:
@@ -1013,14 +1011,12 @@ def IsOwnerOrHigher(
                 # includes owner
                 return True
         else:
-            relationships = (
-                db_management.RUserChat.select()
-                .where(db_management.RUserChat.user_id == user_id)
-                .execute()
+            return any(
+                x.rank > 3
+                for x in db_management.RUserChat.select().where(
+                    db_management.RUserChat.user_id == user_id
                 )
-            for relationship in relationships:
-                if relationship.rank > 3:
-                    return True
+            )
     return False
 
 
@@ -1038,14 +1034,12 @@ def IsSeniorModOrHigher(
                 # includes senior mods and owner
                 return True
         else:
-            relationships = (
-                db_management.RUserChat.select()
-                .where(db_management.RUserChat.user_id == user_id)
-                .execute()
+            return any(
+                x.rank > 2
+                for x in db_management.RUserChat.select().where(
+                    db_management.RUserChat.user_id == user_id
+                )
             )
-            for relationship in relationships:
-                if relationship.rank > 2:
-                    return True
     return False
 
 
@@ -1063,14 +1057,12 @@ def IsJuniorModOrHigher(
                 # includes junior mods, senior mods and owner
                 return True
         else:
-            relationships = (
-                db_management.RUserChat.select()
-                .where(db_management.RUserChat.user_id == user_id)
-                .execute()
+            return any(
+                x.rank > 1
+                for x in db_management.RUserChat.select().where(
+                    db_management.RUserChat.user_id == user_id
+                )
             )
-            for relationship in relationships:
-                if relationship.rank > 1:
-                    return True
     return False
 
 
@@ -1088,14 +1080,12 @@ def IsPrivilegedOrHigher(
                 # includes privileged, junior mods, senior mods and owner
                 return True
         else:
-            relationships = (
-                db_management.RUserChat.select()
-                .where(db_management.RUserChat.user_id == user_id)
-                .execute()
+            return any(
+                x.rank > 0
+                for x in db_management.RUserChat.select().where(
+                    db_management.RUserChat.user_id == user_id
+                )
             )
-            for relationship in relationships:
-                if relationship.rank > 0:
-                    return True
     return False
 
 
