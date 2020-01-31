@@ -1247,6 +1247,7 @@ def CmdUsername(client: pyrogram.Client, msg: pyrogram.Message):
                                     if entity.user.username
                                     else None
                                 )
+                                break
 
         if msg.command[0].lower().endswith("pvt"):
             methods.SendMessage(
@@ -1290,6 +1291,7 @@ def CmdIsMember(client: pyrogram.Client, msg: pyrogram.Message):
                             member = client.get_chat_member(
                                 chat_id=msg.chat.id, user_id=entity.user.id
                             )
+                            break
                 if not member:
                     if utils.IsInt(msg.command[1]):
                         query: peewee.ModelSelect = db_management.ResolvedObjects.select().where(
