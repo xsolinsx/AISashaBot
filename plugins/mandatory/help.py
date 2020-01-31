@@ -229,7 +229,7 @@ def CbQryHelp(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
     )
     text = ""
     rank = utils.GetRank(user_id=cb_qry.from_user.id)
-    user_viewable_plugins = [
+    user_viewable_plugins = (
         p.name
         for p in db_management.Plugins.select()
         .where(db_management.Plugins.is_enabled)
@@ -238,7 +238,7 @@ def CbQryHelp(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         and dictionaries.HELP_DICTIONARY[p.name][0].lower() in dictionaries.RANK_STRING
         and rank
         >= dictionaries.RANK_STRING[dictionaries.HELP_DICTIONARY[p.name][0].lower()]
-    ]
+    )
     for plugin in user_viewable_plugins:
         text += (
             "<b>"
@@ -263,7 +263,7 @@ def CmdHelp(client: pyrogram.Client, msg: pyrogram.Message):
     text = ""
     rank = utils.GetRank(user_id=msg.from_user.id)
     if len(msg.command) == 1:
-        user_viewable_plugins = [
+        user_viewable_plugins = (
             p.name
             for p in db_management.Plugins.select()
             .where(db_management.Plugins.is_enabled)
@@ -273,7 +273,7 @@ def CmdHelp(client: pyrogram.Client, msg: pyrogram.Message):
             in dictionaries.RANK_STRING
             and rank
             >= dictionaries.RANK_STRING[dictionaries.HELP_DICTIONARY[p.name][0].lower()]
-        ]
+        )
         for plugin in user_viewable_plugins:
             text += (
                 "<b>"
@@ -345,7 +345,7 @@ def CmdHelp(client: pyrogram.Client, msg: pyrogram.Message):
 def CmdHelpAll(client: pyrogram.Client, msg: pyrogram.Message):
     text = _(msg.from_user.settings.language, f"help_intro")
     rank = utils.GetRank(user_id=msg.from_user.id)
-    user_viewable_plugins = [
+    user_viewable_plugins = (
         p.name
         for p in db_management.Plugins.select()
         .where(db_management.Plugins.is_enabled)
@@ -354,7 +354,7 @@ def CmdHelpAll(client: pyrogram.Client, msg: pyrogram.Message):
         and dictionaries.HELP_DICTIONARY[p.name][0].lower() in dictionaries.RANK_STRING
         and rank
         >= dictionaries.RANK_STRING[dictionaries.HELP_DICTIONARY[p.name][0].lower()]
-    ]
+    )
     for plugin in user_viewable_plugins:
         text += (
             f'<b><a href="#{plugin}">'

@@ -1590,7 +1590,7 @@ def AutoPunish(
                     r_target_chat.save()
 
         # retrieve reasons
-        reasons = [_(chat_settings.language, f"reason_{x}") for x in reasons]
+        reasons = (_(chat_settings.language, f"reason_{x}") for x in reasons)
         hashtags.append("#automatic")
         hashtags.reverse()
         text = _(chat_settings.language, "action_on_user").format(

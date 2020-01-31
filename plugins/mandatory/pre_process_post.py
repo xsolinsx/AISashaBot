@@ -48,7 +48,7 @@ def PreDeletedMessages(client: pyrogram.Client, msgs: typing.List[pyrogram.Messa
     while db_management.DB.is_stopped():
         time.sleep(1)
     tmp = ""
-    tmp = " ".join([msg.message_id for msg in msgs.messages])
+    tmp = " ".join(msg.message_id for msg in msgs.messages)
     # print("######################\nDELETED MESSAGES")
     print(
         "[UTC {0}] >>> Deleted messages\nCount: {1}\nMessage IDs: {2}".format(

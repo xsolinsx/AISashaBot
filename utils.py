@@ -352,7 +352,7 @@ def PrintMessage(msg: pyrogram.Message) -> str:
             tmp = " ERR UNKNOWN SERVICE"
             if msg.new_chat_members:
                 tmp = " [added]" + " ".join(
-                    [PrintUser(user=user) for user in msg.new_chat_members]
+                    PrintUser(user=user) for user in msg.new_chat_members
                 )
             elif msg.left_chat_member:
                 tmp = f" [removed {PrintUser(user=msg.left_chat_member)}]"
@@ -667,8 +667,8 @@ def DFromUToTelegramProgress(
         # 0% = [░░░░░░░░░░░░░░░░░░░░]
         # 100% = [████████████████████]
         progress = "[{0}{1}] {2}%\n".format(
-            "".join(["█" for i in range(math.floor(percentage / 5))]),
-            "".join(["░" for i in range(20 - math.floor(percentage / 5))]),
+            "".join("█" for i in range(math.floor(percentage / 5))),
+            "".join("░" for i in range(20 - math.floor(percentage / 5))),
             round(percentage, 2),
         )
         tmp = progress + "{0}/{1}\n{2}/s {3}/{4}\n".format(
@@ -985,7 +985,7 @@ def IsTelegramAdministrator(
             db_management.RUserChat.select()
             .where(db_management.RUserChat.user_id == user_id)
             .execute()
-        )
+            )
         for relationship in relationships:
             if relationship.is_admin:
                 return True
@@ -1017,7 +1017,7 @@ def IsOwnerOrHigher(
                 db_management.RUserChat.select()
                 .where(db_management.RUserChat.user_id == user_id)
                 .execute()
-            )
+                )
             for relationship in relationships:
                 if relationship.rank > 3:
                     return True
