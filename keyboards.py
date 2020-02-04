@@ -118,6 +118,7 @@ def BuildStartMenu(
     user_settings: db_management.UserSettings, bot_username: str, channel_username: str
 ) -> list:
     channel_username = channel_username.replace("@", "")
+
     keyboard = list()
     keyboard.append(
         [
@@ -237,7 +238,6 @@ def BuildPrivateSettingsMenu(user_settings: db_management.UserSettings) -> list:
 
 def BuildTelegramSettingsMenu(chat_settings: db_management.ChatSettings) -> list:
     keyboard = list()
-
     keyboard.append(
         [
             pyrogram.InlineKeyboardButton(
@@ -312,6 +312,7 @@ def BuildGroupSettingsMenu(
     selected_setting: str = None,
 ) -> list:
     current_keyboard = current_keyboard.replace("useless", "")
+
     header_buttons = list()
     header_buttons.append(
         [
@@ -494,78 +495,51 @@ def BuildGeneralSettingsMenu(
     chat_settings: db_management.ChatSettings, selected_setting: str = None
 ) -> list:
     if selected_setting:
-        if chat_settings.allow_temporary_punishments:
-            punishments_rows = [
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
-                        callback_data=f"settings {selected_setting} selectvalue0",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
-                        callback_data=f"settings {selected_setting} selectvalue1",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
-                        callback_data=f"settings {selected_setting} selectvalue2",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
-                        callback_data=f"settings {selected_setting} selectvalue3",
-                    ),
-                ],
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
-                        callback_data=f"settings {selected_setting} selectvalue4",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
-                        callback_data=f"settings {selected_setting} selectvalue5",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
-                        callback_data=f"settings {selected_setting} selectvalue6",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
-                        callback_data=f"settings {selected_setting} selectvalue7",
-                    ),
-                ],
-            ]
-        else:
-            punishments_rows = [
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
-                        callback_data=f"settings {selected_setting} selectvalue0",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
-                        callback_data=f"settings {selected_setting} selectvalue1",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
-                        callback_data=f"settings {selected_setting} selectvalue2",
-                    ),
-                ],
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
-                        callback_data=f"settings {selected_setting} selectvalue3",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
-                        callback_data=f"settings {selected_setting} selectvalue5",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
-                        callback_data=f"settings {selected_setting} selectvalue7",
-                    ),
-                ],
-            ]
-    keyboard = list()
+        punishments_rows = [
+            [
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
+                    callback_data=f"settings {selected_setting} selectvalue0",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
+                    callback_data=f"settings {selected_setting} selectvalue1",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
+                    callback_data=f"settings {selected_setting} selectvalue2",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
+                    callback_data=f"settings {selected_setting} selectvalue3",
+                ),
+            ],
+            [
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
+                    callback_data=f"settings {selected_setting} selectvalue4",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
+                    callback_data=f"settings {selected_setting} selectvalue5",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
+                    callback_data=f"settings {selected_setting} selectvalue6",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
+                    callback_data=f"settings {selected_setting} selectvalue7",
+                ),
+            ],
+        ]
+        if not chat_settings.allow_temporary_punishments:
+            # remove temporary punishments from the rows
+            tmp = punishments_rows[0].pop(3)
+            punishments_rows[1][0] = tmp
+            punishments_rows[1].pop(2)
 
+    keyboard = list()
     keyboard.append(
         [
             pyrogram.InlineKeyboardButton(
@@ -711,76 +685,49 @@ def BuildFloodSettingsMenu(
     chat_settings: db_management.ChatSettings, selected_setting: str = None
 ) -> list:
     if selected_setting:
-        if chat_settings.allow_temporary_punishments:
-            punishments_rows = [
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
-                        callback_data=f"settings {selected_setting} selectvalue0",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
-                        callback_data=f"settings {selected_setting} selectvalue1",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
-                        callback_data=f"settings {selected_setting} selectvalue2",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
-                        callback_data=f"settings {selected_setting} selectvalue3",
-                    ),
-                ],
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
-                        callback_data=f"settings {selected_setting} selectvalue4",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
-                        callback_data=f"settings {selected_setting} selectvalue5",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
-                        callback_data=f"settings {selected_setting} selectvalue6",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
-                        callback_data=f"settings {selected_setting} selectvalue7",
-                    ),
-                ],
-            ]
-        else:
-            punishments_rows = [
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
-                        callback_data=f"settings {selected_setting} selectvalue0",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
-                        callback_data=f"settings {selected_setting} selectvalue1",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
-                        callback_data=f"settings {selected_setting} selectvalue2",
-                    ),
-                ],
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
-                        callback_data=f"settings {selected_setting} selectvalue3",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
-                        callback_data=f"settings {selected_setting} selectvalue5",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
-                        callback_data=f"settings {selected_setting} selectvalue7",
-                    ),
-                ],
-            ]
+        punishments_rows = [
+            [
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
+                    callback_data=f"settings {selected_setting} selectvalue0",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
+                    callback_data=f"settings {selected_setting} selectvalue1",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
+                    callback_data=f"settings {selected_setting} selectvalue2",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
+                    callback_data=f"settings {selected_setting} selectvalue3",
+                ),
+            ],
+            [
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
+                    callback_data=f"settings {selected_setting} selectvalue4",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
+                    callback_data=f"settings {selected_setting} selectvalue5",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
+                    callback_data=f"settings {selected_setting} selectvalue6",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
+                    callback_data=f"settings {selected_setting} selectvalue7",
+                ),
+            ],
+        ]
+        if not chat_settings.allow_temporary_punishments:
+            # remove temporary punishments from the rows
+            tmp = punishments_rows[0].pop(3)
+            punishments_rows[1][0] = tmp
+            punishments_rows[1].pop(2)
 
     keyboard = list()
     keyboard.append(
@@ -842,76 +789,49 @@ def BuildInviteSettingsMenu(
     chat_settings: db_management.ChatSettings, selected_setting: str = None
 ) -> list:
     if selected_setting:
-        if chat_settings.allow_temporary_punishments:
-            punishments_rows = [
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
-                        callback_data=f"settings {selected_setting} selectvalue0",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
-                        callback_data=f"settings {selected_setting} selectvalue1",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
-                        callback_data=f"settings {selected_setting} selectvalue2",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
-                        callback_data=f"settings {selected_setting} selectvalue3",
-                    ),
-                ],
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
-                        callback_data=f"settings {selected_setting} selectvalue4",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
-                        callback_data=f"settings {selected_setting} selectvalue5",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
-                        callback_data=f"settings {selected_setting} selectvalue6",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
-                        callback_data=f"settings {selected_setting} selectvalue7",
-                    ),
-                ],
-            ]
-        else:
-            punishments_rows = [
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
-                        callback_data=f"settings {selected_setting} selectvalue0",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
-                        callback_data=f"settings {selected_setting} selectvalue1",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
-                        callback_data=f"settings {selected_setting} selectvalue2",
-                    ),
-                ],
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
-                        callback_data=f"settings {selected_setting} selectvalue3",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
-                        callback_data=f"settings {selected_setting} selectvalue5",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
-                        callback_data=f"settings {selected_setting} selectvalue7",
-                    ),
-                ],
-            ]
+        punishments_rows = [
+            [
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
+                    callback_data=f"settings {selected_setting} selectvalue0",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
+                    callback_data=f"settings {selected_setting} selectvalue1",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
+                    callback_data=f"settings {selected_setting} selectvalue2",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
+                    callback_data=f"settings {selected_setting} selectvalue3",
+                ),
+            ],
+            [
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
+                    callback_data=f"settings {selected_setting} selectvalue4",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
+                    callback_data=f"settings {selected_setting} selectvalue5",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
+                    callback_data=f"settings {selected_setting} selectvalue6",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
+                    callback_data=f"settings {selected_setting} selectvalue7",
+                ),
+            ],
+        ]
+        if not chat_settings.allow_temporary_punishments:
+            # remove temporary punishments from the rows
+            tmp = punishments_rows[0].pop(3)
+            punishments_rows[1][0] = tmp
+            punishments_rows[1].pop(2)
 
     keyboard = list()
     keyboard.append(
@@ -1016,7 +936,6 @@ def BuildInviteSettingsMenu(
 
 def BuildGreetingSettingsMenu(chat_settings: db_management.ChatSettings) -> list:
     keyboard = list()
-
     keyboard.append(
         [
             pyrogram.InlineKeyboardButton(
@@ -1143,76 +1062,49 @@ def BuildActionTypeSettingsMenu(
     chat_settings: db_management.ChatSettings, selected_setting: str = None
 ) -> list:
     if selected_setting:
-        if chat_settings.allow_temporary_punishments:
-            punishments_rows = [
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
-                        callback_data=f"settings {selected_setting} selectvalue0",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
-                        callback_data=f"settings {selected_setting} selectvalue1",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
-                        callback_data=f"settings {selected_setting} selectvalue2",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
-                        callback_data=f"settings {selected_setting} selectvalue3",
-                    ),
-                ],
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
-                        callback_data=f"settings {selected_setting} selectvalue4",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
-                        callback_data=f"settings {selected_setting} selectvalue5",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
-                        callback_data=f"settings {selected_setting} selectvalue6",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
-                        callback_data=f"settings {selected_setting} selectvalue7",
-                    ),
-                ],
-            ]
-        else:
-            punishments_rows = [
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
-                        callback_data=f"settings {selected_setting} selectvalue0",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
-                        callback_data=f"settings {selected_setting} selectvalue1",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
-                        callback_data=f"settings {selected_setting} selectvalue2",
-                    ),
-                ],
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
-                        callback_data=f"settings {selected_setting} selectvalue3",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
-                        callback_data=f"settings {selected_setting} selectvalue5",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
-                        callback_data=f"settings {selected_setting} selectvalue7",
-                    ),
-                ],
-            ]
+        punishments_rows = [
+            [
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
+                    callback_data=f"settings {selected_setting} selectvalue0",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
+                    callback_data=f"settings {selected_setting} selectvalue1",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
+                    callback_data=f"settings {selected_setting} selectvalue2",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
+                    callback_data=f"settings {selected_setting} selectvalue3",
+                ),
+            ],
+            [
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
+                    callback_data=f"settings {selected_setting} selectvalue4",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
+                    callback_data=f"settings {selected_setting} selectvalue5",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
+                    callback_data=f"settings {selected_setting} selectvalue6",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
+                    callback_data=f"settings {selected_setting} selectvalue7",
+                ),
+            ],
+        ]
+        if not chat_settings.allow_temporary_punishments:
+            # remove temporary punishments from the rows
+            tmp = punishments_rows[0].pop(3)
+            punishments_rows[1][0] = tmp
+            punishments_rows[1].pop(2)
 
     keyboard = list()
     keyboard.append(
@@ -1342,76 +1234,49 @@ def BuildMessageTypeSettingsMenu(
     chat_settings: db_management.ChatSettings, selected_setting: str = None
 ) -> list:
     if selected_setting:
-        if chat_settings.allow_temporary_punishments:
-            punishments_rows = [
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
-                        callback_data=f"settings {selected_setting} selectvalue0",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
-                        callback_data=f"settings {selected_setting} selectvalue1",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
-                        callback_data=f"settings {selected_setting} selectvalue2",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
-                        callback_data=f"settings {selected_setting} selectvalue3",
-                    ),
-                ],
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
-                        callback_data=f"settings {selected_setting} selectvalue4",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
-                        callback_data=f"settings {selected_setting} selectvalue5",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
-                        callback_data=f"settings {selected_setting} selectvalue6",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
-                        callback_data=f"settings {selected_setting} selectvalue7",
-                    ),
-                ],
-            ]
-        else:
-            punishments_rows = [
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
-                        callback_data=f"settings {selected_setting} selectvalue0",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
-                        callback_data=f"settings {selected_setting} selectvalue1",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
-                        callback_data=f"settings {selected_setting} selectvalue2",
-                    ),
-                ],
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
-                        callback_data=f"settings {selected_setting} selectvalue3",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
-                        callback_data=f"settings {selected_setting} selectvalue5",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
-                        callback_data=f"settings {selected_setting} selectvalue7",
-                    ),
-                ],
-            ]
+        punishments_rows = [
+            [
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
+                    callback_data=f"settings {selected_setting} selectvalue0",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
+                    callback_data=f"settings {selected_setting} selectvalue1",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
+                    callback_data=f"settings {selected_setting} selectvalue2",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
+                    callback_data=f"settings {selected_setting} selectvalue3",
+                ),
+            ],
+            [
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
+                    callback_data=f"settings {selected_setting} selectvalue4",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
+                    callback_data=f"settings {selected_setting} selectvalue5",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
+                    callback_data=f"settings {selected_setting} selectvalue6",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
+                    callback_data=f"settings {selected_setting} selectvalue7",
+                ),
+            ],
+        ]
+        if not chat_settings.allow_temporary_punishments:
+            # remove temporary punishments from the rows
+            tmp = punishments_rows[0].pop(3)
+            punishments_rows[1][0] = tmp
+            punishments_rows[1].pop(2)
 
     keyboard = list()
     keyboard.append(
@@ -1684,76 +1549,50 @@ def BuildNightModeSettingsMenu(
         ]
     )
     if selected_setting == "night_mode_punishment":
-        if chat_settings.allow_temporary_punishments:
-            punishments_rows = [
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=dictionaries.YES_NO_EMOJI[0],
-                        callback_data=f"settings {selected_setting} selectvalue0",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
-                        callback_data=f"settings {selected_setting} selectvalue1",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
-                        callback_data=f"settings {selected_setting} selectvalue2",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
-                        callback_data=f"settings {selected_setting} selectvalue3",
-                    ),
-                ],
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
-                        callback_data=f"settings {selected_setting} selectvalue4",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
-                        callback_data=f"settings {selected_setting} selectvalue5",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
-                        callback_data=f"settings {selected_setting} selectvalue6",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
-                        callback_data=f"settings {selected_setting} selectvalue7",
-                    ),
-                ],
-            ]
-        else:
-            punishments_rows = [
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
-                        callback_data=f"settings {selected_setting} selectvalue0",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
-                        callback_data=f"settings {selected_setting} selectvalue1",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
-                        callback_data=f"settings {selected_setting} selectvalue2",
-                    ),
-                ],
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
-                        callback_data=f"settings {selected_setting} selectvalue3",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
-                        callback_data=f"settings {selected_setting} selectvalue5",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
-                        callback_data=f"settings {selected_setting} selectvalue7",
-                    ),
-                ],
-            ]
+        punishments_rows = [
+            [
+                pyrogram.InlineKeyboardButton(
+                    text=dictionaries.YES_NO_EMOJI[0],
+                    callback_data=f"settings {selected_setting} selectvalue0",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
+                    callback_data=f"settings {selected_setting} selectvalue1",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
+                    callback_data=f"settings {selected_setting} selectvalue2",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
+                    callback_data=f"settings {selected_setting} selectvalue3",
+                ),
+            ],
+            [
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
+                    callback_data=f"settings {selected_setting} selectvalue4",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
+                    callback_data=f"settings {selected_setting} selectvalue5",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
+                    callback_data=f"settings {selected_setting} selectvalue6",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
+                    callback_data=f"settings {selected_setting} selectvalue7",
+                ),
+            ],
+        ]
+        if not chat_settings.allow_temporary_punishments:
+            # remove temporary punishments from the rows
+            tmp = punishments_rows[0].pop(3)
+            punishments_rows[1][0] = tmp
+            punishments_rows[1].pop(2)
+
         keyboard[-1][1].text = f".{keyboard[-1][1].text}."
         keyboard.extend(punishments_rows)
     elif (
@@ -1870,7 +1709,7 @@ def BuildSlowModeSettingsMenu(
     )
 
     if selected_setting == "slow_mode_value":
-        punishments_rows = [
+        mode_values = [
             [
                 pyrogram.InlineKeyboardButton(
                     text=dictionaries.YES_NO_EMOJI[0],
@@ -1917,7 +1756,7 @@ def BuildSlowModeSettingsMenu(
             ],
         ]
         keyboard[-1][1].text = f".{keyboard[-1][1].text}."
-        keyboard.extend(punishments_rows)
+        keyboard.extend(mode_values)
     elif (
         selected_setting == "slow_mode_fromhour"
         or selected_setting == "slow_mode_tohour"
@@ -2359,76 +2198,50 @@ def BuildCensorshipsList(
     selected_setting: str = None,
 ) -> list:
     if selected_setting:
-        if chat_settings.allow_temporary_punishments:
-            punishments_rows = [
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
-                        callback_data=f"censorships {selected_setting} selectvalue0",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
-                        callback_data=f"censorships {selected_setting} selectvalue1",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
-                        callback_data=f"censorships {selected_setting} selectvalue2",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
-                        callback_data=f"censorships {selected_setting} selectvalue3",
-                    ),
-                ],
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
-                        callback_data=f"censorships {selected_setting} selectvalue4",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
-                        callback_data=f"censorships {selected_setting} selectvalue5",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
-                        callback_data=f"censorships {selected_setting} selectvalue6",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
-                        callback_data=f"censorships {selected_setting} selectvalue7",
-                    ),
-                ],
-            ]
-        else:
-            punishments_rows = [
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
-                        callback_data=f"censorships {selected_setting} selectvalue0",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
-                        callback_data=f"censorships {selected_setting} selectvalue1",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
-                        callback_data=f"censorships {selected_setting} selectvalue2",
-                    ),
-                ],
-                [
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
-                        callback_data=f"censorships {selected_setting} selectvalue3",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
-                        callback_data=f"censorships {selected_setting} selectvalue5",
-                    ),
-                    pyrogram.InlineKeyboardButton(
-                        text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
-                        callback_data=f"censorships {selected_setting} selectvalue7",
-                    ),
-                ],
-            ]
+        punishments_rows = [
+            [
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
+                    callback_data=f"censorships {selected_setting} selectvalue0",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
+                    callback_data=f"censorships {selected_setting} selectvalue1",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
+                    callback_data=f"censorships {selected_setting} selectvalue2",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
+                    callback_data=f"censorships {selected_setting} selectvalue3",
+                ),
+            ],
+            [
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
+                    callback_data=f"censorships {selected_setting} selectvalue4",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
+                    callback_data=f"censorships {selected_setting} selectvalue5",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
+                    callback_data=f"censorships {selected_setting} selectvalue6",
+                ),
+                pyrogram.InlineKeyboardButton(
+                    text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
+                    callback_data=f"censorships {selected_setting} selectvalue7",
+                ),
+            ],
+        ]
+        if not chat_settings.allow_temporary_punishments:
+            # remove temporary punishments from the rows
+            tmp = punishments_rows[0].pop(3)
+            punishments_rows[1][0] = tmp
+            punishments_rows[1].pop(2)
+
     header = list()
     header.append(
         [
@@ -2440,7 +2253,6 @@ def BuildCensorshipsList(
     )
 
     keyboard = list()
-
     if not selected_setting or selected_setting == "punishment":
         keyboard.append(
             [
@@ -2550,7 +2362,6 @@ def BuildExtraList(
     )
 
     keyboard = list()
-
     if not selected_setting:
         header.append(
             [
@@ -3181,9 +2992,6 @@ def BuildAlternativeCommandsList(
             )
         ]
     )
-
-    keyboard = list()
-
     header.append(
         [
             pyrogram.InlineKeyboardButton(
@@ -3192,6 +3000,8 @@ def BuildAlternativeCommandsList(
             )
         ]
     )
+
+    keyboard = list()
     query: peewee.ModelSelect = chat_settings.alternative_commands.order_by(
         peewee.fn.LOWER(db_management.ChatAlternatives.original),
         peewee.fn.LOWER(db_management.ChatAlternatives.alternative),
@@ -3254,7 +3064,6 @@ def BuildPermissionsKeyboard(
     r_user_chat: db_management.RUserChat,
 ) -> list:
     keyboard = list()
-
     keyboard.append(
         [
             pyrogram.InlineKeyboardButton(
@@ -3388,6 +3197,7 @@ def BuildInfoMenu(
             )
         ]
     )
+
     keyboard = list()
     if current_keyboard == "maininfo":
         if target < 0:
@@ -3801,6 +3611,8 @@ def BuildBotPluginsMenu(
             )
         ]
     ]
+
+    keyboard = list()
     query: peewee.ModelSelect = db_management.Plugins.select().order_by(
         peewee.fn.LOWER(db_management.Plugins.name)
     )
@@ -3809,7 +3621,7 @@ def BuildBotPluginsMenu(
     )
     begin = page * utils.config["max_items_keyboard"]
     end = min(len(query), (page + 1) * utils.config["max_items_keyboard"])
-    keyboard = list()
+
     keyboard.append(
         [
             pyrogram.InlineKeyboardButton(
@@ -3870,6 +3682,8 @@ def BuildChatPluginsMenu(
             )
         ]
     ]
+
+    keyboard = list()
     query: peewee.ModelSelect = (
         chat_settings.plugins.select()
         .join(
@@ -3884,7 +3698,7 @@ def BuildChatPluginsMenu(
     )
     begin = page * utils.config["max_items_keyboard"]
     end = min(len(query), (page + 1) * utils.config["max_items_keyboard"])
-    keyboard = list()
+
     keyboard.append(
         [
             pyrogram.InlineKeyboardButton(
@@ -3953,6 +3767,8 @@ def BuildGroupsMenu(
             )
         ]
     ]
+
+    keyboard = list()
     query: peewee.ModelSelect = (
         db_management.ChatSettings.select()
         .join(
@@ -3970,7 +3786,6 @@ def BuildGroupsMenu(
     )
     begin = page * utils.config["max_items_keyboard"]
     end = min(len(query), (page + 1) * utils.config["max_items_keyboard"])
-    keyboard = list()
     for i in range(begin, end):
         current_chat = query[i].chat
         if current_chat.username or query[i].link:
@@ -4038,6 +3853,7 @@ def BuildActionOnAddedUsersList(
             )
         ]
     ]
+
     keyboard = list()
     for user in new_chat_members:
         keyboard.append(
