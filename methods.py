@@ -392,7 +392,7 @@ def Warn(
                             chat_id=chat_id,
                             until_date=chat_settings.max_temp_restrict,
                             reasons=f"{reasons}\n"
-                            + _(chat_settings.language, "max_warns_reached"),
+                            + _(chat_settings.language, "reason_max_warns_reached"),
                             r_executer_chat=r_executer_chat,
                             r_target_chat=r_target_chat,
                             chat_settings=chat_settings,
@@ -407,7 +407,7 @@ def Warn(
                             target=target,
                             chat_id=chat_id,
                             reasons=f"{reasons}\n"
-                            + _(chat_settings.language, "max_warns_reached"),
+                            + _(chat_settings.language, "reason_max_warns_reached"),
                             r_executer_chat=r_executer_chat,
                             r_target_chat=r_target_chat,
                             chat_settings=chat_settings,
@@ -423,7 +423,7 @@ def Warn(
                             chat_id=chat_id,
                             until_date=chat_settings.max_temp_ban,
                             reasons=f"{reasons}\n"
-                            + _(chat_settings.language, "max_warns_reached"),
+                            + _(chat_settings.language, "reason_max_warns_reached"),
                             r_executer_chat=r_executer_chat,
                             r_target_chat=r_target_chat,
                             chat_settings=chat_settings,
@@ -438,7 +438,7 @@ def Warn(
                             target=target,
                             chat_id=chat_id,
                             reasons=f"{reasons}\n"
-                            + _(chat_settings.language, "max_warns_reached"),
+                            + _(chat_settings.language, "reason_max_warns_reached"),
                             r_executer_chat=r_executer_chat,
                             r_target_chat=r_target_chat,
                             chat_settings=chat_settings,
