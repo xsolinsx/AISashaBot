@@ -49,7 +49,7 @@ def CmdUrbanDictionary(client: pyrogram.Client, msg: pyrogram.Message):
         else:
             data = r.json()
             if data["list"]:
-                text = ""
+                text = f"<code>{msg.text[len(msg.command[0]) + 2 :].upper()}</code>"
                 for i, entry in enumerate(data["list"]):
                     text += (
                         "<b>"
