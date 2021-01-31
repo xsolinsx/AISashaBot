@@ -7,16 +7,15 @@ import db_management
 import dictionaries
 import keyboards
 import methods
-import my_filters
 import utils
 
 _ = utils.GetLocalizedString
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^\(i\)chatplugins", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^\(i\)chatplugins", flags=re.I)
 )
-def CbQryChatPluginsInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryChatPluginsInfo(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     methods.CallbackQueryAnswer(
         cb_qry=cb_qry,
         text=_(cb_qry.from_user.settings.language, cb_qry.data[:3] + cb_qry.data[7:]),
@@ -25,9 +24,11 @@ def CbQryChatPluginsInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^chatplugins PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^chatplugins PAGES[<<|\-|\+|>>]", flags=re.I)
 )
-def CbQryChatPluginsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryChatPluginsPages(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -42,13 +43,13 @@ def CbQryChatPluginsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuer
         )
         if cb_qry.data.endswith("<<"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildChatPluginsMenu(chat_settings=chat_settings, page=0)
                 )
             )
         elif cb_qry.data.endswith("-"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildChatPluginsMenu(
                         chat_settings=chat_settings, page=page - 1
                     )
@@ -56,7 +57,7 @@ def CbQryChatPluginsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuer
             )
         elif cb_qry.data.endswith("+"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildChatPluginsMenu(
                         chat_settings=chat_settings, page=page + 1
                     )
@@ -64,7 +65,7 @@ def CbQryChatPluginsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuer
             )
         elif cb_qry.data.endswith(">>"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildChatPluginsMenu(
                         chat_settings=chat_settings, page=-1,
                     )
@@ -79,12 +80,10 @@ def CbQryChatPluginsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuer
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(
-        pattern=r"^chatplugins is_enabled_on_chat (\w+)", flags=re.I
-    )
+    pyrogram.filters.regex(pattern=r"^chatplugins is_enabled_on_chat (\w+)", flags=re.I)
 )
 def CbQryChatPluginsEnableDisableOnChat(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -137,7 +136,7 @@ def CbQryChatPluginsEnableDisableOnChat(
             )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildChatPluginsMenu(chat_settings=chat_settings, page=page)
             ),
         )
@@ -150,9 +149,11 @@ def CbQryChatPluginsEnableDisableOnChat(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^chatplugins min_rank (\w+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^chatplugins min_rank (\w+)", flags=re.I)
 )
-def CbQryChatPluginsMinRank(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryChatPluginsMinRank(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -213,7 +214,7 @@ def CbQryChatPluginsMinRank(client: pyrogram.Client, cb_qry: pyrogram.CallbackQu
             )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildChatPluginsMenu(chat_settings=chat_settings, page=page)
             ),
         )
@@ -226,9 +227,9 @@ def CbQryChatPluginsMinRank(client: pyrogram.Client, cb_qry: pyrogram.CallbackQu
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^chatplugins (\-\d+) (\d+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^chatplugins (\-\d+) (\d+)", flags=re.I)
 )
-def CbQryChatPlugins(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryChatPlugins(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.data.split(" ")
     chat_id = int(parameters[1])
     page = int(parameters[2])
@@ -239,7 +240,7 @@ def CbQryChatPlugins(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         cb_qry.message.edit_text(
             text=_(cb_qry.message.chat.settings.language, "chatplugins")
             + f" {utils.PrintChat(chat=chat_settings.chat)}",
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildChatPluginsMenu(chat_settings=chat_settings, page=page)
             ),
         )
@@ -252,15 +253,15 @@ def CbQryChatPlugins(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(
             commands=["chatplugins", "plugins"], del_=True, pvt=True
         ),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.group
+    & pyrogram.filters.group
 )
-def CmdChatPlugins(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdChatPlugins(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -270,7 +271,7 @@ def CmdChatPlugins(client: pyrogram.Client, msg: pyrogram.Message):
                 chat_id=msg.from_user.id,
                 text=_(msg.from_user.settings.language, "chatplugins")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildChatPluginsMenu(
                         chat_settings=msg.chat.settings, page=0
                     )
@@ -290,7 +291,7 @@ def CmdChatPlugins(client: pyrogram.Client, msg: pyrogram.Message):
                 msg=msg,
                 text=_(msg.chat.settings.language, "chatplugins")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildChatPluginsMenu(
                         chat_settings=msg.chat.settings, page=0
                     )
@@ -299,12 +300,12 @@ def CmdChatPlugins(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=["chatplugins", "plugins"], prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.private
+    & pyrogram.filters.private
 )
-def CmdChatPluginsChat(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdChatPluginsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
@@ -319,7 +320,7 @@ def CmdChatPluginsChat(client: pyrogram.Client, msg: pyrogram.Message):
                     msg=msg,
                     text=_(chat_settings.language, "chatplugins")
                     + f" {utils.PrintChat(chat=chat_settings.chat)}",
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildChatPluginsMenu(
                             chat_settings=chat_settings, page=0
                         )

@@ -80,7 +80,7 @@ def Info(
             other_info = list()
             # get current chat_member info
             try:
-                member: pyrogram.ChatMember = client.get_chat_member(
+                member: pyrogram.types.ChatMember = client.get_chat_member(
                     chat_id=chat_id, user_id=target
                 )
             except pyrogram.errors.FloodWait as ex:
@@ -278,10 +278,10 @@ def Invite(
                         client=client,
                         chat_id=target,
                         text=_(chat_settings.language, "you_have_been_invited"),
-                        reply_markup=pyrogram.InlineKeyboardMarkup(
+                        reply_markup=pyrogram.types.InlineKeyboardMarkup(
                             [
                                 [
-                                    pyrogram.InlineKeyboardButton(
+                                    pyrogram.types.InlineKeyboardButton(
                                         text=chat_settings.chat.title,
                                         url=f"t.me/{chat_settings.chat.username}"
                                         if chat_settings.chat.username
@@ -694,7 +694,7 @@ def Restrict(
                     client.restrict_chat_member(
                         chat_id=chat_id,
                         user_id=target,
-                        permissions=pyrogram.ChatPermissions(),
+                        permissions=pyrogram.types.ChatPermissions(),
                         until_date=until_date,
                     )
                 except pyrogram.errors.FloodWait as ex:
@@ -823,7 +823,7 @@ def Unrestrict(
                 client.restrict_chat_member(
                     chat_id=chat_id,
                     user_id=target,
-                    permissions=pyrogram.ChatPermissions(
+                    permissions=pyrogram.types.ChatPermissions(
                         can_send_messages=True,
                         can_send_media_messages=True,
                         can_send_other_messages=True,
@@ -1438,7 +1438,7 @@ def AutoPunish(
                     client.restrict_chat_member(
                         chat_id=chat_id,
                         user_id=target,
-                        permissions=pyrogram.ChatPermissions(),
+                        permissions=pyrogram.types.ChatPermissions(),
                         until_date=until_date,
                     )
                     hashtags.append(
@@ -1459,7 +1459,7 @@ def AutoPunish(
                         kwargs=dict(
                             chat_id=chat_id,
                             user_id=target,
-                            permissions=pyrogram.ChatPermissions(),
+                            permissions=pyrogram.types.ChatPermissions(),
                             until_date=until_date,
                         ),
                     )
@@ -1480,7 +1480,7 @@ def AutoPunish(
                     client.restrict_chat_member(
                         chat_id=chat_id,
                         user_id=target,
-                        permissions=pyrogram.ChatPermissions(),
+                        permissions=pyrogram.types.ChatPermissions(),
                     )
                     hashtags.append("#restrict")
                 except pyrogram.errors.FloodWait as ex:
@@ -1495,7 +1495,7 @@ def AutoPunish(
                         kwargs=dict(
                             chat_id=chat_id,
                             user_id=target,
-                            permissions=pyrogram.ChatPermissions(),
+                            permissions=pyrogram.types.ChatPermissions(),
                         ),
                     )
                     hashtags.append(f"#scheduledrestrict UTC {run_date}")
@@ -1620,7 +1620,7 @@ def AutoPunish(
 
 
 def CallbackQueryAnswer(
-    cb_qry: pyrogram.CallbackQuery,
+    cb_qry: pyrogram.types.CallbackQuery,
     text: str = None,
     show_alert: bool = None,
     url: str = None,
@@ -1649,12 +1649,12 @@ def SendLog(
     reply_to_message_id: int = None,
     schedule_date: int = None,
     reply_markup: typing.Union[
-        "pyrogram.InlineKeyboardMarkup",
+        "pyrogram.types.InlineKeyboardMarkup",
         "pyrogram.ReplyKeyboardMarkup",
         "pyrogram.ReplyKeyboardRemove",
         "pyrogram.ForceReply",
     ] = None,
-) -> typing.Union[pyrogram.Message, None]:
+) -> typing.Union[pyrogram.types.Message, None]:
     try:
         return client.send_message(
             chat_id=utils.config["log_chat"],
@@ -1701,12 +1701,12 @@ def SendMessage(
     reply_to_message_id: int = None,
     schedule_date: int = None,
     reply_markup: typing.Union[
-        "pyrogram.InlineKeyboardMarkup",
+        "pyrogram.types.InlineKeyboardMarkup",
         "pyrogram.ReplyKeyboardMarkup",
         "pyrogram.ReplyKeyboardRemove",
         "pyrogram.ForceReply",
     ] = None,
-) -> typing.Union[pyrogram.Message, None]:
+) -> typing.Union[pyrogram.types.Message, None]:
     if chat_id < 0:
         chat_settings = db_management.ChatSettings.get_or_none(chat_id=chat_id)
     else:
@@ -1800,19 +1800,19 @@ def SendMessage(
 
 def ReplyText(
     client: pyrogram.Client,
-    msg: pyrogram.Message,
+    msg: pyrogram.types.Message,
     text: str,
     parse_mode: typing.Union[str, None] = object,
     disable_web_page_preview: bool = None,
     disable_notification: bool = None,
     reply_to_message_id: int = None,
     reply_markup: typing.Union[
-        "pyrogram.InlineKeyboardMarkup",
+        "pyrogram.types.InlineKeyboardMarkup",
         "pyrogram.ReplyKeyboardMarkup",
         "pyrogram.ReplyKeyboardRemove",
         "pyrogram.ForceReply",
     ] = None,
-) -> typing.Union[pyrogram.Message, None]:
+) -> typing.Union[pyrogram.types.Message, None]:
 
     try:
         client.send_chat_action(
@@ -1888,19 +1888,19 @@ def ReplyText(
 
 def ReplyPhoto(
     client: pyrogram.Client,
-    msg: pyrogram.Message,
+    msg: pyrogram.types.Message,
     photo: str,
     caption: str = "",
     parse_mode: typing.Union[str, None] = object,
     disable_notification: bool = None,
     reply_to_message_id: int = None,
     reply_markup: typing.Union[
-        "pyrogram.InlineKeyboardMarkup",
+        "pyrogram.types.InlineKeyboardMarkup",
         "pyrogram.ReplyKeyboardMarkup",
         "pyrogram.ReplyKeyboardRemove",
         "pyrogram.ForceReply",
     ] = None,
-) -> typing.Union[pyrogram.Message, None]:
+) -> typing.Union[pyrogram.types.Message, None]:
 
     try:
         client.send_chat_action(
@@ -1984,14 +1984,14 @@ def SendDocument(
     reply_to_message_id: int = None,
     schedule_date: int = None,
     reply_markup: typing.Union[
-        "pyrogram.InlineKeyboardMarkup",
+        "pyrogram.types.InlineKeyboardMarkup",
         "pyrogram.ReplyKeyboardMarkup",
         "pyrogram.ReplyKeyboardRemove",
         "pyrogram.ForceReply",
     ] = None,
     progress: callable = None,
     progress_args: tuple = (),
-) -> typing.Union[pyrogram.Message, None]:
+) -> typing.Union[pyrogram.types.Message, None]:
     if chat_id < 0:
         chat_settings = db_management.ChatSettings.get_or_none(chat_id=chat_id)
     else:
@@ -2084,21 +2084,21 @@ def SendDocument(
 
 def ReplyDocument(
     client: pyrogram.Client,
-    msg: pyrogram.Message,
+    msg: pyrogram.types.Message,
     document: str,
     caption: str = "",
     parse_mode: typing.Union[str, None] = object,
     disable_notification: bool = None,
     reply_to_message_id: int = None,
     reply_markup: typing.Union[
-        "pyrogram.InlineKeyboardMarkup",
+        "pyrogram.types.InlineKeyboardMarkup",
         "pyrogram.ReplyKeyboardMarkup",
         "pyrogram.ReplyKeyboardRemove",
         "pyrogram.ForceReply",
     ] = None,
     progress: callable = None,
     progress_args: tuple = (),
-) -> typing.Union[pyrogram.Message, None]:
+) -> typing.Union[pyrogram.types.Message, None]:
 
     try:
         client.send_chat_action(

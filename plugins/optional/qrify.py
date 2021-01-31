@@ -13,12 +13,12 @@ _ = utils.GetLocalizedString
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["qrencode"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
 )
-def CmdQrEncode(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdQrEncode(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
@@ -44,13 +44,13 @@ def CmdQrEncode(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["qrdecode"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
+    & pyrogram.filters.reply
 )
-def CmdQrDecode(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdQrDecode(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(

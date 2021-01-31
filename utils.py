@@ -279,7 +279,7 @@ def InstantiateGreetingsDictionary(chat_id: int):
         )
 
 
-def PrintUser(user: pyrogram.User, use_html=False) -> str:
+def PrintUser(user: pyrogram.types.User, use_html=False) -> str:
     return (
         (
             html.escape(
@@ -298,7 +298,7 @@ def PrintUser(user: pyrogram.User, use_html=False) -> str:
     )
 
 
-def PrintChat(chat: pyrogram.Chat, use_html=False) -> str:
+def PrintChat(chat: pyrogram.types.Chat, use_html=False) -> str:
     return (
         html.escape(
             chat.title
@@ -316,7 +316,7 @@ def PrintChat(chat: pyrogram.Chat, use_html=False) -> str:
     )
 
 
-def PrintMessage(msg: pyrogram.Message) -> str:
+def PrintMessage(msg: pyrogram.types.Message) -> str:
     if msg:
         date = datetime.datetime.utcfromtimestamp(msg.date)
         receiver = ""
@@ -329,7 +329,10 @@ def PrintMessage(msg: pyrogram.Message) -> str:
         if msg.from_user:
             sender = PrintUser(user=msg.from_user)
         else:
-            sender = receiver
+            if msg.sender_chat:
+                sender = "ANONYMOUS"
+            else:
+                sender = receiver
 
         string = ""
         if receiver == sender:
@@ -386,7 +389,7 @@ def PrintMessage(msg: pyrogram.Message) -> str:
     return str(None)
 
 
-def PrintCallbackQuery(cb_qry: pyrogram.CallbackQuery) -> str:
+def PrintCallbackQuery(cb_qry: pyrogram.types.CallbackQuery) -> str:
     if cb_qry:
         date = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
         receiver = ""
@@ -412,7 +415,7 @@ def PrintCallbackQuery(cb_qry: pyrogram.CallbackQuery) -> str:
     return str(None)
 
 
-def ReloadPlugins(client: pyrogram.Client, msg: pyrogram.Message):
+def ReloadPlugins(client: pyrogram.Client, msg: pyrogram.types.Message):
     client.restart()
     db_management.LoadPluginsToDB()
     msg.reply_text(_(msg.chat.settings.language, "plugins_config_langs_reloaded"))
@@ -459,7 +462,7 @@ def RemoveCommand(cmd: list) -> str:
 
     message = ""
     if len(cmd):
-        # "/cmd foobar foo bar" reconstruct the path in case there are spaces (pyrogram.Filters.command uses spaces as default separator)
+        # "/cmd foobar foo bar" reconstruct the path in case there are spaces (pyrogram.filters.command uses spaces as default separator)
         message += " ".join(cmd)
     return message
 
@@ -495,10 +498,10 @@ def CensorPhone(obj: object) -> object:
     return obj
 
 
-def ExtractMedia(msg: pyrogram.Message) -> typing.Tuple[object, str]:
-    """Extract the media from a :obj:`Message <pyrogram.Message>`.
+def ExtractMedia(msg: pyrogram.types.Message) -> typing.Tuple[object, str]:
+    """Extract the media from a :obj:`Message <pyrogram.types.Message>`.
 
-    msg (:obj:`Message <pyrogram.Message>`): Message from which you want to extract the media
+    msg (:obj:`Message <pyrogram.types.Message>`): Message from which you want to extract the media
 
 
     SUCCESS Returns a tuple with the media (``object``) and its type.
@@ -633,7 +636,7 @@ def TimeFormatter(milliseconds: int) -> str:
 
 
 def DFromUToTelegramProgress(
-    current: int, total: int, msg: pyrogram.Message, text: str, start: float,
+    current: int, total: int, msg: pyrogram.types.Message, text: str, start: float,
 ) -> None:
     """
     Use this method to update the progress of a download from/an upload to Telegram, this method is called every 512KB.
@@ -643,7 +646,7 @@ def DFromUToTelegramProgress(
 
     total (``int``): File size in bytes.
 
-    msg (:class:`Message <pyrogram.Message>`): The Message to update while downloading/uploading the file.
+    msg (:class:`Message <pyrogram.types.Message>`): The Message to update while downloading/uploading the file.
 
     text (``str``): Text to put into the update.
 
@@ -729,7 +732,9 @@ def ConvertDurationToUnix(
 
 
 def ResolveCommandToId(
-    client: pyrogram.Client, value: typing.Union[str, int], msg: pyrogram.Message = None
+    client: pyrogram.Client,
+    value: typing.Union[str, int],
+    msg: pyrogram.types.Message = None,
 ) -> typing.Union[str, int]:
     language = None
     if msg and msg.chat and msg.chat.settings:
@@ -811,7 +816,9 @@ def GetCommandsVariants(commands: list, del_: bool = False, pvt: bool = False) -
     return tmp
 
 
-def AdjustMarkers(value: str, msg: pyrogram.Message, welcome: bool = False) -> str:
+def AdjustMarkers(
+    value: str, msg: pyrogram.types.Message, welcome: bool = False
+) -> str:
     # chat
     value = AdjustChatMarkers(value=value, chat=msg.chat)
 
@@ -914,7 +921,7 @@ def AdjustMarkers(value: str, msg: pyrogram.Message, welcome: bool = False) -> s
     return value
 
 
-def AdjustUserMarkers(value: str, user: pyrogram.User) -> str:
+def AdjustUserMarkers(value: str, user: pyrogram.types.User) -> str:
     # joined/invited user
     value = value.replace("$user_id", str(user.id))
     value = value.replace("$first_name", html.escape(user.first_name))
@@ -941,7 +948,7 @@ def AdjustUserMarkers(value: str, user: pyrogram.User) -> str:
     return value
 
 
-def AdjustChatMarkers(value: str, chat: pyrogram.Chat) -> str:
+def AdjustChatMarkers(value: str, chat: pyrogram.types.Chat) -> str:
     # chat
     value = value.replace("$chat_id", str(chat.id))
     value = value.replace("$chat_title", html.escape(chat.title))

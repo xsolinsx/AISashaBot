@@ -11,8 +11,8 @@ import utils
 _ = utils.GetLocalizedString
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.group, group=-2)
-def FlameUser(client: pyrogram.Client, msg: pyrogram.Message):
+@pyrogram.Client.on_message(pyrogram.filters.group, group=-2)
+def FlameUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
@@ -61,14 +61,14 @@ def FlameUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["flame"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdFlameReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdFlameReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
@@ -152,14 +152,14 @@ def CmdFlameReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["flame"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & ~pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & ~pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdFlameUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdFlameUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
@@ -259,10 +259,10 @@ def CmdFlameUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["flame"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["flame"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdFlameChatUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdFlameChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     user_id = utils.ResolveCommandToId(client=client, value=msg.command[2], msg=msg)
     if isinstance(chat_id, str) or isinstance(user_id, str):
@@ -383,14 +383,14 @@ def CmdFlameChatUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["stopflame"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdStopFlameReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdStopFlameReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
@@ -432,14 +432,14 @@ def CmdStopFlameReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["stopflame"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & ~pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & ~pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdStopFlameUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdStopFlameUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
@@ -491,10 +491,10 @@ def CmdStopFlameUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["stopflame"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["stopflame"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdStopFlameChatUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdStopFlameChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     user_id = utils.ResolveCommandToId(client=client, value=msg.command[2], msg=msg)
     if isinstance(chat_id, str) or isinstance(user_id, str):

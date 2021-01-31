@@ -48,10 +48,10 @@ BOT_CLIENT = pyrogram.Client(
     bot_token=utils.config["telegram"]["bot_api_key"],
     workers=4,
     plugins=plugins,
+    parse_mode=None,
 )
 
 BOT_CLIENT.start()
-BOT_CLIENT.set_parse_mode(parse_mode=None)
 BOT_CLIENT.ME = BOT_CLIENT.get_me()
 print(
     start_string.format(
@@ -70,18 +70,24 @@ for dirpath, dirnames, filenames in os.walk(BOT_CLIENT.plugins["root"]):
         )
 
 for x in utils.config["masters"]:
-    BOT_CLIENT.send_message(
-        chat_id=x,
-        text=f"<b>Bot started!</b>\n<b>Pyrogram: {pyrogram.__version__}</b>\n<b>{datetime.datetime.utcnow()}</b>\n"
-        + "\n".join(
-            sorted(
-                # put html and take only file_name
-                map(lambda x: f"<code>{os.path.splitext(x)[0]}</code>", loaded_plugins,)
+    try:
+        BOT_CLIENT.send_message(
+            chat_id=x,
+            text=f"<b>Bot started!</b>\n<b>Pyrogram: {pyrogram.__version__}</b>\n<b>{datetime.datetime.utcnow()}</b>\n"
+            + "\n".join(
+                sorted(
+                    # put html and take only file_name
+                    map(
+                        lambda x: f"<code>{os.path.splitext(x)[0]}</code>",
+                        loaded_plugins,
+                    )
+                )
             )
+            + f"\n\n<b>{len(loaded_plugins)} plugins loaded</b>",
+            parse_mode="html",
         )
-        + f"\n\n<b>{len(loaded_plugins)} plugins loaded</b>",
-        parse_mode="html",
-    )
+    except pyrogram.errors.RPCError as ex:
+        print(ex)
 
 utils.Log(
     client=BOT_CLIENT,
@@ -96,7 +102,7 @@ utils.scheduler.add_job(
     trigger=CronTrigger(hour=2, minute=30, jitter=600, timezone=utc),
     args=(BOT_CLIENT,),
 )
-BOT_CLIENT.idle()
+pyrogram.idle()
 BOT_CLIENT.stop()
 
 db_management.DB.close()

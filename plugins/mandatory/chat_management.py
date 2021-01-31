@@ -17,8 +17,8 @@ import utils
 _ = utils.GetLocalizedString
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.new_chat_members, group=-5)
-def SendWelcome(client: pyrogram.Client, msg: pyrogram.Message):
+@pyrogram.Client.on_message(pyrogram.filters.new_chat_members, group=-5)
+def SendWelcome(client: pyrogram.Client, msg: pyrogram.types.Message):
     welcome = (
         msg.chat.settings.extras.where(
             (db_management.ChatExtras.key == "welcome")
@@ -86,10 +86,10 @@ def SendWelcome(client: pyrogram.Client, msg: pyrogram.Message):
                     )
                 else:
                     try:
-                        tmp: pyrogram.Message = msg.reply_cached_media(
+                        tmp: pyrogram.types.Message = msg.reply_cached_media(
                             file_id=media_id,
                             caption=caption,
-                            reply_markup=pyrogram.InlineKeyboardMarkup(
+                            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                                 keyboards.BuildWelcomeButtonsKeyboard(
                                     welcome_buttons=welcome_buttons
                                 )
@@ -112,11 +112,11 @@ def SendWelcome(client: pyrogram.Client, msg: pyrogram.Message):
             else:
                 text = utils.AdjustMarkers(value=welcome, msg=msg, welcome=True)
                 if text is not None:
-                    tmp: pyrogram.Message = methods.ReplyText(
+                    tmp: pyrogram.types.Message = methods.ReplyText(
                         client=client,
                         msg=msg,
                         text=text,
-                        reply_markup=pyrogram.InlineKeyboardMarkup(
+                        reply_markup=pyrogram.types.InlineKeyboardMarkup(
                             keyboards.BuildWelcomeButtonsKeyboard(
                                 welcome_buttons=welcome_buttons
                             )
@@ -140,8 +140,8 @@ def SendWelcome(client: pyrogram.Client, msg: pyrogram.Message):
     msg.continue_propagation()
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.left_chat_member, group=-5)
-def SendGoodbye(client: pyrogram.Client, msg: pyrogram.Message):
+@pyrogram.Client.on_message(pyrogram.filters.left_chat_member, group=-5)
+def SendGoodbye(client: pyrogram.Client, msg: pyrogram.types.Message):
     goodbye = (
         msg.chat.settings.extras.where(
             (db_management.ChatExtras.key == "goodbye")
@@ -190,7 +190,7 @@ def SendGoodbye(client: pyrogram.Client, msg: pyrogram.Message):
                     )
                 else:
                     try:
-                        tmp: pyrogram.Message = msg.reply_cached_media(
+                        tmp: pyrogram.types.Message = msg.reply_cached_media(
                             file_id=media_id, caption=caption, parse_mode="html",
                         )
                     except pyrogram.errors.FloodWait as ex:
@@ -206,7 +206,7 @@ def SendGoodbye(client: pyrogram.Client, msg: pyrogram.Message):
                         )
 
         else:
-            tmp: pyrogram.Message = methods.ReplyText(
+            tmp: pyrogram.types.Message = methods.ReplyText(
                 client=client,
                 msg=msg,
                 text=utils.AdjustMarkers(value=goodbye, msg=msg),
@@ -241,7 +241,7 @@ def SendGoodbye(client: pyrogram.Client, msg: pyrogram.Message):
         ]
     )
 )
-def CbQrySettingsMenu(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQrySettingsMenu(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = list()
     if len(cb_qry.data.split(" ")) > 1 and utils.IsInt(cb_qry.data.split(" ")[1]):
         parameters = cb_qry.data.split(" ")
@@ -263,7 +263,7 @@ def CbQrySettingsMenu(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         cb_qry.message.edit_text(
             text=_(chat_settings.language, "settings")
             + f" {utils.PrintChat(chat=chat_settings.chat)}",
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings,
                     current_keyboard=cb_qry.data.split(" ")[0],
@@ -279,9 +279,11 @@ def CbQrySettingsMenu(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings", flags=re.I), group=-1
+    pyrogram.filters.regex(pattern=r"^settings", flags=re.I), group=-1
 )
-def CbQryCheckSettingsLocked(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryCheckSettingsLocked(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -303,9 +305,9 @@ def CbQryCheckSettingsLocked(client: pyrogram.Client, cb_qry: pyrogram.CallbackQ
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^\(i\)settings", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^\(i\)settings", flags=re.I)
 )
-def CbQrySettingsInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQrySettingsInfo(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     regex_setting_time_punishment_keyboard = re.compile(
         r"^\(i\)settings (max_temp_restrict|max_temp_ban) (weeks|days|hours|minutes|seconds)",
         re.I,
@@ -327,10 +329,10 @@ def CbQrySettingsInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings are_locked", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings are_locked", flags=re.I)
 )
 def CbQrySettingsAreLockedChange(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -361,7 +363,7 @@ def CbQrySettingsAreLockedChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings, current_keyboard=kybrd,
                 )
@@ -376,10 +378,10 @@ def CbQrySettingsAreLockedChange(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings language", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings language", flags=re.I)
 )
 def CbQrySettingsLanguageChange(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -398,7 +400,7 @@ def CbQrySettingsLanguageChange(
             cb_qry=cb_qry,
             text=_(cb_qry.from_user.settings.language, "selected_language").format(
                 dictionaries.LANGUAGE_EMOJI.get(
-                    chat_settings.language, pyrogram.Emoji.PIRATE_FLAG
+                    chat_settings.language, pyrogram.emoji.PIRATE_FLAG
                 )
             ),
             show_alert=True,
@@ -414,7 +416,7 @@ def CbQrySettingsLanguageChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings, current_keyboard=kybrd,
                 )
@@ -429,9 +431,11 @@ def CbQrySettingsLanguageChange(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings is_bot_on", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings is_bot_on", flags=re.I)
 )
-def CbQrySettingsIsBotOnChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQrySettingsIsBotOnChange(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -463,7 +467,7 @@ def CbQrySettingsIsBotOnChange(client: pyrogram.Client, cb_qry: pyrogram.Callbac
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings, current_keyboard=kybrd,
                 )
@@ -478,12 +482,10 @@ def CbQrySettingsIsBotOnChange(client: pyrogram.Client, cb_qry: pyrogram.Callbac
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(
-        pattern=r"^settings allow_temporary_punishments", flags=re.I
-    )
+    pyrogram.filters.regex(pattern=r"^settings allow_temporary_punishments", flags=re.I)
 )
 def CbQrySettingsAllowTemporaryPunishmentsChange(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -518,7 +520,7 @@ def CbQrySettingsAllowTemporaryPunishmentsChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings, current_keyboard=kybrd,
                 )
@@ -533,10 +535,10 @@ def CbQrySettingsAllowTemporaryPunishmentsChange(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings has_tag_alerts", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings has_tag_alerts", flags=re.I)
 )
 def CbQrySettingsHasTagAlertsChange(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -575,7 +577,7 @@ def CbQrySettingsHasTagAlertsChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings, current_keyboard=kybrd,
                 )
@@ -590,10 +592,10 @@ def CbQrySettingsHasTagAlertsChange(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings has_pin_markers", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings has_pin_markers", flags=re.I)
 )
 def CbQrySettingsHasPinMarkersChange(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -626,7 +628,7 @@ def CbQrySettingsHasPinMarkersChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings, current_keyboard=kybrd,
                 )
@@ -641,10 +643,10 @@ def CbQrySettingsHasPinMarkersChange(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings group_notices", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings group_notices", flags=re.I)
 )
 def CbQrySettingsGroupNoticesChange(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -697,7 +699,7 @@ def CbQrySettingsGroupNoticesChange(
             )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings,
                     current_keyboard=kybrd,
@@ -714,10 +716,10 @@ def CbQrySettingsGroupNoticesChange(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings is_link_public", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings is_link_public", flags=re.I)
 )
 def CbQrySettingsIsLinkPublicChange(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -756,7 +758,7 @@ def CbQrySettingsIsLinkPublicChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings, current_keyboard=kybrd,
                 )
@@ -771,11 +773,13 @@ def CbQrySettingsIsLinkPublicChange(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(
+    pyrogram.filters.regex(
         pattern=r"^settings (.+) select(hour|minute) (\d+)", flags=re.I
     )
 )
-def CbQrySettingsSelectTime(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQrySettingsSelectTime(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -817,7 +821,7 @@ def CbQrySettingsSelectTime(client: pyrogram.Client, cb_qry: pyrogram.CallbackQu
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings,
                     current_keyboard=kybrd,
@@ -834,10 +838,10 @@ def CbQrySettingsSelectTime(client: pyrogram.Client, cb_qry: pyrogram.CallbackQu
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings night_mode_(from|to)(.*)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings night_mode_(from|to)(.*)", flags=re.I)
 )
 def CbQrySettingsNightModeTimeChange(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -867,7 +871,7 @@ def CbQrySettingsNightModeTimeChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings,
                     current_keyboard=kybrd,
@@ -884,10 +888,10 @@ def CbQrySettingsNightModeTimeChange(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings night_mode_punishment", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings night_mode_punishment", flags=re.I)
 )
 def CbQrySettingsNightModePunishmentChange(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -939,7 +943,7 @@ def CbQrySettingsNightModePunishmentChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings,
                     current_keyboard=kybrd,
@@ -956,10 +960,10 @@ def CbQrySettingsNightModePunishmentChange(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings slow_mode_(from|to)(.*)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings slow_mode_(from|to)(.*)", flags=re.I)
 )
 def CbQrySettingsSlowModeTimeChange(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -989,7 +993,7 @@ def CbQrySettingsSlowModeTimeChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings,
                     current_keyboard=kybrd,
@@ -1006,10 +1010,10 @@ def CbQrySettingsSlowModeTimeChange(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings slow_mode_value", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings slow_mode_value", flags=re.I)
 )
 def CbQrySettingsSlowModeValueChange(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -1062,7 +1066,7 @@ def CbQrySettingsSlowModeValueChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings,
                     current_keyboard=kybrd,
@@ -1079,10 +1083,10 @@ def CbQrySettingsSlowModeValueChange(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings allow_service_messages", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings allow_service_messages", flags=re.I)
 )
 def CbQrySettingsAllowServiceMessagesChange(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -1115,7 +1119,7 @@ def CbQrySettingsAllowServiceMessagesChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings, current_keyboard=kybrd,
                 )
@@ -1130,10 +1134,10 @@ def CbQrySettingsAllowServiceMessagesChange(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings allow_media_group", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings allow_media_group", flags=re.I)
 )
 def CbQrySettingsAllowMediaGroupChange(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -1166,7 +1170,7 @@ def CbQrySettingsAllowMediaGroupChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings, current_keyboard=kybrd,
                 )
@@ -1181,10 +1185,10 @@ def CbQrySettingsAllowMediaGroupChange(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings generate_link", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings generate_link", flags=re.I)
 )
 def CbQrySettingsGenerateLinkChange(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -1233,7 +1237,7 @@ def CbQrySettingsGenerateLinkChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings, current_keyboard=kybrd,
                 )
@@ -1248,9 +1252,9 @@ def CbQrySettingsGenerateLinkChange(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings set_(.+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings set_(.+)", flags=re.I)
 )
-def CbQrySettingsSet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQrySettingsSet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -1269,10 +1273,10 @@ def CbQrySettingsSet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
         cb_qry.message.edit_text(
             text=_(cb_qry.from_user.settings.language, f"{variable}_help") + "\n",
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 [
                     [
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=_(cb_qry.from_user.settings.language, "cancel"),
                             callback_data=f"cancel {kybrd} {chat_id}",
                         )
@@ -1290,9 +1294,9 @@ def CbQrySettingsSet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings get_(.+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings get_(.+)", flags=re.I)
 )
-def CbQrySettingsGet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQrySettingsGet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -1330,7 +1334,7 @@ def CbQrySettingsGet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                     cb_qry.message.reply_cached_media(
                         file_id=media_id,
                         caption=caption,
-                        reply_markup=pyrogram.InlineKeyboardMarkup(
+                        reply_markup=pyrogram.types.InlineKeyboardMarkup(
                             keyboards.BuildWelcomeButtonsKeyboard(
                                 welcome_buttons=welcome_buttons
                             )
@@ -1343,7 +1347,7 @@ def CbQrySettingsGet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                         client=client,
                         msg=cb_qry.message,
                         text=welcome,
-                        reply_markup=pyrogram.InlineKeyboardMarkup(
+                        reply_markup=pyrogram.types.InlineKeyboardMarkup(
                             keyboards.BuildWelcomeButtonsKeyboard(
                                 welcome_buttons=welcome_buttons
                             )
@@ -1382,7 +1386,7 @@ def CbQrySettingsGet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                     text=_(cb_qry.from_user.settings.language, "get_variable_X").format(
                         _(cb_qry.from_user.settings.language, "welcome_buttons")
                     ),
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildWelcomeButtonsKeyboard(
                             welcome_buttons=welcome_buttons
                         )
@@ -1491,9 +1495,9 @@ def CbQrySettingsGet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings unset_(.+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings unset_(.+)", flags=re.I)
 )
-def CbQrySettingsUnset(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQrySettingsUnset(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -1564,12 +1568,10 @@ def CbQrySettingsUnset(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(
-        pattern=r"^settings welcome_members(\-\-|\+\+)", flags=re.I
-    )
+    pyrogram.filters.regex(pattern=r"^settings welcome_members(\-\-|\+\+)", flags=re.I)
 )
 def CbQrySettingsWelcomeMembersPlusMinus(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -1607,7 +1609,7 @@ def CbQrySettingsWelcomeMembersPlusMinus(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings, current_keyboard=kybrd,
                 )
@@ -1622,10 +1624,10 @@ def CbQrySettingsWelcomeMembersPlusMinus(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings max_invites(\-\-|\+\+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings max_invites(\-\-|\+\+)", flags=re.I)
 )
 def CbQrySettingsMaxInvitesPlusMinus(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -1660,7 +1662,7 @@ def CbQrySettingsMaxInvitesPlusMinus(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings, current_keyboard=kybrd,
                 )
@@ -1675,12 +1677,10 @@ def CbQrySettingsMaxInvitesPlusMinus(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(
-        pattern=r"^settings max_flood_time(\-\-|\+\+)", flags=re.I
-    )
+    pyrogram.filters.regex(pattern=r"^settings max_flood_time(\-\-|\+\+)", flags=re.I)
 )
 def CbQrySettingsMaxFloodTimePlusMinus(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -1717,7 +1717,7 @@ def CbQrySettingsMaxFloodTimePlusMinus(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings, current_keyboard=kybrd,
                 )
@@ -1732,10 +1732,10 @@ def CbQrySettingsMaxFloodTimePlusMinus(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings max_flood(\-\-|\+\+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings max_flood(\-\-|\+\+)", flags=re.I)
 )
 def CbQrySettingsMaxFloodPlusMinus(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -1772,7 +1772,7 @@ def CbQrySettingsMaxFloodPlusMinus(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings, current_keyboard=kybrd,
                 )
@@ -1787,10 +1787,10 @@ def CbQrySettingsMaxFloodPlusMinus(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings max_warns(\-\-|\+\+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings max_warns(\-\-|\+\+)", flags=re.I)
 )
 def CbQrySettingsMaxWarnsPlusMinus(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -1825,7 +1825,7 @@ def CbQrySettingsMaxWarnsPlusMinus(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings, current_keyboard=kybrd,
                 )
@@ -1840,13 +1840,13 @@ def CbQrySettingsMaxWarnsPlusMinus(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(
+    pyrogram.filters.regex(
         pattern=r"^settings (.+) (weeks|days|hours|minutes|seconds)(\-\d+|\+\d+)",
         flags=re.I,
     )
 )
 def CbQrySettingsModifyTempPunishmentTime(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -1896,7 +1896,7 @@ def CbQrySettingsModifyTempPunishmentTime(
 
         time_tuple = utils.ConvertUnixToDuration(timestamp=max_temp_punishment_time)
         time_string = (
-            pyrogram.Emoji.INFINITY
+            pyrogram.emoji.INFINITY
             if not max_temp_punishment_time
             else (
                 (
@@ -1932,7 +1932,7 @@ def CbQrySettingsModifyTempPunishmentTime(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings, current_keyboard=kybrd,
                 )
@@ -1947,10 +1947,10 @@ def CbQrySettingsModifyTempPunishmentTime(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings max_temp_(restrict|ban)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings max_temp_(restrict|ban)", flags=re.I)
 )
 def CbQrySettingsMaxTempPunishmentChange(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -1972,7 +1972,7 @@ def CbQrySettingsMaxTempPunishmentChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings, current_keyboard=kybrd,
                 )
@@ -1987,9 +1987,9 @@ def CbQrySettingsMaxTempPunishmentChange(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^settings (.+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^settings (.+)", flags=re.I)
 )
-def CbQrySettingsChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQrySettingsChange(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -2108,7 +2108,7 @@ def CbQrySettingsChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery)
             )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings,
                     current_keyboard=kybrd,
@@ -2125,13 +2125,13 @@ def CbQrySettingsChange(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery)
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["settings"], del_=True, pvt=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.group
+    & pyrogram.filters.group
 )
-def CmdSettings(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdSettings(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -2141,7 +2141,7 @@ def CmdSettings(client: pyrogram.Client, msg: pyrogram.Message):
                 chat_id=msg.from_user.id,
                 text=_(msg.from_user.settings.language, "settings")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildGroupSettingsMenu(
                         chat_settings=msg.chat.settings,
                         current_keyboard="mainsettings",
@@ -2163,7 +2163,7 @@ def CmdSettings(client: pyrogram.Client, msg: pyrogram.Message):
                 msg=msg,
                 text=_(msg.chat.settings.language, "settings")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildGroupSettingsMenu(
                         chat_settings=msg.chat.settings,
                         current_keyboard="mainsettings",
@@ -2173,10 +2173,10 @@ def CmdSettings(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["settings"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["settings"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdSettingsChat(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdSettingsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     chat_id = None
     if len(msg.command) == 2:
         chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
@@ -2189,7 +2189,7 @@ def CmdSettingsChat(client: pyrogram.Client, msg: pyrogram.Message):
             msg=msg,
             text=_(chat_settings.language, "settings")
             + f" {utils.PrintChat(chat=chat_settings.chat)}",
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
                     chat_settings=chat_settings, current_keyboard="mainsettings",
                 )
@@ -2204,13 +2204,13 @@ def CmdSettingsChat(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["getstaff", "staff"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.group
+    & pyrogram.filters.group
 )
-def CmdStaff(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdStaff(client: pyrogram.Client, msg: pyrogram.types.Message):
     query: peewee.ModelSelect = db_management.RUserChat.select().where(
         (db_management.RUserChat.chat_id == msg.chat.id)
         & ((db_management.RUserChat.rank > 1) | (db_management.RUserChat.is_admin))
@@ -2290,12 +2290,12 @@ def CmdStaff(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=["getstaff", "staff"], prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.private
+    & pyrogram.filters.private
 )
-def CmdStaffChat(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdStaffChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     if isinstance(chat_id, str):
@@ -2391,13 +2391,13 @@ def CmdStaffChat(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["syncadmins"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.group
+    & pyrogram.filters.group
 )
-def CmdSyncAdmins(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdSyncAdmins(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -2445,10 +2445,10 @@ def CmdSyncAdmins(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["syncadmins"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["syncadmins"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdSyncAdminsChat(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdSyncAdminsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
@@ -2510,12 +2510,12 @@ def CmdSyncAdminsChat(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=["admins", "admin"], prefixes=["@", "/", "!", "#", "."],
     )
-    & pyrogram.Filters.group
+    & pyrogram.filters.group
 )
-def CmdAdmins(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdAdmins(client: pyrogram.Client, msg: pyrogram.types.Message):
     if msg.chat.id not in utils.tmp_dicts["staffContacted"]:
         utils.tmp_dicts["staffContacted"].add(msg.chat.id)
         query: peewee.ModelSelect = db_management.RUserChat.select().where(
@@ -2569,7 +2569,7 @@ def CmdAdmins(client: pyrogram.Client, msg: pyrogram.Message):
                     client=client,
                     chat_id=user_id,
                     text=text,
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildTagKeyboard(
                             chat=msg.chat,
                             message_id=msg.message_id,
@@ -2619,13 +2619,13 @@ def CmdAdmins(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["rules", "getrules"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.group
+    & pyrogram.filters.group
 )
-def CmdRules(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdRules(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -2642,15 +2642,15 @@ def CmdRules(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(
             commands=["welcome", "getwelcome"], del_=True
         ),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.group
+    & pyrogram.filters.group
 )
-def CmdWelcome(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdWelcome(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -2682,7 +2682,7 @@ def CmdWelcome(client: pyrogram.Client, msg: pyrogram.Message):
                 msg.reply_cached_media(
                     file_id=media_id,
                     caption=caption,
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildWelcomeButtonsKeyboard(
                             welcome_buttons=welcome_buttons
                         )
@@ -2698,7 +2698,7 @@ def CmdWelcome(client: pyrogram.Client, msg: pyrogram.Message):
                         client=client,
                         msg=msg,
                         text=text,
-                        reply_markup=pyrogram.InlineKeyboardMarkup(
+                        reply_markup=pyrogram.types.InlineKeyboardMarkup(
                             keyboards.BuildWelcomeButtonsKeyboard(
                                 welcome_buttons=welcome_buttons
                             )
@@ -2714,13 +2714,13 @@ def CmdWelcome(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["newlink"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.group
+    & pyrogram.filters.group
 )
-def CmdNewLink(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdNewLink(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsSeniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -2760,13 +2760,13 @@ def CmdNewLink(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["link"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.group
+    & pyrogram.filters.group
 )
-def CmdLink(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdLink(client: pyrogram.Client, msg: pyrogram.types.Message):
     if (
         utils.IsJuniorModOrHigher(
             user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -2815,10 +2815,10 @@ def CmdLink(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["link"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["link"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdLinkChat(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdLinkChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
@@ -2889,9 +2889,9 @@ def CmdLinkChat(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^\(i\)censorships", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^\(i\)censorships", flags=re.I)
 )
-def CbQryCensorshipsInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryCensorshipsInfo(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -2917,9 +2917,9 @@ def CbQryCensorshipsInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^censorships get (\d+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^censorships get (\d+)", flags=re.I)
 )
-def CbQryCensorshipsGet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryCensorshipsGet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -2974,17 +2974,15 @@ def CbQryCensorshipsGet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery)
                         cb_qry.message.reply_cached_media(file_id=element.value)
                     except pyrogram.errors.FilerefUpgradeNeeded:
                         try:
-                            original_media_message: pyrogram.Message = client.get_messages(
+                            original_media_message: pyrogram.types.Message = client.get_messages(
                                 chat_id=element.original_chat_id,
                                 message_id=element.original_message_id,
                             )
                             type_, media = utils.ExtractMedia(
                                 msg=original_media_message
                             )
-                            if media and hasattr(media, "file_ref") and media.file_ref:
-                                cb_qry.message.reply_cached_media(
-                                    file_id=element.value, file_ref=media.file_ref
-                                )
+                            if media:
+                                cb_qry.message.reply_cached_media(file_id=element.value)
                             else:
                                 element.delete_instance()
                                 methods.ReplyText(
@@ -3041,9 +3039,11 @@ def CbQryCensorshipsGet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery)
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^censorships PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^censorships PAGES[<<|\-|\+|>>]", flags=re.I)
 )
-def CbQryCensorshipsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryCensorshipsPages(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -3058,13 +3058,13 @@ def CbQryCensorshipsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuer
         )
         if cb_qry.data.endswith("<<"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildCensorshipsList(chat_settings=chat_settings, page=0)
                 )
             )
         elif cb_qry.data.endswith("-"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildCensorshipsList(
                         chat_settings=chat_settings, page=page - 1
                     )
@@ -3072,7 +3072,7 @@ def CbQryCensorshipsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuer
             )
         elif cb_qry.data.endswith("+"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildCensorshipsList(
                         chat_settings=chat_settings, page=page + 1
                     )
@@ -3080,7 +3080,7 @@ def CbQryCensorshipsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuer
             )
         elif cb_qry.data.endswith(">>"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildCensorshipsList(
                         chat_settings=chat_settings, page=-1,
                     )
@@ -3095,9 +3095,9 @@ def CbQryCensorshipsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuer
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^censorships add", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^censorships add", flags=re.I)
 )
-def CbQryCensorshipsAdd(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryCensorshipsAdd(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -3115,7 +3115,7 @@ def CbQryCensorshipsAdd(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery)
         if cb_qry.data == "censorships add":
             cb_qry.message.edit_text(
                 text=_(cb_qry.from_user.settings.language, "select_type_of_censorship"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildCensorshipsList(
                         chat_settings=chat_settings, selected_setting="add"
                     )
@@ -3134,10 +3134,10 @@ def CbQryCensorshipsAdd(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery)
             text = _(cb_qry.from_user.settings.language, "send_regex_censorship")
         cb_qry.message.edit_text(
             text=text,
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 [
                     [
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=_(cb_qry.from_user.settings.language, "cancel"),
                             callback_data=f"cancel censorships {chat_id}",
                         )
@@ -3154,9 +3154,11 @@ def CbQryCensorshipsAdd(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery)
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^censorships remove", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^censorships remove", flags=re.I)
 )
-def CbQryCensorshipsRemove(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryCensorshipsRemove(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -3187,7 +3189,7 @@ def CbQryCensorshipsRemove(client: pyrogram.Client, cb_qry: pyrogram.CallbackQue
                 show_alert=False,
             )
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildCensorshipsList(
                         chat_settings=chat_settings, page=page
                     )
@@ -3208,9 +3210,9 @@ def CbQryCensorshipsRemove(client: pyrogram.Client, cb_qry: pyrogram.CallbackQue
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^censorships (\-\d+) (\d+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^censorships (\-\d+) (\d+)", flags=re.I)
 )
-def CbQryCensorships(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryCensorships(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.data.split(" ")
     chat_id = int(parameters[1])
     page = int(parameters[2])
@@ -3221,7 +3223,7 @@ def CbQryCensorships(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         cb_qry.message.edit_text(
             text=_(cb_qry.message.chat.settings.language, "censorships")
             + f" {utils.PrintChat(chat=chat_settings.chat)}",
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildCensorshipsList(chat_settings=chat_settings, page=page)
             ),
         )
@@ -3234,10 +3236,10 @@ def CbQryCensorships(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^censorships (.+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^censorships (.+)", flags=re.I)
 )
 def CbQryCensorshipsChangePunishment(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -3357,7 +3359,7 @@ def CbQryCensorshipsChangePunishment(
             )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildCensorshipsList(
                     chat_settings=chat_settings,
                     page=int(parameters[2]),
@@ -3374,15 +3376,15 @@ def CbQryCensorshipsChangePunishment(
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(
             commands=["censorships"], del_=True, pvt=True
         ),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.group
+    & pyrogram.filters.group
 )
-def CmdCensorships(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdCensorships(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -3392,7 +3394,7 @@ def CmdCensorships(client: pyrogram.Client, msg: pyrogram.Message):
                 chat_id=msg.from_user.id,
                 text=_(msg.chat.settings.language, "censorships")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildCensorshipsList(
                         chat_settings=msg.chat.settings, page=0
                     )
@@ -3412,7 +3414,7 @@ def CmdCensorships(client: pyrogram.Client, msg: pyrogram.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "globally_banned_users"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildCensorshipsList(
                         chat_settings=msg.chat.settings, page=0
                     )
@@ -3421,10 +3423,10 @@ def CmdCensorships(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["censorships"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["censorships"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdCensorshipsChat(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdCensorshipsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
@@ -3439,7 +3441,7 @@ def CmdCensorshipsChat(client: pyrogram.Client, msg: pyrogram.Message):
                     msg=msg,
                     text=_(chat_settings.language, "censorships")
                     + f" {utils.PrintChat(chat=chat_settings.chat)}",
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildCensorshipsList(
                             chat_settings=chat_settings, page=0
                         )
@@ -3454,14 +3456,14 @@ def CmdCensorshipsChat(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["pin"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdPin(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdPin(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -3500,14 +3502,14 @@ def CmdPin(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["silentpin"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdSilentPin(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdSilentPin(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -3546,13 +3548,13 @@ def CmdSilentPin(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["unpin"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.group
+    & pyrogram.filters.group
 )
-def CmdUnpin(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdUnpin(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -3585,11 +3587,11 @@ def CmdUnpin(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["setlog"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.group
-    & pyrogram.Filters.forwarded
+    pyrogram.filters.command(commands=["setlog"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.group
+    & pyrogram.filters.forwarded
 )
-def CmdSetlog(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdSetlog(client: pyrogram.Client, msg: pyrogram.types.Message):
     if msg.forward_from_chat:
         if utils.IsSeniorModOrHigher(
             user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -3630,11 +3632,11 @@ def CmdSetlog(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["setlog"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.group
-    & ~pyrogram.Filters.forwarded
+    pyrogram.filters.command(commands=["setlog"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.group
+    & ~pyrogram.filters.forwarded
 )
-def CmdSetlogHelp(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdSetlogHelp(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsSeniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -3647,9 +3649,11 @@ def CmdSetlogHelp(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^\(i\)whitelistedchats", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^\(i\)whitelistedchats", flags=re.I)
 )
-def CbQryWhitelistedChatsInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryWhitelistedChatsInfo(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     text = ""
     if cb_qry.data == "(i)whitelistedchats":
         text = _(cb_qry.from_user.settings.language, cb_qry.data)
@@ -3672,11 +3676,11 @@ def CbQryWhitelistedChatsInfo(client: pyrogram.Client, cb_qry: pyrogram.Callback
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(
-        pattern=r"^whitelistedchats PAGES[<<|\-|\+|>>]", flags=re.I
-    )
+    pyrogram.filters.regex(pattern=r"^whitelistedchats PAGES[<<|\-|\+|>>]", flags=re.I)
 )
-def CbQryWhitelistedChatsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryWhitelistedChatsPages(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -3691,7 +3695,7 @@ def CbQryWhitelistedChatsPages(client: pyrogram.Client, cb_qry: pyrogram.Callbac
         )
         if cb_qry.data.endswith("<<"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedChatsList(
                         chat_settings=chat_settings, page=0
                     )
@@ -3699,7 +3703,7 @@ def CbQryWhitelistedChatsPages(client: pyrogram.Client, cb_qry: pyrogram.Callbac
             )
         elif cb_qry.data.endswith("-"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedChatsList(
                         chat_settings=chat_settings, page=page - 1
                     )
@@ -3707,7 +3711,7 @@ def CbQryWhitelistedChatsPages(client: pyrogram.Client, cb_qry: pyrogram.Callbac
             )
         elif cb_qry.data.endswith("+"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedChatsList(
                         chat_settings=chat_settings, page=page + 1
                     )
@@ -3715,7 +3719,7 @@ def CbQryWhitelistedChatsPages(client: pyrogram.Client, cb_qry: pyrogram.Callbac
             )
         elif cb_qry.data.endswith(">>"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedChatsList(
                         chat_settings=chat_settings, page=-1,
                     )
@@ -3730,9 +3734,11 @@ def CbQryWhitelistedChatsPages(client: pyrogram.Client, cb_qry: pyrogram.Callbac
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^whitelistedchats add", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^whitelistedchats add", flags=re.I)
 )
-def CbQryWhitelistedChatsAdd(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryWhitelistedChatsAdd(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -3746,10 +3752,10 @@ def CbQryWhitelistedChatsAdd(client: pyrogram.Client, cb_qry: pyrogram.CallbackQ
         utils.tmp_steps[cb_qry.message.chat.id] = (cb_qry, cb_qry.data)
         cb_qry.message.edit_text(
             text=_(cb_qry.from_user.settings.language, "send_chat_to_whitelist"),
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 [
                     [
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=_(cb_qry.from_user.settings.language, "cancel"),
                             callback_data=f"cancel whitelistedchats {chat_id}",
                         )
@@ -3766,10 +3772,10 @@ def CbQryWhitelistedChatsAdd(client: pyrogram.Client, cb_qry: pyrogram.CallbackQ
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^whitelistedchats remove", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^whitelistedchats remove", flags=re.I)
 )
 def CbQryWhitelistedChatsRemove(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -3799,7 +3805,7 @@ def CbQryWhitelistedChatsRemove(
                 show_alert=False,
             )
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedChatsList(
                         chat_settings=chat_settings, page=page
                     )
@@ -3820,9 +3826,11 @@ def CbQryWhitelistedChatsRemove(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^whitelistedchats (\-\d+) (\d+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^whitelistedchats (\-\d+) (\d+)", flags=re.I)
 )
-def CbQryWhitelistedChats(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryWhitelistedChats(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     parameters = cb_qry.data.split(" ")
     chat_id = int(parameters[1])
     page = int(parameters[2])
@@ -3833,7 +3841,7 @@ def CbQryWhitelistedChats(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuer
         cb_qry.message.edit_text(
             text=_(cb_qry.message.chat.settings.language, "whitelisted_chats")
             + f" {utils.PrintChat(chat=chat_settings.chat)}",
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildWhitelistedChatsList(
                     chat_settings=chat_settings, page=page
                 )
@@ -3848,15 +3856,15 @@ def CbQryWhitelistedChats(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuer
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(
             commands=["whitelistedchats", "chatswhitelist"], del_=True, pvt=True
         ),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.group
+    & pyrogram.filters.group
 )
-def CmdWhitelistedChats(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdWhitelistedChats(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -3866,7 +3874,7 @@ def CmdWhitelistedChats(client: pyrogram.Client, msg: pyrogram.Message):
                 chat_id=msg.from_user.id,
                 text=_(msg.chat.settings.language, "whitelisted_chats")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedChatsList(
                         chat_settings=msg.chat.settings, page=0
                     )
@@ -3887,7 +3895,7 @@ def CmdWhitelistedChats(client: pyrogram.Client, msg: pyrogram.Message):
                 msg=msg,
                 text=_(msg.chat.settings.language, "whitelisted_chats")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedChatsList(
                         chat_settings=msg.chat.settings, page=0
                     )
@@ -3896,12 +3904,12 @@ def CmdWhitelistedChats(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=["whitelistedchats", "chatswhitelist"], prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.private
+    & pyrogram.filters.private
 )
-def CmdWhitelistedChatsChat(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdWhitelistedChatsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
@@ -3916,7 +3924,7 @@ def CmdWhitelistedChatsChat(client: pyrogram.Client, msg: pyrogram.Message):
                     msg=msg,
                     text=_(chat_settings.language, "whitelisted_chats")
                     + f" {utils.PrintChat(chat=chat_settings.chat)}",
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildWhitelistedChatsList(
                             chat_settings=chat_settings, page=0
                         )
@@ -3931,10 +3939,10 @@ def CmdWhitelistedChatsChat(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^\(i\)whitelistedgbanned", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^\(i\)whitelistedgbanned", flags=re.I)
 )
 def CbQryWhitelistedGbannedInfo(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     text = ""
     if cb_qry.data == "(i)whitelistedgbanned":
@@ -3953,12 +3961,12 @@ def CbQryWhitelistedGbannedInfo(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(
+    pyrogram.filters.regex(
         pattern=r"^whitelistedgbanned PAGES[<<|\-|\+|>>]", flags=re.I
     )
 )
 def CbQryWhitelistedGbannedPages(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -3974,7 +3982,7 @@ def CbQryWhitelistedGbannedPages(
         )
         if cb_qry.data.endswith("<<"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedGbannedUsersList(
                         chat_settings=chat_settings, page=0
                     )
@@ -3982,7 +3990,7 @@ def CbQryWhitelistedGbannedPages(
             )
         elif cb_qry.data.endswith("-"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedGbannedUsersList(
                         chat_settings=chat_settings, page=page - 1
                     )
@@ -3990,7 +3998,7 @@ def CbQryWhitelistedGbannedPages(
             )
         elif cb_qry.data.endswith("+"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedGbannedUsersList(
                         chat_settings=chat_settings, page=page + 1
                     )
@@ -3998,7 +4006,7 @@ def CbQryWhitelistedGbannedPages(
             )
         elif cb_qry.data.endswith(">>"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedGbannedUsersList(
                         chat_settings=chat_settings, page=-1,
                     )
@@ -4013,9 +4021,11 @@ def CbQryWhitelistedGbannedPages(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^whitelistedgbanned add", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^whitelistedgbanned add", flags=re.I)
 )
-def CbQryWhitelistedGbannedAdd(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryWhitelistedGbannedAdd(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -4029,10 +4039,10 @@ def CbQryWhitelistedGbannedAdd(client: pyrogram.Client, cb_qry: pyrogram.Callbac
         utils.tmp_steps[cb_qry.message.chat.id] = (cb_qry, cb_qry.data)
         cb_qry.message.edit_text(
             text=_(cb_qry.from_user.settings.language, "send_gbanned_to_whitelist"),
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 [
                     [
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=_(cb_qry.from_user.settings.language, "cancel"),
                             callback_data=f"cancel whitelistedgbanned {chat_id}",
                         )
@@ -4049,10 +4059,10 @@ def CbQryWhitelistedGbannedAdd(client: pyrogram.Client, cb_qry: pyrogram.Callbac
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^whitelistedgbanned remove", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^whitelistedgbanned remove", flags=re.I)
 )
 def CbQryWhitelistedGbannedRemove(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -4081,7 +4091,7 @@ def CbQryWhitelistedGbannedRemove(
                 show_alert=False,
             )
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedUsersList(
                         chat_settings=chat_settings, page=page
                     )
@@ -4102,9 +4112,11 @@ def CbQryWhitelistedGbannedRemove(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^whitelistedgbanned (\-\d+) (\d+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^whitelistedgbanned (\-\d+) (\d+)", flags=re.I)
 )
-def CbQryWhitelistedGbanned(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryWhitelistedGbanned(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     parameters = cb_qry.data.split(" ")
     chat_id = int(parameters[1])
     page = int(parameters[2])
@@ -4115,7 +4127,7 @@ def CbQryWhitelistedGbanned(client: pyrogram.Client, cb_qry: pyrogram.CallbackQu
         cb_qry.message.edit_text(
             text=_(cb_qry.message.chat.settings.language, "whitelistedgbanned_users")
             + f" {utils.PrintChat(chat=chat_settings.chat)}",
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildWhitelistedGbannedUsersList(
                     chat_settings=chat_settings, page=page
                 )
@@ -4130,15 +4142,15 @@ def CbQryWhitelistedGbanned(client: pyrogram.Client, cb_qry: pyrogram.CallbackQu
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(
             commands=["whitelistedgbanned", "whitelistedgban"], del_=True, pvt=True
         ),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.group
+    & pyrogram.filters.group
 )
-def CmdWhitelistedGbanned(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdWhitelistedGbanned(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -4148,7 +4160,7 @@ def CmdWhitelistedGbanned(client: pyrogram.Client, msg: pyrogram.Message):
                 chat_id=msg.from_user.id,
                 text=_(msg.chat.settings.language, "whitelistedgbanned_users")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedGbannedUsersList(
                         chat_settings=msg.chat.settings, page=0
                     )
@@ -4169,7 +4181,7 @@ def CmdWhitelistedGbanned(client: pyrogram.Client, msg: pyrogram.Message):
                 msg=msg,
                 text=_(msg.chat.settings.language, "whitelistedgbanned_users")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedGbannedUsersList(
                         chat_settings=msg.chat.settings, page=0
                     )
@@ -4178,13 +4190,13 @@ def CmdWhitelistedGbanned(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=["whitelistedgbanned", "whitelistedgban"],
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.private
+    & pyrogram.filters.private
 )
-def CmdWhitelistedGbannedChat(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdWhitelistedGbannedChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
@@ -4199,7 +4211,7 @@ def CmdWhitelistedGbannedChat(client: pyrogram.Client, msg: pyrogram.Message):
                     msg=msg,
                     text=_(chat_settings.language, "whitelistedgbanned_users")
                     + f" {utils.PrintChat(chat=chat_settings.chat)}",
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildWhitelistedGbannedUsersList(
                             chat_settings=chat_settings, page=0
                         )
@@ -4214,9 +4226,9 @@ def CmdWhitelistedGbannedChat(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^\(i\)whitelisted", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^\(i\)whitelisted", flags=re.I)
 )
-def CbQryWhitelistedInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryWhitelistedInfo(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     text = ""
     if cb_qry.data == "(i)whitelisted ":
         text = _(cb_qry.from_user.settings.language, cb_qry.data)
@@ -4234,9 +4246,11 @@ def CbQryWhitelistedInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^whitelisted PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^whitelisted PAGES[<<|\-|\+|>>]", flags=re.I)
 )
-def CbQryWhitelistedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryWhitelistedPages(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -4251,7 +4265,7 @@ def CbQryWhitelistedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuer
         )
         if cb_qry.data.endswith("<<"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedUsersList(
                         chat_settings=chat_settings, page=0
                     )
@@ -4259,7 +4273,7 @@ def CbQryWhitelistedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuer
             )
         elif cb_qry.data.endswith("-"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedUsersList(
                         chat_settings=chat_settings, page=page - 1
                     )
@@ -4267,7 +4281,7 @@ def CbQryWhitelistedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuer
             )
         elif cb_qry.data.endswith("+"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedUsersList(
                         chat_settings=chat_settings, page=page + 1
                     )
@@ -4275,7 +4289,7 @@ def CbQryWhitelistedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuer
             )
         elif cb_qry.data.endswith(">>"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedUsersList(
                         chat_settings=chat_settings, page=-1,
                     )
@@ -4290,9 +4304,9 @@ def CbQryWhitelistedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuer
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^whitelisted add", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^whitelisted add", flags=re.I)
 )
-def CbQryWhitelistedAdd(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryWhitelistedAdd(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -4306,10 +4320,10 @@ def CbQryWhitelistedAdd(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery)
         utils.tmp_steps[cb_qry.message.chat.id] = (cb_qry, cb_qry.data)
         cb_qry.message.edit_text(
             text=_(cb_qry.from_user.settings.language, "send_user_to_whitelist"),
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 [
                     [
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=_(cb_qry.from_user.settings.language, "cancel"),
                             callback_data=f"cancel whitelisted {chat_id}",
                         )
@@ -4326,9 +4340,11 @@ def CbQryWhitelistedAdd(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery)
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^whitelisted remove", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^whitelisted remove", flags=re.I)
 )
-def CbQryWhitelistedRemove(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryWhitelistedRemove(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -4356,7 +4372,7 @@ def CbQryWhitelistedRemove(client: pyrogram.Client, cb_qry: pyrogram.CallbackQue
                 show_alert=False,
             )
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedUsersList(
                         chat_settings=chat_settings, page=page
                     )
@@ -4377,9 +4393,9 @@ def CbQryWhitelistedRemove(client: pyrogram.Client, cb_qry: pyrogram.CallbackQue
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^whitelisted (\-\d+) (\d+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^whitelisted (\-\d+) (\d+)", flags=re.I)
 )
-def CbQryWhitelisted(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryWhitelisted(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.data.split(" ")
     chat_id = int(parameters[1])
     page = int(parameters[2])
@@ -4390,7 +4406,7 @@ def CbQryWhitelisted(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         cb_qry.message.edit_text(
             text=_(cb_qry.message.chat.settings.language, "whitelisted_users")
             + f" {utils.PrintChat(chat=chat_settings.chat)}",
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildWhitelistedUsersList(
                     chat_settings=chat_settings, page=page
                 )
@@ -4405,15 +4421,15 @@ def CbQryWhitelisted(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(
             commands=["whitelisted"], del_=True, pvt=True
         ),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.group
+    & pyrogram.filters.group
 )
-def CmdWhitelisted(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdWhitelisted(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -4423,7 +4439,7 @@ def CmdWhitelisted(client: pyrogram.Client, msg: pyrogram.Message):
                 chat_id=msg.from_user.id,
                 text=_(msg.chat.settings.language, "whitelisted_users")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedUsersList(
                         chat_settings=msg.chat.settings, page=0
                     )
@@ -4444,7 +4460,7 @@ def CmdWhitelisted(client: pyrogram.Client, msg: pyrogram.Message):
                 msg=msg,
                 text=_(msg.chat.settings.language, "whitelisted_users")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedUsersList(
                         chat_settings=msg.chat.settings, page=0
                     )
@@ -4453,10 +4469,10 @@ def CmdWhitelisted(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["whitelisted"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["whitelisted"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdWhitelistedChat(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdWhitelistedChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
@@ -4471,7 +4487,7 @@ def CmdWhitelistedChat(client: pyrogram.Client, msg: pyrogram.Message):
                     msg=msg,
                     text=_(chat_settings.language, "whitelisted_users")
                     + f" {utils.PrintChat(chat=chat_settings.chat)}",
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildWhitelistedUsersList(
                             chat_settings=chat_settings, page=0
                         )
@@ -4486,11 +4502,11 @@ def CmdWhitelistedChat(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["del", "delete"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.reply
-    & pyrogram.Filters.group,
+    pyrogram.filters.command(commands=["del", "delete"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.reply
+    & pyrogram.filters.group,
 )
-def CmdDel(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdDel(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -4515,10 +4531,10 @@ def CmdDel(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["leave"], prefixes=["/", "!", "#", "."])
-    & pyrogram.Filters.group,
+    pyrogram.filters.command(commands=["leave"], prefixes=["/", "!", "#", "."])
+    & pyrogram.filters.group,
 )
-def CmdLeave(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdLeave(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsSeniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -4526,10 +4542,10 @@ def CmdLeave(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["leave"], prefixes=["/", "!", "#", "."])
-    & pyrogram.Filters.private,
+    pyrogram.filters.command(commands=["leave"], prefixes=["/", "!", "#", "."])
+    & pyrogram.filters.private,
 )
-def CmdLeaveChat(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdLeaveChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
@@ -4554,21 +4570,21 @@ def CmdLeaveChat(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=["delfrom", "deletefrom"], prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
-    & pyrogram.Filters.group,
+    & pyrogram.filters.reply
+    & pyrogram.filters.group,
 )
-def CmdDelFrom(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdDelFrom(client: pyrogram.Client, msg: pyrogram.types.Message):
     # continue inside pre_process_post.py
     pass
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^logs PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^logs PAGES[<<|\-|\+|>>]", flags=re.I)
 )
-def CbQryLogsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryLogsPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -4624,7 +4640,7 @@ def CbQryLogsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         cb_qry.message.edit_text(
             text=text,
             parse_mode="html",
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildLogMenu(chat_settings=chat_settings, page=page)
             ),
         )
@@ -4637,15 +4653,15 @@ def CbQryLogsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(
             commands=["logs", "log"], del_=True, pvt=True
         ),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.group,
+    & pyrogram.filters.group,
 )
-def CmdLog(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdLog(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -4686,7 +4702,7 @@ def CmdLog(client: pyrogram.Client, msg: pyrogram.Message):
                 chat_id=msg.from_user.id,
                 text=text,
                 parse_mode="html",
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildLogMenu(chat_settings=msg.chat.settings)
                 ),
             )
@@ -4704,17 +4720,17 @@ def CmdLog(client: pyrogram.Client, msg: pyrogram.Message):
                 msg=msg,
                 text=text,
                 parse_mode="html",
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildLogMenu(chat_settings=msg.chat.settings)
                 ),
             )
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["logs", "log"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private,
+    pyrogram.filters.command(commands=["logs", "log"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private,
 )
-def CmdLogChat(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdLogChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
@@ -4760,7 +4776,7 @@ def CmdLogChat(client: pyrogram.Client, msg: pyrogram.Message):
                     msg=msg,
                     text=text,
                     parse_mode="html",
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildLogMenu(chat_settings=chat_settings)
                     ),
                 )
@@ -4773,15 +4789,15 @@ def CmdLogChat(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(
             commands=["sendlogs", "sendlog"], del_=True, pvt=True
         ),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.group,
+    & pyrogram.filters.group,
 )
-def CmdSendLog(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdSendLog(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -4860,12 +4876,12 @@ def CmdSendLog(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=["sendlogs", "sendlog"], prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.private,
+    & pyrogram.filters.private,
 )
-def CmdSendLogChat(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdSendLogChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)

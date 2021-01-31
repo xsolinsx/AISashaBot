@@ -8,9 +8,9 @@ _ = utils.GetLocalizedString
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["convertseconds"], prefixes=["/", "!", "#", "."])
+    pyrogram.filters.command(commands=["convertseconds"], prefixes=["/", "!", "#", "."])
 )
-def CmdConvertSeconds(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdConvertSeconds(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
@@ -56,11 +56,11 @@ def CmdConvertSeconds(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=["convertduration"], prefixes=["/", "!", "#", "."]
     )
 )
-def CmdConvertDuration(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdConvertDuration(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(

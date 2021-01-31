@@ -12,21 +12,20 @@ from pytz import utc
 import db_management
 import keyboards
 import methods
-import my_filters
 import utils
 
 _ = utils.GetLocalizedString
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["invite"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdInviteReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdInviteReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     if msg.reply_to_message.service and msg.reply_to_message.new_chat_members:
         if (
             msg.reply_to_message.new_chat_members[0].id
@@ -38,7 +37,7 @@ def CmdInviteReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildActionOnAddedUsersList(
                         chat_settings=msg.chat.settings,
                         action="invite",
@@ -72,14 +71,14 @@ def CmdInviteReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["invite"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & ~pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & ~pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdInviteUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdInviteUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     user_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     if isinstance(user_id, str):
@@ -98,10 +97,10 @@ def CmdInviteUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["invite"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["invite"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdInviteChatUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdInviteChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     user_id = utils.ResolveCommandToId(client=client, value=msg.command[2], msg=msg)
@@ -133,13 +132,13 @@ def CmdInviteChatUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["kickme"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.group
+    & pyrogram.filters.group
 )
-def CmdKickme(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdKickme(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     try:
         text = methods.Kick(
@@ -169,14 +168,14 @@ def CmdKickme(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["warn"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdWarnReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdWarnReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     reason = ""
     if len(msg.command) > 1:
         reason = " ".join(msg.command[1:])
@@ -191,7 +190,7 @@ def CmdWarnReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildActionOnAddedUsersList(
                         chat_settings=msg.chat.settings,
                         action="warn",
@@ -227,14 +226,14 @@ def CmdWarnReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["warn"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & ~pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & ~pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdWarnUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdWarnUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 2:
@@ -257,10 +256,10 @@ def CmdWarnUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["warn"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["warn"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdWarnChatUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdWarnChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 3:
@@ -296,14 +295,14 @@ def CmdWarnChatUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["unwarn"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdUnwarnReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdUnwarnReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     reason = ""
     if len(msg.command) > 1:
         reason = " ".join(msg.command[1:])
@@ -318,7 +317,7 @@ def CmdUnwarnReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildActionOnAddedUsersList(
                         chat_settings=msg.chat.settings,
                         action="unwarn",
@@ -354,14 +353,14 @@ def CmdUnwarnReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["unwarn"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & ~pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & ~pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdUnwarnUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdUnwarnUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 2:
@@ -384,10 +383,10 @@ def CmdUnwarnUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["unwarn"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["unwarn"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdUnwarnChatUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdUnwarnChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 3:
@@ -423,14 +422,14 @@ def CmdUnwarnChatUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["unwarnall"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdUnwarnAllReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdUnwarnAllReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     reason = ""
     if len(msg.command) > 1:
         reason = " ".join(msg.command[1:])
@@ -445,7 +444,7 @@ def CmdUnwarnAllReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildActionOnAddedUsersList(
                         chat_settings=msg.chat.settings,
                         action="unwarnall",
@@ -481,14 +480,14 @@ def CmdUnwarnAllReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["unwarnall"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & ~pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & ~pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdUnwarnAllUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdUnwarnAllUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 2:
@@ -511,10 +510,10 @@ def CmdUnwarnAllUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["unwarnall"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["unwarnall"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdUnwarnAllChatUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdUnwarnAllChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 3:
@@ -550,14 +549,14 @@ def CmdUnwarnAllChatUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["kick"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdKickReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdKickReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 1:
@@ -573,7 +572,7 @@ def CmdKickReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildActionOnAddedUsersList(
                         chat_settings=msg.chat.settings,
                         action="kick",
@@ -609,14 +608,14 @@ def CmdKickReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["kick"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & ~pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & ~pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdKickUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdKickUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 2:
@@ -639,10 +638,10 @@ def CmdKickUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["kick"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["kick"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdKickChatUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdKickChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 3:
@@ -678,14 +677,14 @@ def CmdKickChatUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["temprestrict"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdTempRestrictReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdTempRestrictReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 1:
@@ -701,7 +700,7 @@ def CmdTempRestrictReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildActionOnAddedUsersList(
                         chat_settings=msg.chat.settings,
                         action="temprestrict",
@@ -739,14 +738,14 @@ def CmdTempRestrictReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["temprestrict"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & ~pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & ~pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdTempRestrictUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdTempRestrictUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 2:
@@ -770,10 +769,10 @@ def CmdTempRestrictUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["temprestrict"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["temprestrict"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdTempRestrictChatUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdTempRestrictChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 3:
@@ -810,14 +809,14 @@ def CmdTempRestrictChatUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["restrict"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdRestrictReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdRestrictReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 1:
@@ -833,7 +832,7 @@ def CmdRestrictReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildActionOnAddedUsersList(
                         chat_settings=msg.chat.settings,
                         action="restrict",
@@ -869,14 +868,14 @@ def CmdRestrictReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["restrict"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & ~pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & ~pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdRestrictUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdRestrictUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 2:
@@ -899,10 +898,10 @@ def CmdRestrictUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["restrict"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["restrict"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdRestrictChatUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdRestrictChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 3:
@@ -938,14 +937,14 @@ def CmdRestrictChatUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["unrestrict"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdUnrestrictReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdUnrestrictReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 1:
@@ -961,7 +960,7 @@ def CmdUnrestrictReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildActionOnAddedUsersList(
                         chat_settings=msg.chat.settings,
                         action="unrestrict",
@@ -997,14 +996,14 @@ def CmdUnrestrictReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["unrestrict"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & ~pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & ~pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdUnrestrictUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdUnrestrictUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 2:
@@ -1027,10 +1026,10 @@ def CmdUnrestrictUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["unrestrict"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["unrestrict"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdUnrestrictChatUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdUnrestrictChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 3:
@@ -1066,14 +1065,14 @@ def CmdUnrestrictChatUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["tempban"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdTempBanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdTempBanReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 1:
@@ -1089,7 +1088,7 @@ def CmdTempBanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildActionOnAddedUsersList(
                         chat_settings=msg.chat.settings,
                         action="tempban",
@@ -1127,14 +1126,14 @@ def CmdTempBanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["tempban"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & ~pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & ~pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdTempBanUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdTempBanUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 2:
@@ -1158,10 +1157,10 @@ def CmdTempBanUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["tempban"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["tempban"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdTempBanChatUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdTempBanChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 3:
@@ -1198,14 +1197,14 @@ def CmdTempBanChatUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["ban"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdBanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdBanReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 1:
@@ -1221,7 +1220,7 @@ def CmdBanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildActionOnAddedUsersList(
                         chat_settings=msg.chat.settings,
                         action="ban",
@@ -1257,14 +1256,14 @@ def CmdBanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["ban"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & ~pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & ~pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdBanUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdBanUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 2:
@@ -1287,10 +1286,10 @@ def CmdBanUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["ban"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["ban"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdBanChatUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdBanChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 3:
@@ -1326,14 +1325,14 @@ def CmdBanChatUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["unban"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdUnbanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdUnbanReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 1:
@@ -1349,7 +1348,7 @@ def CmdUnbanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildActionOnAddedUsersList(
                         chat_settings=msg.chat.settings,
                         action="unban",
@@ -1385,14 +1384,14 @@ def CmdUnbanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["unban"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & ~pyrogram.Filters.reply
-    & pyrogram.Filters.group
+    & ~pyrogram.filters.reply
+    & pyrogram.filters.group
 )
-def CmdUnbanUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdUnbanUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 2:
@@ -1415,10 +1414,10 @@ def CmdUnbanUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["unban"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["unban"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdUnbanChatUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdUnbanChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 3:
@@ -1454,9 +1453,9 @@ def CmdUnbanChatUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^inactives (\w+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^inactives (\w+)", flags=re.I)
 )
-def CbQryInactives(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryInactives(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -1554,10 +1553,10 @@ def CbQryInactives(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["kickinactives"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.group
+    pyrogram.filters.command(commands=["kickinactives"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.group
 )
-def CmdKickInactives(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdKickInactives(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsSeniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -1623,7 +1622,7 @@ def CmdKickInactives(client: pyrogram.Client, msg: pyrogram.Message):
                     text=_(msg.chat.settings.language, "inactives_confirmation").format(
                         len(query), min_date
                     ),
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildInactivesConfirmation(
                             chat_settings=msg.chat.settings,
                             method="kick",
@@ -1634,10 +1633,10 @@ def CmdKickInactives(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["kickinactives"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["kickinactives"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdKickInactivesChat(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdKickInactivesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
@@ -1711,7 +1710,7 @@ def CmdKickInactivesChat(client: pyrogram.Client, msg: pyrogram.Message):
                             text=_(
                                 chat_settings.language, "inactives_confirmation"
                             ).format(len(query), min_date),
-                            reply_markup=pyrogram.InlineKeyboardMarkup(
+                            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                                 keyboards.BuildInactivesConfirmation(
                                     chat_settings=chat_settings,
                                     method="kick",
@@ -1728,10 +1727,10 @@ def CmdKickInactivesChat(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["baninactives"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.group
+    pyrogram.filters.command(commands=["baninactives"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.group
 )
-def CmdBanInactives(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdBanInactives(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsSeniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -1797,7 +1796,7 @@ def CmdBanInactives(client: pyrogram.Client, msg: pyrogram.Message):
                     text=_(msg.chat.settings.language, "inactives_confirmation").format(
                         len(query), min_date
                     ),
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildInactivesConfirmation(
                             chat_settings=msg.chat.settings,
                             method="ban",
@@ -1808,10 +1807,10 @@ def CmdBanInactives(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["baninactives"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["baninactives"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdBanInactivesChat(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdBanInactivesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
@@ -1885,7 +1884,7 @@ def CmdBanInactivesChat(client: pyrogram.Client, msg: pyrogram.Message):
                             text=_(
                                 chat_settings.language, "inactives_confirmation"
                             ).format(len(query), min_date),
-                            reply_markup=pyrogram.InlineKeyboardMarkup(
+                            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                                 keyboards.BuildInactivesConfirmation(
                                     chat_settings=chat_settings,
                                     method="ban",
@@ -1902,14 +1901,14 @@ def CmdBanInactivesChat(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["gban"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
+    & pyrogram.filters.reply
 )
-def CmdGBanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdGBanReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     seconds = utils.config["default_gban"]
     reason = ""
@@ -1930,7 +1929,7 @@ def CmdGBanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildActionOnAddedUsersList(
                         chat_settings=msg.chat.settings,
                         action="gban",
@@ -1965,14 +1964,14 @@ def CmdGBanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["gban"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & ~pyrogram.Filters.reply
+    & ~pyrogram.filters.reply
 )
-def CmdGBanUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdGBanUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     seconds = utils.config["default_gban"]
     reason = ""
     if len(msg.command) > 2:
@@ -1999,14 +1998,14 @@ def CmdGBanUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["ungban"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
+    & pyrogram.filters.reply
 )
-def CmdUngbanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdUngbanReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 1:
@@ -2022,7 +2021,7 @@ def CmdUngbanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildActionOnAddedUsersList(
                         chat_settings=msg.chat.settings,
                         action="ungban",
@@ -2055,14 +2054,14 @@ def CmdUngbanReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["ungban"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & ~pyrogram.Filters.reply
+    & ~pyrogram.filters.reply
 )
-def CmdUngbanUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdUngbanUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     reason = ""
     if len(msg.command) > 2:
         reason = " ".join(msg.command[2:])
@@ -2083,14 +2082,14 @@ def CmdUngbanUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["block"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
+    & pyrogram.filters.reply
 )
-def CmdBlockReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdBlockReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     seconds = utils.config["default_block"]
     reason = ""
@@ -2111,7 +2110,7 @@ def CmdBlockReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildActionOnAddedUsersList(
                         chat_settings=msg.chat.settings,
                         action="block",
@@ -2146,14 +2145,14 @@ def CmdBlockReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["block"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & ~pyrogram.Filters.reply
+    & ~pyrogram.filters.reply
 )
-def CmdBlockUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdBlockUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     seconds = utils.config["default_block"]
     reason = ""
     if len(msg.command) > 2:
@@ -2180,14 +2179,14 @@ def CmdBlockUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["unblock"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
+    & pyrogram.filters.reply
 )
-def CmdUnblockReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdUnblockReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     reason = ""
     if len(msg.command) > 1:
@@ -2203,7 +2202,7 @@ def CmdUnblockReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildActionOnAddedUsersList(
                         chat_settings=msg.chat.settings,
                         action="unblock",
@@ -2236,14 +2235,14 @@ def CmdUnblockReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["unblock"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & ~pyrogram.Filters.reply
+    & ~pyrogram.filters.reply
 )
-def CmdUnblockUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdUnblockUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     reason = ""
     if len(msg.command) > 2:
         reason = " ".join(msg.command[2:])

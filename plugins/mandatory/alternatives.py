@@ -7,16 +7,17 @@ import pyrogram
 import db_management
 import keyboards
 import methods
-import my_filters
 import utils
 
 _ = utils.GetLocalizedString
 
 
 @pyrogram.Client.on_message(
-    (pyrogram.Filters.text | pyrogram.Filters.media) & pyrogram.Filters.group, group=-6,
+    (pyrogram.filters.text | pyrogram.filters.media) & pyrogram.filters.group, group=-6,
 )
-def TranslateAlternativeIntoCommand(client: pyrogram.Client, msg: pyrogram.Message):
+def TranslateAlternativeIntoCommand(
+    client: pyrogram.Client, msg: pyrogram.types.Message
+):
     for element in msg.chat.settings.alternative_commands:
         if msg.media and element.is_media:
             media, type_ = utils.ExtractMedia(msg=msg)
@@ -38,9 +39,11 @@ def TranslateAlternativeIntoCommand(client: pyrogram.Client, msg: pyrogram.Messa
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^\(i\)alternatives", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^\(i\)alternatives", flags=re.I)
 )
-def CbQryAlternativesInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryAlternativesInfo(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -68,9 +71,9 @@ def CbQryAlternativesInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuer
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^alternatives get (\d+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^alternatives get (\d+)", flags=re.I)
 )
-def CbQryAlternativesGet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryAlternativesGet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -126,16 +129,16 @@ def CbQryAlternativesGet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
                         cb_qry.message.reply_cached_media(file_id=element.alternative)
                     except pyrogram.errors.FilerefUpgradeNeeded:
                         try:
-                            original_media_message: pyrogram.Message = client.get_messages(
+                            original_media_message: pyrogram.types.Message = client.get_messages(
                                 chat_id=element.original_chat_id,
                                 message_id=element.original_message_id,
                             )
                             type_, media = utils.ExtractMedia(
                                 msg=original_media_message
                             )
-                            if media and hasattr(media, "file_ref") and media.file_ref:
+                            if media:
                                 cb_qry.message.reply_cached_media(
-                                    file_id=element.alternative, file_ref=media.file_ref
+                                    file_id=element.alternative
                                 )
                             else:
                                 element.delete_instance()
@@ -193,9 +196,11 @@ def CbQryAlternativesGet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^alternatives PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^alternatives PAGES[<<|\-|\+|>>]", flags=re.I)
 )
-def CbQryAlternativesPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryAlternativesPages(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -210,7 +215,7 @@ def CbQryAlternativesPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQue
         )
         if cb_qry.data.endswith("<<"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildAlternativeCommandsList(
                         chat_settings=chat_settings, page=0
                     )
@@ -218,7 +223,7 @@ def CbQryAlternativesPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQue
             )
         elif cb_qry.data.endswith("-"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildAlternativeCommandsList(
                         chat_settings=chat_settings, page=page - 1
                     )
@@ -226,7 +231,7 @@ def CbQryAlternativesPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQue
             )
         elif cb_qry.data.endswith("+"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildAlternativeCommandsList(
                         chat_settings=chat_settings, page=page + 1
                     )
@@ -234,7 +239,7 @@ def CbQryAlternativesPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQue
             )
         elif cb_qry.data.endswith(">>"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildAlternativeCommandsList(
                         chat_settings=chat_settings, page=-1,
                     )
@@ -249,9 +254,9 @@ def CbQryAlternativesPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQue
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^alternatives set", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^alternatives set", flags=re.I)
 )
-def CbQryAlternativesSet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryAlternativesSet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -270,10 +275,10 @@ def CbQryAlternativesSet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
         cb_qry.message.edit_text(
             text=f"{utils.PrintChat(chat=db_management.Chats.get(id=chat_id))}\n"
             + text,
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 [
                     [
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=_(cb_qry.from_user.settings.language, "cancel"),
                             callback_data=f"cancel alternatives {chat_id}",
                         )
@@ -290,9 +295,11 @@ def CbQryAlternativesSet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^alternatives unset", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^alternatives unset", flags=re.I)
 )
-def CbQryAlternativesUnset(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryAlternativesUnset(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -323,7 +330,7 @@ def CbQryAlternativesUnset(client: pyrogram.Client, cb_qry: pyrogram.CallbackQue
                 show_alert=False,
             )
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildAlternativeCommandsList(
                         chat_settings=chat_settings, page=page
                     )
@@ -344,9 +351,9 @@ def CbQryAlternativesUnset(client: pyrogram.Client, cb_qry: pyrogram.CallbackQue
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^alternatives (\-\d+) (\d+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^alternatives (\-\d+) (\d+)", flags=re.I)
 )
-def CbQryAlternatives(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryAlternatives(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.data.split(" ")
     chat_id = int(parameters[1])
     page = int(parameters[2])
@@ -357,7 +364,7 @@ def CbQryAlternatives(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         cb_qry.message.edit_text(
             text=_(cb_qry.message.chat.settings.language, "alternatives")
             + f" {utils.PrintChat(chat=chat_settings.chat)}",
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildAlternativeCommandsList(
                     chat_settings=chat_settings, page=page
                 )
@@ -372,13 +379,13 @@ def CbQryAlternatives(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["alternatives"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.group
+    & pyrogram.filters.group
 )
-def CmdAlternatives(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdAlternatives(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
@@ -387,7 +394,7 @@ def CmdAlternatives(client: pyrogram.Client, msg: pyrogram.Message):
             msg=msg,
             text=_(msg.chat.settings.language, "alternatives")
             + f" {utils.PrintChat(chat=msg.chat)}",
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildAlternativeCommandsList(
                     chat_settings=msg.chat.settings, page=0
                 )
@@ -396,10 +403,10 @@ def CmdAlternatives(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["alternatives"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["alternatives"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdAlternativesChat(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdAlternativesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
@@ -414,7 +421,7 @@ def CmdAlternativesChat(client: pyrogram.Client, msg: pyrogram.Message):
                     msg=msg,
                     text=_(chat_settings.language, "alternatives")
                     + f" {utils.PrintChat(chat=chat_settings.chat)}",
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildAlternativeCommandsList(
                             chat_settings=chat_settings, page=0
                         )

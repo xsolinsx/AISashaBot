@@ -15,25 +15,25 @@ _ = utils.GetLocalizedString
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group
+    pyrogram.filters.group
     & (
-        pyrogram.Filters.regex(pattern="[/!#.]start@(\\w+) new_group", flags=re.I)
-        | pyrogram.Filters.group_chat_created
-        | pyrogram.Filters.new_chat_members
+        pyrogram.filters.regex(pattern="[/!#.]start@(\\w+) new_group", flags=re.I)
+        | pyrogram.filters.group_chat_created
+        | pyrogram.filters.new_chat_members
     ),
     group=-10,
 )
-def AddGroup(client: pyrogram.Client, msg: pyrogram.Message):
+def AddGroup(client: pyrogram.Client, msg: pyrogram.types.Message):
     if msg.new_chat_members:
         if client.ME.id in map(lambda new_member: new_member.id, msg.new_chat_members):
             methods.ReplyText(
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "group_start_message"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     [
                         [
-                            pyrogram.InlineKeyboardButton(
+                            pyrogram.types.InlineKeyboardButton(
                                 text=_(msg.chat.settings.language, "start_private"),
                                 url=f"t.me/{client.ME.username}",
                             )
@@ -47,10 +47,10 @@ def AddGroup(client: pyrogram.Client, msg: pyrogram.Message):
             client=client,
             msg=msg,
             text=_(msg.chat.settings.language, "group_start_message"),
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 [
                     [
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=_(msg.chat.settings.language, "start_private"),
                             url=f"t.me/{client.ME.username}",
                         )
@@ -62,30 +62,30 @@ def AddGroup(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.left_chat_member, group=-10,
+    pyrogram.filters.left_chat_member, group=-10,
 )
-def DeleteGroup(client: pyrogram.Client, msg: pyrogram.Message):
+def DeleteGroup(client: pyrogram.Client, msg: pyrogram.types.Message):
     if client.ME.id == msg.left_chat_member.id:
         msg.chat.settings.chat.delete_instance()
         msg.stop_propagation()
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^start", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^start", flags=re.I)
 )
-def CbQryStart(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryStart(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     methods.CallbackQueryAnswer(
         cb_qry=cb_qry,
         text=_(cb_qry.from_user.settings.language, "updating"),
         show_alert=False,
     )
     services = [
-        [pyrogram.InlineKeyboardButton(text=service, url=url)]
+        [pyrogram.types.InlineKeyboardButton(text=service, url=url)]
         for service, url in utils.config["donations"].items()
     ]
     services.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(cb_qry.from_user.settings.language, "back_to_main_menu"),
                 callback_data="start",
             )
@@ -93,7 +93,7 @@ def CbQryStart(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
     )
     cb_qry.message.edit_text(
         text=_(cb_qry.from_user.settings.language, "private_start_message"),
-        reply_markup=pyrogram.InlineKeyboardMarkup(
+        reply_markup=pyrogram.types.InlineKeyboardMarkup(
             keyboards.BuildStartMenu(
                 user_settings=cb_qry.from_user.settings,
                 bot_username=client.ME.username,
@@ -105,15 +105,15 @@ def CbQryStart(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["start"], prefixes=["/", "!", "#", "."])
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["start"], prefixes=["/", "!", "#", "."])
+    & pyrogram.filters.private
 )
-def CmdStartPrivate(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdStartPrivate(client: pyrogram.Client, msg: pyrogram.types.Message):
     methods.ReplyText(
         client=client,
         msg=msg,
         text=_(msg.from_user.settings.language, "private_start_message"),
-        reply_markup=pyrogram.InlineKeyboardMarkup(
+        reply_markup=pyrogram.types.InlineKeyboardMarkup(
             keyboards.BuildStartMenu(
                 user_settings=msg.from_user.settings,
                 bot_username=client.ME.username,
@@ -124,9 +124,9 @@ def CmdStartPrivate(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^mainhelp PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^mainhelp PAGES[<<|\-|\+|>>]", flags=re.I)
 )
-def CbQryHelpPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryHelpPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -136,13 +136,13 @@ def CbQryHelpPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
     )
     if cb_qry.data.endswith("<<"):
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildHelpMenu(user_settings=cb_qry.from_user.settings, page=0)
             )
         )
     elif cb_qry.data.endswith("-"):
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildHelpMenu(
                     user_settings=cb_qry.from_user.settings, page=page - 1
                 )
@@ -150,7 +150,7 @@ def CbQryHelpPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         )
     elif cb_qry.data.endswith("+"):
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildHelpMenu(
                     user_settings=cb_qry.from_user.settings, page=page + 1
                 )
@@ -158,7 +158,7 @@ def CbQryHelpPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         )
     elif cb_qry.data.endswith(">>"):
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildHelpMenu(
                     user_settings=cb_qry.from_user.settings, page=-1,
                 )
@@ -167,9 +167,9 @@ def CbQryHelpPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^mainhelp (.*)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^mainhelp (.*)", flags=re.I)
 )
-def CbQryHelpPlugin(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryHelpPlugin(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     methods.CallbackQueryAnswer(
         cb_qry=cb_qry,
         text=_(cb_qry.from_user.settings.language, "updating"),
@@ -210,7 +210,7 @@ def CbQryHelpPlugin(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             )
     cb_qry.message.edit_text(
         text=text,
-        reply_markup=pyrogram.InlineKeyboardMarkup(
+        reply_markup=pyrogram.types.InlineKeyboardMarkup(
             keyboards.BuildHelpMenu(
                 user_settings=cb_qry.from_user.settings,
                 selected_setting=cb_qry.data.replace("mainhelp ", ""),
@@ -221,7 +221,7 @@ def CbQryHelpPlugin(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(my_filters.callback_command(commands=["mainhelp"]))
-def CbQryHelp(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryHelp(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     methods.CallbackQueryAnswer(
         cb_qry=cb_qry,
         text=_(cb_qry.from_user.settings.language, "updating"),
@@ -249,7 +249,7 @@ def CbQryHelp(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         )
     cb_qry.message.edit_text(
         text=text,
-        reply_markup=pyrogram.InlineKeyboardMarkup(
+        reply_markup=pyrogram.types.InlineKeyboardMarkup(
             keyboards.BuildHelpMenu(user_settings=cb_qry.from_user.settings)
         ),
         parse_mode="html",
@@ -257,9 +257,9 @@ def CbQryHelp(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["help"], prefixes=["/", "!", "#", "."])
+    pyrogram.filters.command(commands=["help"], prefixes=["/", "!", "#", "."])
 )
-def CmdHelp(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdHelp(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     rank = utils.GetRank(user_id=msg.from_user.id)
     if len(msg.command) == 1:
@@ -287,7 +287,7 @@ def CmdHelp(client: pyrogram.Client, msg: pyrogram.Message):
             client=client,
             chat_id=msg.from_user.id,
             text=text,
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildHelpMenu(user_settings=msg.from_user.settings)
             ),
             parse_mode="html",
@@ -330,7 +330,7 @@ def CmdHelp(client: pyrogram.Client, msg: pyrogram.Message):
             client=client,
             chat_id=msg.from_user.id,
             text=text,
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildHelpMenu(
                     user_settings=msg.from_user.settings, selected_setting=plugin
                 )
@@ -340,9 +340,9 @@ def CmdHelp(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["helpall"], prefixes=["/", "!", "#", "."])
+    pyrogram.filters.command(commands=["helpall"], prefixes=["/", "!", "#", "."])
 )
-def CmdHelpAll(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdHelpAll(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = _(msg.from_user.settings.language, f"help_intro")
     rank = utils.GetRank(user_id=msg.from_user.id)
     user_viewable_plugins = (
@@ -402,21 +402,21 @@ def CmdHelpAll(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^about", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^about", flags=re.I)
 )
-def CbQryAbout(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryAbout(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     methods.CallbackQueryAnswer(
         cb_qry=cb_qry,
         text=_(cb_qry.from_user.settings.language, "updating"),
         show_alert=False,
     )
     services = [
-        [pyrogram.InlineKeyboardButton(text=service, url=url)]
+        [pyrogram.types.InlineKeyboardButton(text=service, url=url)]
         for service, url in utils.config["donations"].items()
     ]
     services.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(cb_qry.from_user.settings.language, "back_to_main_menu"),
                 callback_data="start",
             )
@@ -424,6 +424,6 @@ def CbQryAbout(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
     )
     cb_qry.message.edit_text(
         text=_(cb_qry.from_user.settings.language, "about_message"),
-        reply_markup=pyrogram.InlineKeyboardMarkup(services),
+        reply_markup=pyrogram.types.InlineKeyboardMarkup(services),
         parse_mode="html",
     )

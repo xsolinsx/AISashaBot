@@ -119,22 +119,22 @@ HELP_DICTIONARY = {
 
 
 PUNISHMENT_EMOJI = {
-    0: pyrogram.Emoji.OK_BUTTON,
-    1: pyrogram.Emoji.LITTER_IN_BIN_SIGN,
-    2: pyrogram.Emoji.WARNING,
-    3: pyrogram.Emoji.MAN_S_SHOE,
-    4: pyrogram.Emoji.HOURGLASS_NOT_DONE + pyrogram.Emoji.MUTED_SPEAKER,
-    5: pyrogram.Emoji.MUTED_SPEAKER,
-    6: pyrogram.Emoji.HOURGLASS_NOT_DONE + pyrogram.Emoji.HAMMER,
-    7: pyrogram.Emoji.HAMMER,
-    pyrogram.Emoji.OK_BUTTON: 0,
-    pyrogram.Emoji.LITTER_IN_BIN_SIGN: 1,
-    pyrogram.Emoji.WARNING: 2,
-    pyrogram.Emoji.MAN_S_SHOE: 3,
-    pyrogram.Emoji.HOURGLASS_NOT_DONE + pyrogram.Emoji.MUTED_SPEAKER: 4,
-    pyrogram.Emoji.MUTED_SPEAKER: 5,
-    pyrogram.Emoji.HOURGLASS_NOT_DONE + pyrogram.Emoji.HAMMER: 6,
-    pyrogram.Emoji.HAMMER: 7,
+    0: pyrogram.emoji.OK_BUTTON,
+    1: pyrogram.emoji.LITTER_IN_BIN_SIGN,
+    2: pyrogram.emoji.WARNING,
+    3: pyrogram.emoji.MAN_S_SHOE,
+    4: pyrogram.emoji.HOURGLASS_NOT_DONE + pyrogram.emoji.MUTED_SPEAKER,
+    5: pyrogram.emoji.MUTED_SPEAKER,
+    6: pyrogram.emoji.HOURGLASS_NOT_DONE + pyrogram.emoji.HAMMER,
+    7: pyrogram.emoji.HAMMER,
+    pyrogram.emoji.OK_BUTTON: 0,
+    pyrogram.emoji.LITTER_IN_BIN_SIGN: 1,
+    pyrogram.emoji.WARNING: 2,
+    pyrogram.emoji.MAN_S_SHOE: 3,
+    pyrogram.emoji.HOURGLASS_NOT_DONE + pyrogram.emoji.MUTED_SPEAKER: 4,
+    pyrogram.emoji.MUTED_SPEAKER: 5,
+    pyrogram.emoji.HOURGLASS_NOT_DONE + pyrogram.emoji.HAMMER: 6,
+    pyrogram.emoji.HAMMER: 7,
 }
 
 PUNISHMENT_STRING = {
@@ -158,30 +158,30 @@ PUNISHMENT_STRING = {
 
 
 LANGUAGE_EMOJI = {
-    "it": pyrogram.Emoji.ITALY,
-    "en": pyrogram.Emoji.UNITED_KINGDOM,
+    "it": pyrogram.emoji.FLAG_ITALY,
+    "en": pyrogram.emoji.FLAG_UNITED_KINGDOM,
 }
 
 
 RANK_EMOJI = {
-    0: pyrogram.Emoji.BUST_IN_SILHOUETTE,
-    1: pyrogram.Emoji.ADULT_MEDIUM_SKIN_TONE,
-    2: pyrogram.Emoji.DETECTIVE,
-    3: pyrogram.Emoji.POLICE_OFFICER,
-    4: pyrogram.Emoji.CROWN,
-    5: pyrogram.Emoji.GLOBE_WITH_MERIDIANS + pyrogram.Emoji.POLICE_OFFICER,
-    6: pyrogram.Emoji.GLOBE_WITH_MERIDIANS + pyrogram.Emoji.CROWN,
-    7: pyrogram.Emoji.SUPERHERO,
-    "administrator": pyrogram.Emoji.MAN_GUARD,
-    pyrogram.Emoji.BUST_IN_SILHOUETTE: 0,
-    pyrogram.Emoji.ADULT_MEDIUM_SKIN_TONE: 1,
-    pyrogram.Emoji.DETECTIVE: 2,
-    pyrogram.Emoji.POLICE_OFFICER: 3,
-    pyrogram.Emoji.CROWN: 4,
-    pyrogram.Emoji.GLOBE_WITH_MERIDIANS + pyrogram.Emoji.POLICE_OFFICER: 5,
-    pyrogram.Emoji.GLOBE_WITH_MERIDIANS + pyrogram.Emoji.CROWN: 6,
-    pyrogram.Emoji.SUPERHERO: 7,
-    pyrogram.Emoji.MAN_GUARD: "administrator",
+    0: pyrogram.emoji.BUST_IN_SILHOUETTE,
+    1: pyrogram.emoji.PERSON_MEDIUM_SKIN_TONE,
+    2: pyrogram.emoji.DETECTIVE,
+    3: pyrogram.emoji.POLICE_OFFICER,
+    4: pyrogram.emoji.CROWN,
+    5: pyrogram.emoji.GLOBE_WITH_MERIDIANS + pyrogram.emoji.POLICE_OFFICER,
+    6: pyrogram.emoji.GLOBE_WITH_MERIDIANS + pyrogram.emoji.CROWN,
+    7: pyrogram.emoji.SUPERHERO,
+    "administrator": pyrogram.emoji.MAN_GUARD,
+    pyrogram.emoji.BUST_IN_SILHOUETTE: 0,
+    pyrogram.emoji.PERSON_MEDIUM_SKIN_TONE: 1,
+    pyrogram.emoji.DETECTIVE: 2,
+    pyrogram.emoji.POLICE_OFFICER: 3,
+    pyrogram.emoji.CROWN: 4,
+    pyrogram.emoji.GLOBE_WITH_MERIDIANS + pyrogram.emoji.POLICE_OFFICER: 5,
+    pyrogram.emoji.GLOBE_WITH_MERIDIANS + pyrogram.emoji.CROWN: 6,
+    pyrogram.emoji.SUPERHERO: 7,
+    pyrogram.emoji.MAN_GUARD: "administrator",
 }
 
 
@@ -229,18 +229,18 @@ RESTRICTIONS = {
 
 
 YES_NO_EMOJI = {
-    0: pyrogram.Emoji.BALLOT_BOX_WITH_CHECK,
-    1: pyrogram.Emoji.WHITE_HEAVY_CHECK_MARK,
-    pyrogram.Emoji.BALLOT_BOX_WITH_CHECK: 0,
-    pyrogram.Emoji.WHITE_HEAVY_CHECK_MARK: 1,
+    0: pyrogram.emoji.CHECK_BOX_WITH_CHECK,
+    1: pyrogram.emoji.CHECK_MARK,
+    pyrogram.emoji.CHECK_BOX_WITH_CHECK: 0,
+    pyrogram.emoji.CHECK_MARK: 1,
 }
 
 
 RADIOBUTTON_EMOJI = {
-    0: pyrogram.Emoji.WHITE_LARGE_SQUARE,
-    1: pyrogram.Emoji.WHITE_SQUARE_BUTTON,
-    pyrogram.Emoji.WHITE_LARGE_SQUARE: 0,
-    pyrogram.Emoji.WHITE_SQUARE_BUTTON: 1,
+    0: pyrogram.emoji.WHITE_LARGE_SQUARE,
+    1: pyrogram.emoji.WHITE_SQUARE_BUTTON,
+    pyrogram.emoji.WHITE_LARGE_SQUARE: 0,
+    pyrogram.emoji.WHITE_SQUARE_BUTTON: 1,
 }
 
 

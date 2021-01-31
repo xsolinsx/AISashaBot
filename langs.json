@@ -329,7 +329,7 @@
         "(i)settings anti_video": "Punishment for sending videos (not video notes).",
         "(i)settings anti_video_note": "Punishment for sending video notes (not normal videos).",
         "(i)settings anti_voice": "Punishment for sending voice notes (not normal audios).",
-        "(i)settings allow_media_group": "Should photos and videos sent in media groups (albums) be excluded when checking flood?",
+        "(i)settings allow_media_group": "Should audios/documents/photos/videos sent in media groups (albums) be excluded when checking flood?",
         "(i)settings max_warns": "Maximum number of warns that are given to the user before the punishment.",
         "(i)settings max_warns_punishment": "Punishment applied when the maximum number of warns is reached.",
         "(i)settings max_temp_restrict": "Duration of a temporary restrict.",
@@ -682,35 +682,122 @@
             "CON CHE CORAGGIO PARLI ANCORA BRUTTA FOGNA?"
         ],
         "default_alternatives": {
-            "/ban": ["/banna", "kaboom", "sasha banna", "banna", "sasha decompila", "decompila", "sasha esplodi"],
-            "/dellist": ["/listacensure", "sasha lista censure", "lista censure"],
-            "/echo": ["sasha ripeti"],
-            "/get": ["sasha lista"],
-            "/getadmins": ["sasha lista admin", "lista admin"],
-            "/getlist": ["sasha lista"],
-            "/getrank": ["rango"],
-            "/help": ["sasha aiuto"],
-            "/helpall": ["sasha aiuto tutto"],
-            "/info": ["sasha info", "info"],
-            "/kick": ["sasha uccidi", "uccidi", "sasha spara"],
-            "/kickme": ["sasha uccidimi", "sasha esplodimi", "sasha sparami", "sasha decompilami", "sasha bannami"],
-            "/link": ["sasha link"],
-            "/markdownecho": ["sasha markdown ripeti"],
-            "/modlist": ["sasha lista mod", "lista mod"],
-            "/newlink": ["sasha crea link"],
-            "/plugins": ["sasha lista plugins", "lista plugins"],
-            "/qr": ["sasha qr"],
-            "/rules": ["sasha regole"],
-            "/setlink": ["sasha imposta link"],
-            "/shout": ["sasha grida", "grida", "sasha urla", "urla"],
-            "/startflame": ["sasha flamma", "flamma"],
-            "/stopflame": ["sasha stop flame", "stop flame"],
-            "/tex": ["sasha equazione", "equazione"],
-            "/unban": ["sasha sbanna", "sbanna", "sasha ricompila", "ricompila"],
-            "/unsetlink": ["sasha elimina link"],
-            "/unwarnall": ["sasha azzera avvertimenti", "azzera avvertimenti"],
-            "/warn": ["sasha avverti"],
-            "/webshot": ["sasha webshotta", "webshotta"]
+            "/ban": [
+                "/banna",
+                "kaboom",
+                "sasha banna",
+                "banna",
+                "sasha decompila",
+                "decompila",
+                "sasha esplodi"
+            ],
+            "/dellist": [
+                "/listacensure",
+                "sasha lista censure",
+                "lista censure"
+            ],
+            "/echo": [
+                "sasha ripeti"
+            ],
+            "/get": [
+                "sasha lista"
+            ],
+            "/getadmins": [
+                "sasha lista admin",
+                "lista admin"
+            ],
+            "/getlist": [
+                "sasha lista"
+            ],
+            "/getrank": [
+                "rango"
+            ],
+            "/help": [
+                "sasha aiuto"
+            ],
+            "/helpall": [
+                "sasha aiuto tutto"
+            ],
+            "/info": [
+                "sasha info",
+                "info"
+            ],
+            "/kick": [
+                "sasha uccidi",
+                "uccidi",
+                "sasha spara"
+            ],
+            "/kickme": [
+                "sasha uccidimi",
+                "sasha esplodimi",
+                "sasha sparami",
+                "sasha decompilami",
+                "sasha bannami"
+            ],
+            "/link": [
+                "sasha link"
+            ],
+            "/markdownecho": [
+                "sasha markdown ripeti"
+            ],
+            "/modlist": [
+                "sasha lista mod",
+                "lista mod"
+            ],
+            "/newlink": [
+                "sasha crea link"
+            ],
+            "/plugins": [
+                "sasha lista plugins",
+                "lista plugins"
+            ],
+            "/qr": [
+                "sasha qr"
+            ],
+            "/rules": [
+                "sasha regole"
+            ],
+            "/setlink": [
+                "sasha imposta link"
+            ],
+            "/shout": [
+                "sasha grida",
+                "grida",
+                "sasha urla",
+                "urla"
+            ],
+            "/startflame": [
+                "sasha flamma",
+                "flamma"
+            ],
+            "/stopflame": [
+                "sasha stop flame",
+                "stop flame"
+            ],
+            "/tex": [
+                "sasha equazione",
+                "equazione"
+            ],
+            "/unban": [
+                "sasha sbanna",
+                "sbanna",
+                "sasha ricompila",
+                "ricompila"
+            ],
+            "/unsetlink": [
+                "sasha elimina link"
+            ],
+            "/unwarnall": [
+                "sasha azzera avvertimenti",
+                "azzera avvertimenti"
+            ],
+            "/warn": [
+                "sasha avverti"
+            ],
+            "/webshot": [
+                "sasha webshotta",
+                "webshotta"
+            ]
         },
         "unknown_string": "Stringa mancante, contatta @EricSolinasBot\n{0} {1}",
         "unknown_language": "Lingua mancante, contatta @EricSolinasBot\n{0}",
@@ -1037,7 +1124,7 @@
         "(i)settings anti_video": "Punizione per l'invio di video (non note video).",
         "(i)settings anti_video_note": "Punizione per l'invio di note video (non video normali).",
         "(i)settings anti_voice": "Punizione per l'invio di note vocali (non canzoni e altri audio).",
-        "(i)settings allow_media_group": "Foto e video inviate in gruppo (album) dovrebbero essere escluse dal controllo del flood?",
+        "(i)settings allow_media_group": "Audio/Documenti/Foto/Video inviati in gruppo (album) dovrebbero essere escluse dal controllo del flood?",
         "(i)settings max_warns": "Numero massimo di avvertimenti che un utente può ricevere prima di essere punito.",
         "(i)settings max_warns_punishment": "Punizione del raggiungimento del numero massimo di avvertimenti.",
         "(i)settings max_temp_restrict": "Durata della restrizione temporanea.",

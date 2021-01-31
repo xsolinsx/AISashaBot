@@ -74,22 +74,22 @@ def BuildPager(
         if page - 2 >= 0:
             # goto first
             page_shift_row.append(
-                pyrogram.InlineKeyboardButton(
-                    pyrogram.Emoji.LAST_TRACK_BUTTON,
+                pyrogram.types.InlineKeyboardButton(
+                    pyrogram.emoji.LAST_TRACK_BUTTON,
                     callback_data=f"{base_callback_data} PAGES<<",
                 )
             )
         if page - 1 >= 0:
             # previous page
             page_shift_row.append(
-                pyrogram.InlineKeyboardButton(
-                    pyrogram.Emoji.REVERSE_BUTTON,
+                pyrogram.types.InlineKeyboardButton(
+                    pyrogram.emoji.REVERSE_BUTTON,
                     callback_data=f"{base_callback_data} PAGES-",
                 )
             )
         # select page button
         page_shift_row.append(
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 f"{page + 1}/{math.ceil(n_items / max_items_keyboard)}",
                 callback_data=f"useless{base_callback_data} PAGES",
             )
@@ -97,16 +97,16 @@ def BuildPager(
         if page + 1 < math.ceil(n_items / max_items_keyboard):
             # next page
             page_shift_row.append(
-                pyrogram.InlineKeyboardButton(
-                    pyrogram.Emoji.PLAY_BUTTON,
+                pyrogram.types.InlineKeyboardButton(
+                    pyrogram.emoji.PLAY_BUTTON,
                     callback_data=f"{base_callback_data} PAGES+",
                 )
             )
         if page + 2 < math.ceil(n_items / max_items_keyboard):
             # goto last
             page_shift_row.append(
-                pyrogram.InlineKeyboardButton(
-                    pyrogram.Emoji.NEXT_TRACK_BUTTON,
+                pyrogram.types.InlineKeyboardButton(
+                    pyrogram.emoji.NEXT_TRACK_BUTTON,
                     callback_data=f"{base_callback_data} PAGES>>",
                 )
             )
@@ -122,7 +122,7 @@ def BuildStartMenu(
     keyboard = list()
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(user_settings.language, "add_me_to_group"),
                 url=f"t.me/{bot_username}?startgroup=new_group",
             )
@@ -130,14 +130,14 @@ def BuildStartMenu(
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.INFORMATION
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.INFORMATION
                 + " "
                 + _(user_settings.language, "about"),
                 callback_data="about",
             ),
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.MEGAPHONE
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.MEGAPHONE
                 + " "
                 + _(user_settings.language, "channel"),
                 url=f"t.me/{channel_username}",
@@ -146,14 +146,14 @@ def BuildStartMenu(
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.WORLD_MAP
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.WORLD_MAP
                 + " "
                 + _(user_settings.language, "set_your_language"),
                 callback_data="mysettings",
             ),
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.OPEN_BOOK
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.OPEN_BOOK
                 + " "
                 + _(user_settings.language, "commands"),
                 callback_data="mainhelp",
@@ -167,13 +167,13 @@ def BuildPrivateSettingsMenu(user_settings: db_management.UserSettings) -> list:
     keyboard = list()
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(user_settings.language, "language"),
                 callback_data="(i)mysettings language",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=dictionaries.LANGUAGE_EMOJI.get(
-                    user_settings.language, pyrogram.Emoji.PIRATE_FLAG
+                    user_settings.language, pyrogram.emoji.PIRATE_FLAG
                 ),
                 callback_data="mysettings language",
             ),
@@ -181,11 +181,11 @@ def BuildPrivateSettingsMenu(user_settings: db_management.UserSettings) -> list:
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(user_settings.language, "wants_tag_alerts"),
                 callback_data="(i)mysettings wants_tag_alerts",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(
                     user_settings.language,
                     "yes"
@@ -198,7 +198,7 @@ def BuildPrivateSettingsMenu(user_settings: db_management.UserSettings) -> list:
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(user_settings.language, "nickname"),
                 callback_data="(i)mysettings nickname",
             ),
@@ -206,8 +206,8 @@ def BuildPrivateSettingsMenu(user_settings: db_management.UserSettings) -> list:
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.MEMO
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.MEMO
                 + (
                     _(user_settings.language, "replace")
                     if user_settings.nickname
@@ -215,19 +215,19 @@ def BuildPrivateSettingsMenu(user_settings: db_management.UserSettings) -> list:
                 ),
                 callback_data="mysettings set_nickname",
             ),
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.EYE + _(user_settings.language, "get"),
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.EYE + _(user_settings.language, "get"),
                 callback_data="mysettings get_nickname",
             ),
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.CROSS_MARK + _(user_settings.language, "unset"),
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.CROSS_MARK + _(user_settings.language, "unset"),
                 callback_data="mysettings unset_nickname",
             ),
         ]
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(user_settings.language, "back_to_main_menu"),
                 callback_data="start",
             )
@@ -240,7 +240,7 @@ def BuildTelegramSettingsMenu(chat_settings: db_management.ChatSettings) -> list
     keyboard = list()
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "can_send_messages"),
                 callback_data="settings can_send_messages",
             )
@@ -248,7 +248,7 @@ def BuildTelegramSettingsMenu(chat_settings: db_management.ChatSettings) -> list
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "can_send_media_messages "),
                 callback_data="settings can_send_media_messages",
             )
@@ -256,7 +256,7 @@ def BuildTelegramSettingsMenu(chat_settings: db_management.ChatSettings) -> list
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "can_send_other_messages "),
                 callback_data="settings can_send_other_messages",
             )
@@ -264,7 +264,7 @@ def BuildTelegramSettingsMenu(chat_settings: db_management.ChatSettings) -> list
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "can_add_web_page_previews "),
                 callback_data="settings can_add_web_page_previews",
             )
@@ -272,7 +272,7 @@ def BuildTelegramSettingsMenu(chat_settings: db_management.ChatSettings) -> list
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "can_send_polls"),
                 callback_data="settings can_send_polls",
             )
@@ -280,7 +280,7 @@ def BuildTelegramSettingsMenu(chat_settings: db_management.ChatSettings) -> list
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "can_change_info"),
                 callback_data="settings can_change_info",
             )
@@ -288,7 +288,7 @@ def BuildTelegramSettingsMenu(chat_settings: db_management.ChatSettings) -> list
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "can_invite_users"),
                 callback_data="settings can_invite_users",
             )
@@ -296,7 +296,7 @@ def BuildTelegramSettingsMenu(chat_settings: db_management.ChatSettings) -> list
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "can_pin_messages"),
                 callback_data="settings can_pin_messages",
             )
@@ -316,7 +316,7 @@ def BuildGroupSettingsMenu(
     header_buttons = list()
     header_buttons.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, current_keyboard).upper(),
                 callback_data=f"useless{current_keyboard} {chat_settings.chat_id}",
             )
@@ -325,15 +325,15 @@ def BuildGroupSettingsMenu(
 
     keyboard = list()
     if current_keyboard == "mainsettings":
-        # keyboard.append([pyrogram.InlineKeyboardButton(text=_(chat_settings.language, "telegramsettings"),
+        # keyboard.append([pyrogram.types.InlineKeyboardButton(text=_(chat_settings.language, "telegramsettings"),
         #                                               callback_data="telegramsettings")])
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "generalsettings"),
                     callback_data="generalsettings",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "floodsettings"),
                     callback_data="floodsettings",
                 ),
@@ -341,11 +341,11 @@ def BuildGroupSettingsMenu(
         )
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "invitesettings"),
                     callback_data="invitesettings",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "greetingsettings"),
                     callback_data="greetingsettings",
                 ),
@@ -353,11 +353,11 @@ def BuildGroupSettingsMenu(
         )
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "actionsettings"),
                     callback_data="actionsettings",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "messagesettings"),
                     callback_data="messagesettings",
                 ),
@@ -365,11 +365,11 @@ def BuildGroupSettingsMenu(
         )
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "censorships"),
                     callback_data=f"censorships {chat_settings.chat_id} 0",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "alternatives"),
                     callback_data=f"alternatives {chat_settings.chat_id} 0",
                 ),
@@ -377,20 +377,20 @@ def BuildGroupSettingsMenu(
         )
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "nightmodesettings"),
                     callback_data="nightmodesettings",
                 )
             ]
         )
-        # keyboard.append([pyrogram.InlineKeyboardButton(text=_(chat_settings.language, "nightmodesettings"),
+        # keyboard.append([pyrogram.types.InlineKeyboardButton(text=_(chat_settings.language, "nightmodesettings"),
         #                                                callback_data="nightmodesettings"),
-        #                  pyrogram.InlineKeyboardButton(text=_(chat_settings.language, "slowmodesettings"),
+        #                  pyrogram.types.InlineKeyboardButton(text=_(chat_settings.language, "slowmodesettings"),
         #                                                callback_data="slowmodesettings")])
         if chat_settings.allow_temporary_punishments:
             keyboard.append(
                 [
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=_(chat_settings.language, "temporarypunishmentssettings"),
                         callback_data="temporarypunishmentssettings",
                     )
@@ -398,7 +398,7 @@ def BuildGroupSettingsMenu(
             )
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "whitelist").upper(),
                     callback_data="(i)settings whitelist",
                 ),
@@ -406,15 +406,15 @@ def BuildGroupSettingsMenu(
         )
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "users"),
                     callback_data=f"whitelisted {chat_settings.chat_id} 0",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "gbanned"),
                     callback_data=f"whitelistedgbanned {chat_settings.chat_id} 0",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "chats"),
                     callback_data=f"whitelistedchats {chat_settings.chat_id} 0",
                 ),
@@ -465,9 +465,9 @@ def BuildGroupSettingsMenu(
     if current_keyboard == "mainsettings":
         footer_buttons.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "chat")
-                    + f" {pyrogram.Emoji.INFORMATION}",
+                    + f" {pyrogram.emoji.INFORMATION}",
                     callback_data=f"maininfo {chat_settings.chat_id}",
                 )
             ]
@@ -475,9 +475,9 @@ def BuildGroupSettingsMenu(
     else:
         footer_buttons.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "back_to_settings_menu").format(
-                        pyrogram.Emoji.GEAR
+                        pyrogram.emoji.GEAR
                     ),
                     callback_data="mainsettings",
                 )
@@ -497,37 +497,37 @@ def BuildGeneralSettingsMenu(
     if selected_setting:
         punishments_rows = [
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
                     callback_data=f"settings {selected_setting} selectvalue0",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
                     callback_data=f"settings {selected_setting} selectvalue1",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
                     callback_data=f"settings {selected_setting} selectvalue2",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
                     callback_data=f"settings {selected_setting} selectvalue3",
                 ),
             ],
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
                     callback_data=f"settings {selected_setting} selectvalue4",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
                     callback_data=f"settings {selected_setting} selectvalue5",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
                     callback_data=f"settings {selected_setting} selectvalue6",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
                     callback_data=f"settings {selected_setting} selectvalue7",
                 ),
@@ -542,14 +542,14 @@ def BuildGeneralSettingsMenu(
     keyboard = list()
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "are_locked"),
                 callback_data="(i)settings are_locked",
             ),
-            pyrogram.InlineKeyboardButton(
-                text=f"{pyrogram.Emoji.LOCKED} " + _(chat_settings.language, "locked")
+            pyrogram.types.InlineKeyboardButton(
+                text=f"{pyrogram.emoji.LOCKED} " + _(chat_settings.language, "locked")
                 if chat_settings.are_locked
-                else f"{pyrogram.Emoji.UNLOCKED} "
+                else f"{pyrogram.emoji.UNLOCKED} "
                 + _(chat_settings.language, "unlocked"),
                 callback_data="settings are_locked",
             ),
@@ -557,13 +557,13 @@ def BuildGeneralSettingsMenu(
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "language"),
                 callback_data="(i)settings language",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=dictionaries.LANGUAGE_EMOJI.get(
-                    chat_settings.language, pyrogram.Emoji.PIRATE_FLAG
+                    chat_settings.language, pyrogram.emoji.PIRATE_FLAG
                 ),
                 callback_data="settings language",
             ),
@@ -571,11 +571,11 @@ def BuildGeneralSettingsMenu(
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "is_bot_on"),
                 callback_data="(i)settings is_bot_on",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=dictionaries.YES_NO_EMOJI[chat_settings.is_bot_on],
                 callback_data="settings is_bot_on",
             ),
@@ -583,11 +583,11 @@ def BuildGeneralSettingsMenu(
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "has_pin_markers"),
                 callback_data="(i)settings has_pin_markers",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=dictionaries.YES_NO_EMOJI[chat_settings.has_pin_markers],
                 callback_data="settings has_pin_markers",
             ),
@@ -595,11 +595,11 @@ def BuildGeneralSettingsMenu(
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "allow_temporary_punishments"),
                 callback_data="(i)settings allow_temporary_punishments",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=dictionaries.YES_NO_EMOJI[
                     chat_settings.allow_temporary_punishments
                 ],
@@ -609,11 +609,11 @@ def BuildGeneralSettingsMenu(
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "has_tag_alerts"),
                 callback_data="(i)settings has_tag_alerts",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(
                     chat_settings.language,
                     "yes"
@@ -628,11 +628,11 @@ def BuildGeneralSettingsMenu(
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "group_notices"),
                 callback_data="(i)settings group_notices",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.group_notices])}^"
                 if chat_settings.group_notices
                 else dictionaries.YES_NO_EMOJI[chat_settings.group_notices],
@@ -648,17 +648,17 @@ def BuildGeneralSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "decrement"),
                 callback_data="settings max_warns--",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "max_warns").format(
                     chat_settings.max_warns
                 ),
                 callback_data="(i)settings max_warns",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "increment"),
                 callback_data="settings max_warns++",
             ),
@@ -666,11 +666,11 @@ def BuildGeneralSettingsMenu(
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "max_warns_punishment"),
                 callback_data="(i)settings max_warns_punishment",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.max_warns_punishment]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.max_warns_punishment])}",
                 callback_data="settings max_warns_punishment",
             ),
@@ -687,37 +687,37 @@ def BuildFloodSettingsMenu(
     if selected_setting:
         punishments_rows = [
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
                     callback_data=f"settings {selected_setting} selectvalue0",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
                     callback_data=f"settings {selected_setting} selectvalue1",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
                     callback_data=f"settings {selected_setting} selectvalue2",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
                     callback_data=f"settings {selected_setting} selectvalue3",
                 ),
             ],
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
                     callback_data=f"settings {selected_setting} selectvalue4",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
                     callback_data=f"settings {selected_setting} selectvalue5",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
                     callback_data=f"settings {selected_setting} selectvalue6",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
                     callback_data=f"settings {selected_setting} selectvalue7",
                 ),
@@ -732,11 +732,11 @@ def BuildFloodSettingsMenu(
     keyboard = list()
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "flood_punishment"),
                 callback_data="(i)settings flood_punishment",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.flood_punishment]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.flood_punishment])}",
                 callback_data="settings flood_punishment",
             ),
@@ -747,17 +747,17 @@ def BuildFloodSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "decrement"),
                 callback_data="settings max_flood--",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "max_flood").format(
                     chat_settings.max_flood
                 ),
                 callback_data="(i)settings max_flood",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "increment"),
                 callback_data="settings max_flood++",
             ),
@@ -765,17 +765,17 @@ def BuildFloodSettingsMenu(
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "decrement"),
                 callback_data="settings max_flood_time--",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "max_flood_time").format(
                     chat_settings.max_flood_time
                 ),
                 callback_data="(i)settings max_flood_time",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "increment"),
                 callback_data="settings max_flood_time++",
             ),
@@ -791,37 +791,37 @@ def BuildInviteSettingsMenu(
     if selected_setting:
         punishments_rows = [
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
                     callback_data=f"settings {selected_setting} selectvalue0",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
                     callback_data=f"settings {selected_setting} selectvalue1",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
                     callback_data=f"settings {selected_setting} selectvalue2",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
                     callback_data=f"settings {selected_setting} selectvalue3",
                 ),
             ],
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
                     callback_data=f"settings {selected_setting} selectvalue4",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
                     callback_data=f"settings {selected_setting} selectvalue5",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
                     callback_data=f"settings {selected_setting} selectvalue6",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
                     callback_data=f"settings {selected_setting} selectvalue7",
                 ),
@@ -836,17 +836,17 @@ def BuildInviteSettingsMenu(
     keyboard = list()
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "decrement"),
                 callback_data="settings max_invites--",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "max_invites").format(
                     chat_settings.max_invites
                 ),
                 callback_data="(i)settings max_invites",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "increment"),
                 callback_data="settings max_invites++",
             ),
@@ -855,11 +855,11 @@ def BuildInviteSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "add_punishment"),
                 callback_data="(i)settings add_punishment",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.add_punishment]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.add_punishment])}",
                 callback_data="settings add_punishment",
             ),
@@ -870,11 +870,11 @@ def BuildInviteSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "join_punishment"),
                 callback_data="(i)settings join_punishment",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.join_punishment]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.join_punishment])}",
                 callback_data="settings join_punishment",
             ),
@@ -885,11 +885,11 @@ def BuildInviteSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "is_link_public"),
                 callback_data="(i)settings is_link_public",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(
                     chat_settings.language,
                     "yes"
@@ -905,27 +905,27 @@ def BuildInviteSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "link"), callback_data="(i)settings link"
             ),
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.NEW_BUTTON + _(chat_settings.language, "generate"),
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.NEW_BUTTON + _(chat_settings.language, "generate"),
                 callback_data="settings generate_link",
             ),
         ]
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.MEMO + _(chat_settings.language, "set"),
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.MEMO + _(chat_settings.language, "set"),
                 callback_data="settings set_link",
             ),
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.EYE + _(chat_settings.language, "get"),
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.EYE + _(chat_settings.language, "get"),
                 callback_data="settings get_link",
             ),
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.CROSS_MARK + _(chat_settings.language, "unset"),
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.CROSS_MARK + _(chat_settings.language, "unset"),
                 callback_data="settings unset_link",
             ),
         ]
@@ -938,7 +938,7 @@ def BuildGreetingSettingsMenu(chat_settings: db_management.ChatSettings) -> list
     keyboard = list()
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "welcome").upper(),
                 callback_data="(i)settings welcome",
             )
@@ -946,17 +946,17 @@ def BuildGreetingSettingsMenu(chat_settings: db_management.ChatSettings) -> list
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "decrement"),
                 callback_data="settings welcome_members--",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "welcome_members").format(
                     chat_settings.welcome_members
                 ),
                 callback_data="(i)settings welcome_members",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "increment"),
                 callback_data="settings welcome_members++",
             ),
@@ -964,16 +964,16 @@ def BuildGreetingSettingsMenu(chat_settings: db_management.ChatSettings) -> list
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.MEMO + _(chat_settings.language, "set"),
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.MEMO + _(chat_settings.language, "set"),
                 callback_data="settings set_welcome",
             ),
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.EYE + _(chat_settings.language, "get"),
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.EYE + _(chat_settings.language, "get"),
                 callback_data="settings get_welcome",
             ),
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.CROSS_MARK + _(chat_settings.language, "unset"),
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.CROSS_MARK + _(chat_settings.language, "unset"),
                 callback_data="settings unset_welcome",
             ),
         ]
@@ -981,26 +981,26 @@ def BuildGreetingSettingsMenu(chat_settings: db_management.ChatSettings) -> list
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.INPUT_LATIN_UPPERCASE
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.INPUT_LATIN_UPPERCASE
                 + _(chat_settings.language, "welcome_buttons")
-                + pyrogram.Emoji.INPUT_LATIN_UPPERCASE,
+                + pyrogram.emoji.INPUT_LATIN_UPPERCASE,
                 callback_data="(i)settings welcome_buttons",
             )
         ]
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.MEMO + _(chat_settings.language, "set"),
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.MEMO + _(chat_settings.language, "set"),
                 callback_data="settings set_welcome_buttons",
             ),
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.EYE + _(chat_settings.language, "get"),
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.EYE + _(chat_settings.language, "get"),
                 callback_data="settings get_welcome_buttons",
             ),
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.CROSS_MARK + _(chat_settings.language, "unset"),
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.CROSS_MARK + _(chat_settings.language, "unset"),
                 callback_data="settings unset_welcome_buttons",
             ),
         ]
@@ -1008,7 +1008,7 @@ def BuildGreetingSettingsMenu(chat_settings: db_management.ChatSettings) -> list
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "goodbye").upper(),
                 callback_data="(i)settings goodbye",
             )
@@ -1016,16 +1016,16 @@ def BuildGreetingSettingsMenu(chat_settings: db_management.ChatSettings) -> list
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.MEMO + _(chat_settings.language, "set"),
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.MEMO + _(chat_settings.language, "set"),
                 callback_data="settings set_goodbye",
             ),
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.EYE + _(chat_settings.language, "get"),
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.EYE + _(chat_settings.language, "get"),
                 callback_data="settings get_goodbye",
             ),
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.CROSS_MARK + _(chat_settings.language, "unset"),
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.CROSS_MARK + _(chat_settings.language, "unset"),
                 callback_data="settings unset_goodbye",
             ),
         ]
@@ -1033,7 +1033,7 @@ def BuildGreetingSettingsMenu(chat_settings: db_management.ChatSettings) -> list
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "rules").upper(),
                 callback_data="(i)settings rules",
             )
@@ -1041,16 +1041,16 @@ def BuildGreetingSettingsMenu(chat_settings: db_management.ChatSettings) -> list
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.MEMO + _(chat_settings.language, "set"),
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.MEMO + _(chat_settings.language, "set"),
                 callback_data="settings set_rules",
             ),
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.EYE + _(chat_settings.language, "get"),
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.EYE + _(chat_settings.language, "get"),
                 callback_data="settings get_rules",
             ),
-            pyrogram.InlineKeyboardButton(
-                text=pyrogram.Emoji.CROSS_MARK + _(chat_settings.language, "unset"),
+            pyrogram.types.InlineKeyboardButton(
+                text=pyrogram.emoji.CROSS_MARK + _(chat_settings.language, "unset"),
                 callback_data="settings unset_rules",
             ),
         ]
@@ -1064,37 +1064,37 @@ def BuildActionTypeSettingsMenu(
     if selected_setting:
         punishments_rows = [
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
                     callback_data=f"settings {selected_setting} selectvalue0",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
                     callback_data=f"settings {selected_setting} selectvalue1",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
                     callback_data=f"settings {selected_setting} selectvalue2",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
                     callback_data=f"settings {selected_setting} selectvalue3",
                 ),
             ],
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
                     callback_data=f"settings {selected_setting} selectvalue4",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
                     callback_data=f"settings {selected_setting} selectvalue5",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
                     callback_data=f"settings {selected_setting} selectvalue6",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
                     callback_data=f"settings {selected_setting} selectvalue7",
                 ),
@@ -1109,11 +1109,11 @@ def BuildActionTypeSettingsMenu(
     keyboard = list()
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "arabic_punishment"),
                 callback_data="(i)settings arabic_punishment",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.arabic_punishment]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.arabic_punishment])}",
                 callback_data="settings arabic_punishment",
             ),
@@ -1124,11 +1124,11 @@ def BuildActionTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "bot_punishment"),
                 callback_data="(i)settings bot_punishment",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.bot_punishment]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.bot_punishment])}",
                 callback_data="settings bot_punishment",
             ),
@@ -1139,11 +1139,11 @@ def BuildActionTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "forward_punishment"),
                 callback_data="(i)settings forward_punishment",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.forward_punishment]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.forward_punishment])}",
                 callback_data="settings forward_punishment",
             ),
@@ -1154,11 +1154,11 @@ def BuildActionTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "globally_banned_punishment"),
                 callback_data="(i)settings globally_banned_punishment",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.globally_banned_punishment]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.globally_banned_punishment])}",
                 callback_data="settings globally_banned_punishment",
             ),
@@ -1169,11 +1169,11 @@ def BuildActionTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "link_spam_punishment"),
                 callback_data="(i)settings link_spam_punishment",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.link_spam_punishment]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.link_spam_punishment])}",
                 callback_data="settings link_spam_punishment",
             ),
@@ -1184,11 +1184,11 @@ def BuildActionTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "rtl_punishment"),
                 callback_data="(i)settings rtl_punishment",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.rtl_punishment]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.rtl_punishment])}",
                 callback_data="settings rtl_punishment",
             ),
@@ -1199,11 +1199,11 @@ def BuildActionTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "shitstorm_punishment"),
                 callback_data="(i)settings shitstorm_punishment",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.shitstorm_punishment]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.shitstorm_punishment])}",
                 callback_data="settings shitstorm_punishment",
             ),
@@ -1214,11 +1214,11 @@ def BuildActionTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "text_spam_punishment"),
                 callback_data="(i)settings text_spam_punishment",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.text_spam_punishment]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.text_spam_punishment])}",
                 callback_data="settings text_spam_punishment",
             ),
@@ -1236,37 +1236,37 @@ def BuildMessageTypeSettingsMenu(
     if selected_setting:
         punishments_rows = [
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
                     callback_data=f"settings {selected_setting} selectvalue0",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
                     callback_data=f"settings {selected_setting} selectvalue1",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
                     callback_data=f"settings {selected_setting} selectvalue2",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
                     callback_data=f"settings {selected_setting} selectvalue3",
                 ),
             ],
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
                     callback_data=f"settings {selected_setting} selectvalue4",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
                     callback_data=f"settings {selected_setting} selectvalue5",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
                     callback_data=f"settings {selected_setting} selectvalue6",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
                     callback_data=f"settings {selected_setting} selectvalue7",
                 ),
@@ -1281,11 +1281,11 @@ def BuildMessageTypeSettingsMenu(
     keyboard = list()
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "anti_everything"),
                 callback_data="(i)settings anti_everything",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.anti_everything]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.anti_everything])}",
                 callback_data="settings anti_everything",
             ),
@@ -1296,11 +1296,11 @@ def BuildMessageTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "anti_animation"),
                 callback_data="(i)settings anti_animation",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.anti_animation]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.anti_animation])}",
                 callback_data="settings anti_animation",
             ),
@@ -1311,11 +1311,11 @@ def BuildMessageTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "anti_audio"),
                 callback_data="(i)settings anti_audio",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.anti_audio]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.anti_audio])}",
                 callback_data="settings anti_audio",
             ),
@@ -1326,11 +1326,11 @@ def BuildMessageTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "anti_contact"),
                 callback_data="(i)settings anti_contact",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.anti_contact]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.anti_contact])}",
                 callback_data="settings anti_contact",
             ),
@@ -1341,11 +1341,11 @@ def BuildMessageTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "anti_document"),
                 callback_data="(i)settings anti_document",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.anti_document]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.anti_document])}",
                 callback_data="settings anti_document",
             ),
@@ -1356,11 +1356,11 @@ def BuildMessageTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "anti_game"),
                 callback_data="(i)settings anti_game",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.anti_game]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.anti_game])}",
                 callback_data="settings anti_game",
             ),
@@ -1371,11 +1371,11 @@ def BuildMessageTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "anti_location"),
                 callback_data="(i)settings anti_location",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.anti_location]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.anti_location])}",
                 callback_data="settings anti_location",
             ),
@@ -1386,11 +1386,11 @@ def BuildMessageTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "anti_photo"),
                 callback_data="(i)settings anti_photo",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.anti_photo]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.anti_photo])}",
                 callback_data="settings anti_photo",
             ),
@@ -1401,11 +1401,11 @@ def BuildMessageTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "anti_sticker"),
                 callback_data="(i)settings anti_sticker",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.anti_sticker]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.anti_sticker])}",
                 callback_data="settings anti_sticker",
             ),
@@ -1416,11 +1416,11 @@ def BuildMessageTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "anti_text"),
                 callback_data="(i)settings anti_text",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.anti_text]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.anti_text])}",
                 callback_data="settings anti_text",
             ),
@@ -1431,11 +1431,11 @@ def BuildMessageTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "anti_venue"),
                 callback_data="(i)settings anti_venue",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.anti_venue]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.anti_venue])}",
                 callback_data="settings anti_venue",
             ),
@@ -1446,11 +1446,11 @@ def BuildMessageTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "anti_video"),
                 callback_data="(i)settings anti_video",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.anti_video]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.anti_video])}",
                 callback_data="settings anti_video",
             ),
@@ -1461,11 +1461,11 @@ def BuildMessageTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "anti_video_note"),
                 callback_data="(i)settings anti_video_note",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.anti_video_note]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.anti_video_note])}",
                 callback_data="settings anti_video_note",
             ),
@@ -1476,11 +1476,11 @@ def BuildMessageTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "anti_voice"),
                 callback_data="(i)settings anti_voice",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.anti_voice]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.anti_voice])}",
                 callback_data="settings anti_voice",
             ),
@@ -1491,11 +1491,11 @@ def BuildMessageTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "allow_media_group"),
                 callback_data="(i)settings allow_media_group",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=dictionaries.YES_NO_EMOJI[chat_settings.allow_media_group],
                 callback_data="settings allow_media_group",
             ),
@@ -1504,11 +1504,11 @@ def BuildMessageTypeSettingsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "allow_service_messages"),
                 callback_data="(i)settings allow_service_messages",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=dictionaries.YES_NO_EMOJI[chat_settings.allow_service_messages],
                 callback_data="settings allow_service_messages",
             ),
@@ -1524,7 +1524,7 @@ def BuildNightModeSettingsMenu(
     keyboard = list()
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "night_mode_punishment"),
                 callback_data="(i)settings night_mode_punishment",
             )
@@ -1532,17 +1532,17 @@ def BuildNightModeSettingsMenu(
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=utils.ConvertTimedModeToTime(value=chat_settings.night_mode_from),
                 callback_data="settings night_mode_from",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=dictionaries.YES_NO_EMOJI[chat_settings.night_mode_punishment]
                 if not chat_settings.night_mode_punishment
                 else f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.night_mode_punishment]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.night_mode_punishment])}",
                 callback_data="settings night_mode_punishment",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=utils.ConvertTimedModeToTime(value=chat_settings.night_mode_to),
                 callback_data="settings night_mode_to",
             ),
@@ -1551,37 +1551,37 @@ def BuildNightModeSettingsMenu(
     if selected_setting == "night_mode_punishment":
         punishments_rows = [
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=dictionaries.YES_NO_EMOJI[0],
                     callback_data=f"settings {selected_setting} selectvalue0",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
                     callback_data=f"settings {selected_setting} selectvalue1",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
                     callback_data=f"settings {selected_setting} selectvalue2",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
                     callback_data=f"settings {selected_setting} selectvalue3",
                 ),
             ],
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
                     callback_data=f"settings {selected_setting} selectvalue4",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
                     callback_data=f"settings {selected_setting} selectvalue5",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
                     callback_data=f"settings {selected_setting} selectvalue6",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
                     callback_data=f"settings {selected_setting} selectvalue7",
                 ),
@@ -1612,28 +1612,28 @@ def BuildNightModeSettingsMenu(
         if "hour" in selected_setting:
             hours_rows = [
                 [
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=f"{i:02d}",
                         callback_data=f"settings {setting} selecthour {j}",
                     )
                     for i, j in zip(range(0, 6), range(0, 24, 4))
                 ],
                 [
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=f"{i:02d}",
                         callback_data=f"settings {setting} selecthour {j}",
                     )
                     for i, j in zip(range(6, 12), range(24, 48, 4))
                 ],
                 [
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=f"{i:02d}",
                         callback_data=f"settings {setting} selecthour {j}",
                     )
                     for i, j in zip(range(12, 18), range(48, 72, 4))
                 ],
                 [
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=f"{i:02d}",
                         callback_data=f"settings {setting} selecthour {j}",
                     )
@@ -1644,25 +1644,25 @@ def BuildNightModeSettingsMenu(
         elif "minute" in selected_setting:
             minutes_rows = [
                 [
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=utils.ConvertTimedModeToTime(
                             value=getattr(chat_settings, setting)
                         ),
                         callback_data=f"settings {setting} selectminute {getattr(chat_settings, setting)}",
                     ),
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=utils.ConvertTimedModeToTime(
                             value=getattr(chat_settings, setting) + 1
                         ),
                         callback_data=f"settings {setting} selectminute {getattr(chat_settings, setting) + 1}",
                     ),
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=utils.ConvertTimedModeToTime(
                             value=getattr(chat_settings, setting) + 2
                         ),
                         callback_data=f"settings {setting} selectminute {getattr(chat_settings, setting) + 2}",
                     ),
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=utils.ConvertTimedModeToTime(
                             value=getattr(chat_settings, setting) + 3
                         ),
@@ -1680,7 +1680,7 @@ def BuildSlowModeSettingsMenu(
     keyboard = list()
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "slow_mode_value"),
                 callback_data="(i)settings slow_mode_value",
             )
@@ -1688,11 +1688,11 @@ def BuildSlowModeSettingsMenu(
     )
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=utils.ConvertTimedModeToTime(value=chat_settings.slow_mode_from),
                 callback_data="settings slow_mode_from",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=dictionaries.YES_NO_EMOJI[chat_settings.slow_mode_value]
                 if not chat_settings.slow_mode_value
                 else utils.TimeFormatter(
@@ -1701,7 +1701,7 @@ def BuildSlowModeSettingsMenu(
                 ),
                 callback_data="settings slow_mode_value",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=utils.ConvertTimedModeToTime(value=chat_settings.slow_mode_to),
                 callback_data="settings slow_mode_to",
             ),
@@ -1711,17 +1711,17 @@ def BuildSlowModeSettingsMenu(
     if selected_setting == "slow_mode_value":
         mode_values = [
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=dictionaries.YES_NO_EMOJI[0],
                     callback_data="settings slow_mode_value selectvalue0",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=utils.TimeFormatter(
                         int(dictionaries.SLOW_MODE_VALUES[1]) * 1000
                     ),
                     callback_data="settings slow_mode_value selectvalue1",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=utils.TimeFormatter(
                         int(dictionaries.SLOW_MODE_VALUES[2]) * 1000
                     ),
@@ -1729,25 +1729,25 @@ def BuildSlowModeSettingsMenu(
                 ),
             ],
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=utils.TimeFormatter(
                         int(dictionaries.SLOW_MODE_VALUES[3]) * 1000
                     ),
                     callback_data="settings slow_mode_value selectvalue3",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=utils.TimeFormatter(
                         int(dictionaries.SLOW_MODE_VALUES[4]) * 1000
                     ),
                     callback_data="settings slow_mode_value selectvalue4",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=utils.TimeFormatter(
                         int(dictionaries.SLOW_MODE_VALUES[5]) * 1000
                     ),
                     callback_data="settings slow_mode_value selectvalue5",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=utils.TimeFormatter(
                         int(dictionaries.SLOW_MODE_VALUES[6]) * 1000
                     ),
@@ -1774,28 +1774,28 @@ def BuildSlowModeSettingsMenu(
         if "hour" in selected_setting:
             hours_rows = [
                 [
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=f"{i:02d}",
                         callback_data=f"settings {setting} selecthour {j}",
                     )
                     for i, j in zip(range(0, 6), range(0, 24, 4))
                 ],
                 [
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=f"{i:02d}",
                         callback_data=f"settings {setting} selecthour {j}",
                     )
                     for i, j in zip(range(6, 12), range(24, 48, 4))
                 ],
                 [
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=f"{i:02d}",
                         callback_data=f"settings {setting} selecthour {j}",
                     )
                     for i, j in zip(range(12, 18), range(48, 72, 4))
                 ],
                 [
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=f"{i:02d}",
                         callback_data=f"settings {setting} selecthour {j}",
                     )
@@ -1806,25 +1806,25 @@ def BuildSlowModeSettingsMenu(
         elif "minute" in selected_setting:
             minutes_rows = [
                 [
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=utils.ConvertTimedModeToTime(
                             value=getattr(chat_settings, setting)
                         ),
                         callback_data=f"settings {setting} selectminute{getattr(chat_settings, setting)}",
                     ),
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=utils.ConvertTimedModeToTime(
                             value=getattr(chat_settings, setting) + 1
                         ),
                         callback_data=f"settings {setting} selectminute{getattr(chat_settings, setting) + 1}",
                     ),
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=utils.ConvertTimedModeToTime(
                             value=getattr(chat_settings, setting) + 2
                         ),
                         callback_data=f"settings {setting} selectminute{getattr(chat_settings, setting) + 2}",
                     ),
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=utils.ConvertTimedModeToTime(
                             value=getattr(chat_settings, setting) + 3
                         ),
@@ -1851,12 +1851,12 @@ def BuildTempPunishmentMenu(
 
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "max_temp_restrict"),
                     callback_data="(i)settings max_temp_restrict",
                 ),
-                pyrogram.InlineKeyboardButton(
-                    text=pyrogram.Emoji.INFINITY
+                pyrogram.types.InlineKeyboardButton(
+                    text=pyrogram.emoji.INFINITY
                     if not chat_settings.max_temp_restrict
                     else (
                         (
@@ -1899,12 +1899,12 @@ def BuildTempPunishmentMenu(
 
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "max_temp_ban"),
                     callback_data="(i)settings max_temp_ban",
                 ),
-                pyrogram.InlineKeyboardButton(
-                    text=pyrogram.Emoji.INFINITY
+                pyrogram.types.InlineKeyboardButton(
+                    text=pyrogram.emoji.INFINITY
                     if not chat_settings.max_temp_ban
                     else (
                         (
@@ -1946,7 +1946,7 @@ def BuildTempPunishmentMenu(
         duration = utils.ConvertUnixToDuration(timestamp=max_temp_punishment_time)
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "weeks") + f" ({duration[0]})",
                     callback_data=f"(i){current_keyboard} weeks",
                 )
@@ -1954,27 +1954,27 @@ def BuildTempPunishmentMenu(
         )
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "decrement_X").format(10),
                     callback_data=f"{current_keyboard} weeks-10",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "decrement_X").format(5),
                     callback_data=f"{current_keyboard} weeks-5",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "decrement_X").format(1),
                     callback_data=f"{current_keyboard} weeks-1",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "increment_X").format(1),
                     callback_data=f"{current_keyboard} weeks+1",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "increment_X").format(5),
                     callback_data=f"{current_keyboard} weeks+5",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "increment_X").format(10),
                     callback_data=f"{current_keyboard} weeks+10",
                 ),
@@ -1983,7 +1983,7 @@ def BuildTempPunishmentMenu(
 
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "days") + f" ({duration[1]})",
                     callback_data=f"(i){current_keyboard} days",
                 )
@@ -1991,27 +1991,27 @@ def BuildTempPunishmentMenu(
         )
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "decrement_X").format(3),
                     callback_data=f"{current_keyboard} days-3",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "decrement_X").format(2),
                     callback_data=f"{current_keyboard} days-2",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "decrement_X").format(1),
                     callback_data=f"{current_keyboard} days-1",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "increment_X").format(1),
                     callback_data=f"{current_keyboard} days+1",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "increment_X").format(2),
                     callback_data=f"{current_keyboard} days+2",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "increment_X").format(3),
                     callback_data=f"{current_keyboard} days+3",
                 ),
@@ -2020,7 +2020,7 @@ def BuildTempPunishmentMenu(
 
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "hours") + f" ({duration[2]})",
                     callback_data=f"(i){current_keyboard} hours",
                 )
@@ -2028,27 +2028,27 @@ def BuildTempPunishmentMenu(
         )
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "decrement_X").format(7),
                     callback_data=f"{current_keyboard} hours-7",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "decrement_X").format(4),
                     callback_data=f"{current_keyboard} hours-4",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "decrement_X").format(1),
                     callback_data=f"{current_keyboard} hours-1",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "increment_X").format(1),
                     callback_data=f"{current_keyboard} hours+1",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "increment_X").format(4),
                     callback_data=f"{current_keyboard} hours+4",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "increment_X").format(7),
                     callback_data=f"{current_keyboard} hours+7",
                 ),
@@ -2057,7 +2057,7 @@ def BuildTempPunishmentMenu(
 
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "minutes") + f" ({duration[3]})",
                     callback_data=f"(i){current_keyboard} minutes",
                 )
@@ -2065,27 +2065,27 @@ def BuildTempPunishmentMenu(
         )
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "decrement_X").format(10),
                     callback_data=f"{current_keyboard} minutes-10",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "decrement_X").format(5),
                     callback_data=f"{current_keyboard} minutes-5",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "decrement_X").format(1),
                     callback_data=f"{current_keyboard} minutes-1",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "increment_X").format(1),
                     callback_data=f"{current_keyboard} minutes+1",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "increment_X").format(5),
                     callback_data=f"{current_keyboard} minutes+5",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "increment_X").format(10),
                     callback_data=f"{current_keyboard} minutes+10",
                 ),
@@ -2094,7 +2094,7 @@ def BuildTempPunishmentMenu(
 
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "seconds") + f" ({duration[4]})",
                     callback_data=f"(i){current_keyboard} seconds",
                 )
@@ -2102,27 +2102,27 @@ def BuildTempPunishmentMenu(
         )
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "decrement_X").format(10),
                     callback_data=f"{current_keyboard} seconds-10",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "decrement_X").format(5),
                     callback_data=f"{current_keyboard} seconds-5",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "decrement_X").format(1),
                     callback_data=f"{current_keyboard} seconds-1",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "increment_X").format(1),
                     callback_data=f"{current_keyboard} seconds+1",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "increment_X").format(5),
                     callback_data=f"{current_keyboard} seconds+5",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "increment_X").format(10),
                     callback_data=f"{current_keyboard} seconds+10",
                 ),
@@ -2131,7 +2131,7 @@ def BuildTempPunishmentMenu(
         if max_temp_punishment_time:
             keyboard.append(
                 [
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=(
                             (
                                 f"{duration[0] * 7 + duration[1]} "
@@ -2164,8 +2164,8 @@ def BuildTempPunishmentMenu(
         else:
             keyboard.append(
                 [
-                    pyrogram.InlineKeyboardButton(
-                        text=pyrogram.Emoji.INFINITY,
+                    pyrogram.types.InlineKeyboardButton(
+                        text=pyrogram.emoji.INFINITY,
                         callback_data=f"{current_keyboard} 0"
                         if punishing_user
                         else f"useless{current_keyboard} 0",
@@ -2183,7 +2183,7 @@ def BuildWelcomeButtonsKeyboard(welcome_buttons: str) -> list:
             button_parameters = button.split("|")
             if len(button_parameters) > 1:
                 keyboard_row.append(
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=button_parameters[0].strip(),
                         url=button_parameters[1].strip(),
                     )
@@ -2200,37 +2200,37 @@ def BuildCensorshipsList(
     if selected_setting:
         punishments_rows = [
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[0]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[0])}",
                     callback_data=f"censorships {selected_setting} selectvalue0",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[1]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[1])}",
                     callback_data=f"censorships {selected_setting} selectvalue1",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[2]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[2])}",
                     callback_data=f"censorships {selected_setting} selectvalue2",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[3]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[3])}",
                     callback_data=f"censorships {selected_setting} selectvalue3",
                 ),
             ],
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[4]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[4])}",
                     callback_data=f"censorships {selected_setting} selectvalue4",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[5]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[5])}",
                     callback_data=f"censorships {selected_setting} selectvalue5",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[6]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[6])}",
                     callback_data=f"censorships {selected_setting} selectvalue6",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[7]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[7])}",
                     callback_data=f"censorships {selected_setting} selectvalue7",
                 ),
@@ -2245,7 +2245,7 @@ def BuildCensorshipsList(
     header = list()
     header.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "censorships").upper(),
                 callback_data=f"uselesscensorships {chat_settings.chat_id} {page}",
             )
@@ -2256,11 +2256,11 @@ def BuildCensorshipsList(
     if not selected_setting or selected_setting == "punishment":
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "censorships_punishment"),
                     callback_data="(i)settings censorships_punishment",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.PUNISHMENT_EMOJI[chat_settings.censorships_punishment]} {_(chat_settings.language, dictionaries.PUNISHMENT_STRING[chat_settings.censorships_punishment])}",
                     callback_data="censorships punishment",
                 ),
@@ -2271,7 +2271,7 @@ def BuildCensorshipsList(
 
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "add_censorship"),
                     callback_data=f"censorships add",
                 )
@@ -2291,15 +2291,15 @@ def BuildCensorshipsList(
         for i in range(begin, end):
             keyboard.append(
                 [
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=query[i].value, callback_data=f"(i)censorships {i}",
                     ),
-                    pyrogram.InlineKeyboardButton(
-                        text=pyrogram.Emoji.EYE + _(chat_settings.language, "get"),
+                    pyrogram.types.InlineKeyboardButton(
+                        text=pyrogram.emoji.EYE + _(chat_settings.language, "get"),
                         callback_data=f"censorships get {i}",
                     ),
-                    pyrogram.InlineKeyboardButton(
-                        text=pyrogram.Emoji.CROSS_MARK,
+                    pyrogram.types.InlineKeyboardButton(
+                        text=pyrogram.emoji.CROSS_MARK,
                         callback_data=f"censorships remove {i}",
                     ),
                 ]
@@ -2313,9 +2313,9 @@ def BuildCensorshipsList(
         )
         footer.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "back_to_settings_menu").format(
-                        pyrogram.Emoji.GEAR
+                        pyrogram.emoji.GEAR
                     ),
                     callback_data="mainsettings",
                 )
@@ -2328,15 +2328,15 @@ def BuildCensorshipsList(
     elif selected_setting == "add":
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "text"),
                     callback_data="censorships add text",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "media"),
                     callback_data="censorships add media",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "regex"),
                     callback_data="censorships add regex",
                 ),
@@ -2354,7 +2354,7 @@ def BuildExtraList(
     header = list()
     header.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "extras").upper(),
                 callback_data=f"uselessextras {chat_settings.chat_id} {page}",
             )
@@ -2365,7 +2365,7 @@ def BuildExtraList(
     if not selected_setting:
         header.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "set_extra"),
                     callback_data=f"extras set",
                 )
@@ -2384,19 +2384,19 @@ def BuildExtraList(
         for i in range(begin, end):
             keyboard.append(
                 [
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=query[i].key, callback_data=f"(i)extras {i}",
                     ),
-                    pyrogram.InlineKeyboardButton(
-                        text=pyrogram.Emoji.MEMO + _(chat_settings.language, "set"),
+                    pyrogram.types.InlineKeyboardButton(
+                        text=pyrogram.emoji.MEMO + _(chat_settings.language, "set"),
                         callback_data=f"extras replace {i}",
                     ),
-                    pyrogram.InlineKeyboardButton(
-                        text=pyrogram.Emoji.EYE + _(chat_settings.language, "get"),
+                    pyrogram.types.InlineKeyboardButton(
+                        text=pyrogram.emoji.EYE + _(chat_settings.language, "get"),
                         callback_data=f"extras get {i}",
                     ),
-                    pyrogram.InlineKeyboardButton(
-                        text=pyrogram.Emoji.CROSS_MARK
+                    pyrogram.types.InlineKeyboardButton(
+                        text=pyrogram.emoji.CROSS_MARK
                         + _(chat_settings.language, "unset"),
                         callback_data=f"extras unset {i}",
                     ),
@@ -2416,7 +2416,7 @@ def BuildExtraList(
     elif selected_setting == "set":
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "key_text_value_text"),
                     callback_data=f"extras set text text",
                 ),
@@ -2424,7 +2424,7 @@ def BuildExtraList(
         )
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "key_text_value_media"),
                     callback_data=f"extras set text media",
                 ),
@@ -2432,7 +2432,7 @@ def BuildExtraList(
         )
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "key_regex_value_text"),
                     callback_data=f"extras set regex text",
                 ),
@@ -2440,7 +2440,7 @@ def BuildExtraList(
         )
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "key_regex_value_media"),
                     callback_data=f"extras set regex media",
                 ),
@@ -2473,7 +2473,7 @@ def BuildMessagesList(
     )
     header = [
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "messages").upper()
                 + f" ({total_chat_messages})",
                 callback_data=f"uselessmessages {chat_settings.chat_id} {int(members_only)} {page}",
@@ -2484,11 +2484,11 @@ def BuildMessagesList(
     keyboard = list()
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "members_only"),
                 callback_data="(i)messages members_only",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=dictionaries.YES_NO_EMOJI[int(members_only)],
                 callback_data="messages members_only",
             ),
@@ -2532,11 +2532,11 @@ def BuildMessagesList(
     for i in range(begin, end):
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{query[i].user_id} - {query[i].user.first_name}",
                     callback_data=f"(i)messages {query[i].user_id}",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{query[i].message_counter * 100 / total_chat_messages:.2f}% ({query[i].message_counter})",
                     callback_data="uselessmessages",
                 ),
@@ -2560,7 +2560,7 @@ def BuildInactivesConfirmation(
 ) -> list:
     header = [
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, method).upper()
                 + " "
                 + _(chat_settings.language, "inactives").upper(),
@@ -2571,36 +2571,36 @@ def BuildInactivesConfirmation(
 
     keyboard = [
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "yes"), callback_data="inactives yes",
             ),
         ],
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "yes_send_list"),
                 callback_data="inactives yes_list",
             ),
         ],
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "yes_send_list_pvt"),
                 callback_data="inactives yes_list_pvt",
             ),
         ],
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "no_send_list_pvt"),
                 callback_data="inactives no_list_pvt",
             ),
         ],
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "no_send_list"),
                 callback_data="inactives no_list",
             ),
         ],
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "no"), callback_data="inactives no",
             ),
         ],
@@ -2614,13 +2614,13 @@ def BuildWhitelistedUsersList(
 ) -> list:
     header = [
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "whitelisted_users").upper(),
                 callback_data=f"uselesswhitelisted {chat_settings.chat_id} {page}",
             )
         ],
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "add_user"),
                 callback_data="whitelisted add",
             )
@@ -2652,12 +2652,12 @@ def BuildWhitelistedUsersList(
     for i in range(begin, end):
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{query[i].user_id} - {query[i].user.first_name}",
                     callback_data=f"(i)whitelisted  {query[i].user_id}",
                 ),
-                pyrogram.InlineKeyboardButton(
-                    text=pyrogram.Emoji.CROSS_MARK,
+                pyrogram.types.InlineKeyboardButton(
+                    text=pyrogram.emoji.CROSS_MARK,
                     callback_data=f"whitelisted remove {query[i].user_id}",
                 ),
             ]
@@ -2671,9 +2671,9 @@ def BuildWhitelistedUsersList(
     )
     footer.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "back_to_settings_menu").format(
-                    pyrogram.Emoji.GEAR
+                    pyrogram.emoji.GEAR
                 ),
                 callback_data="mainsettings",
             )
@@ -2690,13 +2690,13 @@ def BuildWhitelistedGbannedUsersList(
 ) -> list:
     header = [
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "whitelistedgbanned_users").upper(),
                 callback_data=f"uselesswhitelistedgbanned {chat_settings.chat_id} {page}",
             )
         ],
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "add_user"),
                 callback_data="whitelistedgbanned add",
             )
@@ -2728,12 +2728,12 @@ def BuildWhitelistedGbannedUsersList(
     for i in range(begin, end):
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{query[i].user_id} - {query[i].user.first_name}",
                     callback_data=f"(i)whitelistedgbanned  {query[i].user_id}",
                 ),
-                pyrogram.InlineKeyboardButton(
-                    text=pyrogram.Emoji.CROSS_MARK,
+                pyrogram.types.InlineKeyboardButton(
+                    text=pyrogram.emoji.CROSS_MARK,
                     callback_data=f"whitelistedgbanned remove {query[i].user_id}",
                 ),
             ]
@@ -2747,9 +2747,9 @@ def BuildWhitelistedGbannedUsersList(
     )
     footer.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "back_to_settings_menu").format(
-                    pyrogram.Emoji.GEAR
+                    pyrogram.emoji.GEAR
                 ),
                 callback_data="mainsettings",
             )
@@ -2766,13 +2766,13 @@ def BuildWhitelistedChatsList(
 ) -> list:
     header = [
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "whitelisted_chats").upper(),
                 callback_data=f"uselesswhitelistedchats {chat_settings.chat_id} {page}",
             )
         ],
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "add_chat"),
                 callback_data="whitelistedchats add",
             )
@@ -2805,12 +2805,12 @@ def BuildWhitelistedChatsList(
             text = f"{query[i].whitelisted_chat} - {chat.title if chat else None}"
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=text,
                     callback_data=f"(i)whitelistedchats  {query[i].whitelisted_chat}",
                 ),
-                pyrogram.InlineKeyboardButton(
-                    text=pyrogram.Emoji.CROSS_MARK,
+                pyrogram.types.InlineKeyboardButton(
+                    text=pyrogram.emoji.CROSS_MARK,
                     callback_data=f"whitelistedchats remove {query[i].whitelisted_chat}",
                 ),
             ]
@@ -2824,9 +2824,9 @@ def BuildWhitelistedChatsList(
     )
     footer.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "back_to_settings_menu").format(
-                    pyrogram.Emoji.GEAR
+                    pyrogram.emoji.GEAR
                 ),
                 callback_data="mainsettings",
             )
@@ -2844,13 +2844,13 @@ def BuildGloballyBannedUsersList(
 ) -> list:
     header = [
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "globally_banned_users").upper(),
                 callback_data=f"uselessgbanned {page}",
             )
         ],
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "add_user"), callback_data="gbanned add",
             )
         ],
@@ -2878,7 +2878,7 @@ def BuildGloballyBannedUsersList(
     for i in range(begin, end):
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{query[i].user_id} - {query[i].user.first_name}",
                     callback_data=f"(i)gbanned  {query[i].user_id}",
                 ),
@@ -2886,12 +2886,12 @@ def BuildGloballyBannedUsersList(
         )
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{query[i].global_ban_expiration}",
                     callback_data=f"(i)gbanned  {query[i].user_id}",
                 ),
-                pyrogram.InlineKeyboardButton(
-                    text=pyrogram.Emoji.CROSS_MARK,
+                pyrogram.types.InlineKeyboardButton(
+                    text=pyrogram.emoji.CROSS_MARK,
                     callback_data=f"gbanned remove {query[i].user_id}",
                 ),
             ]
@@ -2915,13 +2915,13 @@ def BuildBlockedUsersList(
 ) -> list:
     header = [
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "blocked_users").upper(),
                 callback_data=f"uselessblocked {page}",
             )
         ],
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "add_user"), callback_data="blocked add",
             )
         ],
@@ -2949,7 +2949,7 @@ def BuildBlockedUsersList(
     for i in range(begin, end):
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{query[i].user_id} - {query[i].user.first_name}",
                     callback_data=f"(i)blocked  {query[i].user_id}",
                 ),
@@ -2957,12 +2957,12 @@ def BuildBlockedUsersList(
         )
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{query[i].block_expiration}",
                     callback_data=f"(i)blocked  {query[i].user_id}",
                 ),
-                pyrogram.InlineKeyboardButton(
-                    text=pyrogram.Emoji.CROSS_MARK,
+                pyrogram.types.InlineKeyboardButton(
+                    text=pyrogram.emoji.CROSS_MARK,
                     callback_data=f"blocked remove {query[i].user_id}",
                 ),
             ]
@@ -2986,7 +2986,7 @@ def BuildAlternativeCommandsList(
     header = list()
     header.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "alternatives").upper(),
                 callback_data=f"uselessalternatives {chat_settings.chat_id} {page}",
             )
@@ -2994,7 +2994,7 @@ def BuildAlternativeCommandsList(
     )
     header.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "set_alternative"),
                 callback_data=f"alternatives set",
             )
@@ -3014,15 +3014,15 @@ def BuildAlternativeCommandsList(
     for i in range(begin, end):
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"/{query[i].original}", callback_data=f"(i)alternatives {i}",
                 ),
-                pyrogram.InlineKeyboardButton(
-                    text=f"{pyrogram.Emoji.EYE} {query[i].alternative}",
+                pyrogram.types.InlineKeyboardButton(
+                    text=f"{pyrogram.emoji.EYE} {query[i].alternative}",
                     callback_data=f"alternatives get {i}",
                 ),
-                pyrogram.InlineKeyboardButton(
-                    text=pyrogram.Emoji.CROSS_MARK + _(chat_settings.language, "unset"),
+                pyrogram.types.InlineKeyboardButton(
+                    text=pyrogram.emoji.CROSS_MARK + _(chat_settings.language, "unset"),
                     callback_data=f"alternatives unset {i}",
                 ),
             ]
@@ -3036,9 +3036,9 @@ def BuildAlternativeCommandsList(
     )
     footer.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "back_to_settings_menu").format(
-                    pyrogram.Emoji.GEAR
+                    pyrogram.emoji.GEAR
                 ),
                 callback_data="mainsettings",
             )
@@ -3066,7 +3066,7 @@ def BuildPermissionsKeyboard(
     keyboard = list()
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "can_be_edited")
                 + " "
                 + (
@@ -3082,17 +3082,17 @@ def BuildPermissionsKeyboard(
     for permission in dictionaries.PERMISSIONS:
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, permission),
                     callback_data=f"(i)permissions {permission}",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=(
                         ""
                         if r_bot_chat.can_promote_members
                         and getattr(r_bot_chat, permission, 0)
                         and r_user_chat.rank < 3
-                        else pyrogram.Emoji.NO_ENTRY
+                        else pyrogram.emoji.NO_ENTRY
                     )
                     + dictionaries.YES_NO_EMOJI[
                         getattr(r_user_chat, permission, 0)
@@ -3106,7 +3106,7 @@ def BuildPermissionsKeyboard(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "is_admin_on_telegram")
                 + " "
                 + (
@@ -3121,11 +3121,11 @@ def BuildPermissionsKeyboard(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "sync_bot2tg"),
                 callback_data="permissions sync_bot2tg",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "sync_tg2bot"),
                 callback_data="permissions sync_tg2bot",
             ),
@@ -3138,23 +3138,22 @@ def BuildPermissionsKeyboard(
 def BuildRestrictionsKeyboard(
     chat_settings: db_management.ChatSettings,
     r_bot_chat: db_management.RUserChat,
-    chat_member: pyrogram.ChatMember,
+    chat_member: pyrogram.types.ChatMember,
 ) -> list:
     keyboard = list()
     for restriction in dictionaries.RESTRICTIONS:
-        tmp = getattr(chat_member, restriction)
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, restriction),
                     callback_data="(i)restrictions {restriction}",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=(
                         ""
                         if r_bot_chat.can_restrict_members
                         and chat_member.status != "creator"
-                        else pyrogram.Emoji.NO_ENTRY
+                        else pyrogram.emoji.NO_ENTRY
                     )
                     + dictionaries.YES_NO_EMOJI[
                         getattr(chat_member, restriction, 0)
@@ -3191,7 +3190,7 @@ def BuildInfoMenu(
     header_buttons = list()
     header_buttons.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, current_keyboard).upper(),
                 callback_data=f"useless{current_keyboard} {target} {chat_id}",
             )
@@ -3204,10 +3203,10 @@ def BuildInfoMenu(
             # chat
             keyboard.append(
                 [
-                    pyrogram.InlineKeyboardButton(
-                        text=pyrogram.Emoji.GEAR
+                    pyrogram.types.InlineKeyboardButton(
+                        text=pyrogram.emoji.GEAR
                         + _(chat_settings.language, "settings").upper()
-                        + pyrogram.Emoji.GEAR,
+                        + pyrogram.emoji.GEAR,
                         callback_data=f"mainsettings {chat_id}",
                     )
                 ]
@@ -3215,10 +3214,10 @@ def BuildInfoMenu(
 
             keyboard.append(
                 [
-                    pyrogram.InlineKeyboardButton(
-                        text=pyrogram.Emoji.CONTROL_KNOBS
+                    pyrogram.types.InlineKeyboardButton(
+                        text=pyrogram.emoji.CONTROL_KNOBS
                         + _(chat_settings.language, "plugins").upper()
-                        + pyrogram.Emoji.CONTROL_KNOBS,
+                        + pyrogram.emoji.CONTROL_KNOBS,
                         callback_data=f"chatplugins {chat_id} 0",
                     )
                 ]
@@ -3231,11 +3230,11 @@ def BuildInfoMenu(
             if target_settings.global_ban_expiration > datetime.date.today():
                 keyboard.append(
                     [
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=_(chat_settings.language, "info_gbanned"),
                             callback_data="(i)info gbanned",
                         ),
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=str(target_settings.global_ban_expiration),
                             callback_data="uselessinfo gbanned",
                         ),
@@ -3244,11 +3243,11 @@ def BuildInfoMenu(
             if target_settings.block_expiration > datetime.datetime.utcnow():
                 keyboard.append(
                     [
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=_(chat_settings.language, "info_blocked"),
                             callback_data="(i)info blocked",
                         ),
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=str(target_settings.block_expiration),
                             callback_data="uselessinfo blocked",
                         ),
@@ -3266,15 +3265,15 @@ def BuildInfoMenu(
                     )
                 keyboard.append(
                     [
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=_(chat_settings.language, "privileged_user"),
                             callback_data="(i)info privileged_user",
                         ),
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=_(chat_settings.language, "junior_mod"),
                             callback_data="(i)info junior_mod",
                         ),
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=_(chat_settings.language, "senior_mod"),
                             callback_data="(i)info senior_mod",
                         ),
@@ -3282,7 +3281,7 @@ def BuildInfoMenu(
                 )
                 keyboard.append(
                     [
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=dictionaries.RADIOBUTTON_EMOJI[
                                 int(
                                     r_target_chat.rank
@@ -3291,7 +3290,7 @@ def BuildInfoMenu(
                             ],
                             callback_data="info privileged_user",
                         ),
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=dictionaries.RADIOBUTTON_EMOJI[
                                 int(
                                     r_target_chat.rank
@@ -3300,7 +3299,7 @@ def BuildInfoMenu(
                             ],
                             callback_data="info junior_mod",
                         ),
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=dictionaries.RADIOBUTTON_EMOJI[
                                 int(
                                     r_target_chat.rank
@@ -3315,11 +3314,11 @@ def BuildInfoMenu(
                 if target_settings.global_ban_expiration > datetime.date.today():
                     keyboard.append(
                         [
-                            pyrogram.InlineKeyboardButton(
+                            pyrogram.types.InlineKeyboardButton(
                                 text=_(chat_settings.language, "whitelisted"),
                                 callback_data="(i)info whitelisted",
                             ),
-                            pyrogram.InlineKeyboardButton(
+                            pyrogram.types.InlineKeyboardButton(
                                 text=_(
                                     chat_settings.language, "global_ban_whitelisted"
                                 ),
@@ -3329,13 +3328,13 @@ def BuildInfoMenu(
                     )
                     keyboard.append(
                         [
-                            pyrogram.InlineKeyboardButton(
+                            pyrogram.types.InlineKeyboardButton(
                                 text=dictionaries.YES_NO_EMOJI[
                                     int(r_target_chat.is_whitelisted)
                                 ],
                                 callback_data="info whitelisted",
                             ),
-                            pyrogram.InlineKeyboardButton(
+                            pyrogram.types.InlineKeyboardButton(
                                 text=dictionaries.YES_NO_EMOJI[
                                     int(r_target_chat.is_global_ban_whitelisted)
                                 ],
@@ -3346,11 +3345,11 @@ def BuildInfoMenu(
                 else:
                     keyboard.append(
                         [
-                            pyrogram.InlineKeyboardButton(
+                            pyrogram.types.InlineKeyboardButton(
                                 text=_(chat_settings.language, "whitelisted"),
                                 callback_data="(i)info whitelisted",
                             ),
-                            pyrogram.InlineKeyboardButton(
+                            pyrogram.types.InlineKeyboardButton(
                                 text=dictionaries.YES_NO_EMOJI[
                                     int(r_target_chat.is_whitelisted)
                                 ],
@@ -3361,17 +3360,17 @@ def BuildInfoMenu(
 
                 keyboard.append(
                     [
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=_(chat_settings.language, "decrement"),
                             callback_data="info warns--",
                         ),
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=_(chat_settings.language, "info_warns").format(
                                 r_target_chat.warns, chat_settings.max_warns
                             ),
                             callback_data="(i)info warns",
                         ),
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=_(chat_settings.language, "increment"),
                             callback_data="info warns++",
                         ),
@@ -3380,7 +3379,7 @@ def BuildInfoMenu(
 
                 keyboard.append(
                     [
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=_(chat_settings.language, "punish").upper(),
                             callback_data="info punishments",
                         )
@@ -3389,7 +3388,7 @@ def BuildInfoMenu(
                 if selected_setting == "punishments":
                     keyboard.append(
                         [
-                            pyrogram.InlineKeyboardButton(
+                            pyrogram.types.InlineKeyboardButton(
                                 text=dictionaries.PUNISHMENT_EMOJI[3]
                                 + _(
                                     chat_settings.language,
@@ -3397,7 +3396,7 @@ def BuildInfoMenu(
                                 ),
                                 callback_data="info punishments selectvalue3",
                             ),
-                            pyrogram.InlineKeyboardButton(
+                            pyrogram.types.InlineKeyboardButton(
                                 text=dictionaries.PUNISHMENT_EMOJI[4]
                                 + _(
                                     chat_settings.language,
@@ -3405,7 +3404,7 @@ def BuildInfoMenu(
                                 ),
                                 callback_data="info punishments selectvalue4",
                             ),
-                            pyrogram.InlineKeyboardButton(
+                            pyrogram.types.InlineKeyboardButton(
                                 text=dictionaries.PUNISHMENT_EMOJI[5]
                                 + _(
                                     chat_settings.language,
@@ -3418,7 +3417,7 @@ def BuildInfoMenu(
 
                     keyboard.append(
                         [
-                            pyrogram.InlineKeyboardButton(
+                            pyrogram.types.InlineKeyboardButton(
                                 text=dictionaries.PUNISHMENT_EMOJI[6]
                                 + _(
                                     chat_settings.language,
@@ -3426,7 +3425,7 @@ def BuildInfoMenu(
                                 ),
                                 callback_data="info punishments selectvalue6",
                             ),
-                            pyrogram.InlineKeyboardButton(
+                            pyrogram.types.InlineKeyboardButton(
                                 text=dictionaries.PUNISHMENT_EMOJI[7]
                                 + _(
                                     chat_settings.language,
@@ -3455,14 +3454,14 @@ def BuildInfoMenu(
         # user in chat
         footer_buttons.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "user")
-                    + f" {pyrogram.Emoji.INFORMATION}",
+                    + f" {pyrogram.emoji.INFORMATION}",
                     callback_data=f"maininfo {target}",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "chat")
-                    + f" {pyrogram.Emoji.INFORMATION}",
+                    + f" {pyrogram.emoji.INFORMATION}",
                     callback_data=f"maininfo {chat_id}",
                 ),
             ]
@@ -3476,7 +3475,7 @@ def BuildInfoMenu(
 
 
 def BuildTagKeyboard(
-    chat: pyrogram.Chat,
+    chat: pyrogram.types.Chat,
     message_id: int,
     chat_settings: db_management.ChatSettings,
     is_member: bool = False,
@@ -3485,7 +3484,7 @@ def BuildTagKeyboard(
     if chat.type == "supergroup":
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "link_to_message"),
                     url="t.me/"
                     + (chat.username if chat.username else f"c/{str(chat.id)[4:]}")
@@ -3506,7 +3505,7 @@ def BuildTagKeyboard(
         if link_to_chat:
             keyboard.append(
                 [
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=_(chat_settings.language, "link_to_chat"),
                         url=link_to_chat,
                     )
@@ -3524,7 +3523,7 @@ def BuildHelpMenu(
     if not selected_setting:
         header_buttons = [
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(user_settings.language, "mainhelp").upper(),
                     callback_data=f"uselessmainhelp {page}",
                 )
@@ -3556,7 +3555,7 @@ def BuildHelpMenu(
                     # max_columns buttons per line, then add another row
                     keyboard.append(list())
                 keyboard[-1].append(
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=_(user_settings.language, f"{plugin_name}"),
                         callback_data=f"mainhelp {plugin_name}",
                     )
@@ -3575,7 +3574,7 @@ def BuildHelpMenu(
         )
         footer_buttons.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(user_settings.language, "back_to_main_menu"),
                     callback_data="start",
                 )
@@ -3590,7 +3589,7 @@ def BuildHelpMenu(
     else:
         keyboard = [
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(user_settings.language, "back_to_help_menu"),
                     callback_data="mainhelp",
                 )
@@ -3605,7 +3604,7 @@ def BuildBotPluginsMenu(
 ) -> list:
     header_buttons = [
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(user_settings.language, "botplugins").upper(),
                 callback_data=f"uselessbotplugins {page}",
             )
@@ -3624,15 +3623,15 @@ def BuildBotPluginsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(user_settings.language, "plugin_name"),
                 callback_data="(i)botplugins plugin_name",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(user_settings.language, "is_enabled"),
                 callback_data="(i)botplugins is_enabled",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(user_settings.language, "is_optional"),
                 callback_data="(i)botplugins is_optional",
             ),
@@ -3641,16 +3640,16 @@ def BuildBotPluginsMenu(
     for i in range(begin, end):
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=query[i].name, callback_data=f"(i)botplugins {query[i].name}",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=dictionaries.YES_NO_EMOJI[query[i].is_enabled]
                     if query[i].is_optional
-                    else pyrogram.Emoji.HEAVY_CHECK_MARK,
+                    else pyrogram.emoji.HEAVY_CHECK_MARK,
                     callback_data=f"botplugins is_enabled {query[i].name}",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=dictionaries.YES_NO_EMOJI[query[i].is_optional],
                     callback_data=f"botplugins is_optional {query[i].name}",
                 ),
@@ -3676,7 +3675,7 @@ def BuildChatPluginsMenu(
 ) -> list:
     header_buttons = [
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "chatplugins").upper(),
                 callback_data=f"uselesschatplugins {chat_settings.chat_id} {page}",
             )
@@ -3701,15 +3700,15 @@ def BuildChatPluginsMenu(
 
     keyboard.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "plugin_name"),
                 callback_data="(i)botplugins plugin_name",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "is_enabled_on_chat"),
                 callback_data="(i)botplugins is_enabled_on_chat",
             ),
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "min_rank"),
                 callback_data="(i)botplugins min_rank",
             ),
@@ -3718,15 +3717,15 @@ def BuildChatPluginsMenu(
     for i in range(begin, end):
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=query[i].plugin,
                     callback_data=f"(i)chatplugins {query[i].plugin}",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=dictionaries.YES_NO_EMOJI[query[i].is_enabled_on_chat],
                     callback_data=f"chatplugins is_enabled_on_chat {query[i].plugin}",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{dictionaries.RANK_STRING[query[i].min_rank]}^",
                     callback_data=f"chatplugins min_rank {query[i].plugin}",
                 ),
@@ -3740,9 +3739,9 @@ def BuildChatPluginsMenu(
     )
     footer_buttons.append(
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "chat")
-                + f" {pyrogram.Emoji.INFORMATION}",
+                + f" {pyrogram.emoji.INFORMATION}",
                 callback_data=f"maininfo {chat_settings.chat_id}",
             )
         ]
@@ -3761,7 +3760,7 @@ def BuildGroupsMenu(
 ) -> list:
     header_buttons = [
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "public_groups").upper(),
                 callback_data=f"uselessgroups {page}",
             )
@@ -3791,7 +3790,7 @@ def BuildGroupsMenu(
         if current_chat.username or query[i].link:
             keyboard.append(
                 [
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=current_chat.title,
                         url=f"t.me/{current_chat.username}"
                         if current_chat.username
@@ -3816,7 +3815,7 @@ def BuildGroupsMenu(
 def BuildLogMenu(chat_settings: db_management.ChatSettings, page: int = 0) -> list:
     header_buttons = [
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "logs").upper(),
                 callback_data=f"uselesslogs {chat_settings.chat_id} {page}",
             )
@@ -3843,11 +3842,13 @@ def BuildLogMenu(chat_settings: db_management.ChatSettings, page: int = 0) -> li
 def BuildActionOnAddedUsersList(
     chat_settings: db_management.ChatSettings,
     action: str,
-    new_chat_members: typing.Union[typing.List[pyrogram.User], peewee.ModelSelect],
+    new_chat_members: typing.Union[
+        typing.List[pyrogram.types.User], peewee.ModelSelect
+    ],
 ) -> list:
     header_buttons = [
         [
-            pyrogram.InlineKeyboardButton(
+            pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, f"{action}_all").upper(),
                 callback_data=f"{action}_all",
             )
@@ -3858,11 +3859,11 @@ def BuildActionOnAddedUsersList(
     for user in new_chat_members:
         keyboard.append(
             [
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=f"{user.id} - {user.first_name}",
                     callback_data=f"useless{action} {user.id}",
                 ),
-                pyrogram.InlineKeyboardButton(
+                pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, f"{action}"),
                     callback_data=f"{action} {user.id}",
                 ),

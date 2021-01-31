@@ -7,17 +7,16 @@ import pyrogram
 import db_management
 import keyboards
 import methods
-import my_filters
 import utils
 
 _ = utils.GetLocalizedString
 
 
 @pyrogram.Client.on_message(
-    (pyrogram.Filters.text | pyrogram.Filters.caption) & pyrogram.Filters.group,
+    (pyrogram.filters.text | pyrogram.filters.caption) & pyrogram.filters.group,
     group=-3,
 )
-def SendExtra(client: pyrogram.Client, msg: pyrogram.Message):
+def SendExtra(client: pyrogram.Client, msg: pyrogram.types.Message):
     r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
         plugin="extra_variables", chat=msg.chat.id
     )
@@ -56,17 +55,16 @@ def SendExtra(client: pyrogram.Client, msg: pyrogram.Message):
                                 file_id=media_id, caption=caption, parse_mode="html",
                             )
                         except pyrogram.errors.FilerefUpgradeNeeded:
-                            original_media_message: pyrogram.Message = client.get_messages(
+                            original_media_message: pyrogram.types.Message = client.get_messages(
                                 chat_id=element.original_chat_id,
                                 message_id=element.original_message_id,
                             )
                             type_, media = utils.ExtractMedia(
                                 msg=original_media_message
                             )
-                            if media and hasattr(media, "file_ref") and media.file_ref:
+                            if media:
                                 msg.reply_cached_media(
                                     file_id=media_id,
-                                    file_ref=media.file_ref,
                                     caption=caption,
                                     parse_mode="html",
                                 )
@@ -94,9 +92,9 @@ def SendExtra(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^\(i\)extras", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^\(i\)extras", flags=re.I)
 )
-def CbQryExtrasInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryExtrasInfo(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -122,9 +120,9 @@ def CbQryExtrasInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^extras replace (\d+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^extras replace (\d+)", flags=re.I)
 )
-def CbQryExtrasReplace(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryExtrasReplace(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -164,10 +162,10 @@ def CbQryExtrasReplace(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
                 cb_qry.message.edit_text(
                     text=_(cb_qry.from_user.settings.language, "send_extra_value"),
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         [
                             [
-                                pyrogram.InlineKeyboardButton(
+                                pyrogram.types.InlineKeyboardButton(
                                     text=_(
                                         cb_qry.from_user.settings.language, "cancel"
                                     ),
@@ -192,9 +190,9 @@ def CbQryExtrasReplace(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^extras get (\d+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^extras get (\d+)", flags=re.I)
 )
-def CbQryExtrasGet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryExtrasGet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -236,17 +234,14 @@ def CbQryExtrasGet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                             file_id=media_id, caption=caption, parse_mode="html",
                         )
                     except pyrogram.errors.FilerefUpgradeNeeded:
-                        original_media_message: pyrogram.Message = client.get_messages(
+                        original_media_message: pyrogram.types.Message = client.get_messages(
                             chat_id=element.original_chat_id,
                             message_id=element.original_message_id,
                         )
                         type_, media = utils.ExtractMedia(msg=original_media_message)
-                        if media and hasattr(media, "file_ref") and media.file_ref:
+                        if media:
                             cb_qry.message.reply_cached_media(
-                                file_id=media_id,
-                                file_ref=media.file_ref,
-                                caption=caption,
-                                parse_mode="html",
+                                file_id=media_id, caption=caption, parse_mode="html",
                             )
                         else:
                             element.delete_instance()
@@ -281,9 +276,9 @@ def CbQryExtrasGet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^extras PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^extras PAGES[<<|\-|\+|>>]", flags=re.I)
 )
-def CbQryExtrasPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryExtrasPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -308,13 +303,13 @@ def CbQryExtrasPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             )
             if cb_qry.data.endswith("<<"):
                 cb_qry.message.edit_reply_markup(
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildExtraList(chat_settings=chat_settings, page=0)
                     )
                 )
             elif cb_qry.data.endswith("-"):
                 cb_qry.message.edit_reply_markup(
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildExtraList(
                             chat_settings=chat_settings, page=page - 1
                         )
@@ -322,7 +317,7 @@ def CbQryExtrasPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                 )
             elif cb_qry.data.endswith("+"):
                 cb_qry.message.edit_reply_markup(
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildExtraList(
                             chat_settings=chat_settings, page=page + 1
                         )
@@ -330,7 +325,7 @@ def CbQryExtrasPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                 )
             elif cb_qry.data.endswith(">>"):
                 cb_qry.message.edit_reply_markup(
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildExtraList(chat_settings=chat_settings, page=-1)
                     )
                 )
@@ -343,9 +338,9 @@ def CbQryExtrasPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^extras set", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^extras set", flags=re.I)
 )
-def CbQryExtrasSet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryExtrasSet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -371,7 +366,7 @@ def CbQryExtrasSet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             if cb_qry.data == "extras set":
                 cb_qry.message.edit_text(
                     text=_(cb_qry.from_user.settings.language, "select_type_of_extra"),
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildExtraList(
                             chat_settings=chat_settings, selected_setting="set"
                         )
@@ -385,10 +380,10 @@ def CbQryExtrasSet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                 utils.tmp_steps[cb_qry.message.chat.id] = (cb_qry, cb_qry.data)
                 cb_qry.message.edit_text(
                     text=_(cb_qry.from_user.settings.language, "send_extra_key"),
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         [
                             [
-                                pyrogram.InlineKeyboardButton(
+                                pyrogram.types.InlineKeyboardButton(
                                     text=_(
                                         cb_qry.from_user.settings.language, "cancel"
                                     ),
@@ -407,9 +402,9 @@ def CbQryExtrasSet(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^extras unset", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^extras unset", flags=re.I)
 )
-def CbQryExtrasUnset(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryExtrasUnset(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -449,7 +444,7 @@ def CbQryExtrasUnset(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
                     show_alert=False,
                 )
                 cb_qry.message.edit_reply_markup(
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildExtraList(chat_settings=chat_settings, page=page)
                     )
                 )
@@ -468,13 +463,13 @@ def CbQryExtrasUnset(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["extras"], del_=True, pvt=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.group
+    & pyrogram.filters.group
 )
-def CmdExtras(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdExtras(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
@@ -494,7 +489,7 @@ def CmdExtras(client: pyrogram.Client, msg: pyrogram.Message):
                     chat_id=msg.from_user.id,
                     text=_(msg.chat.settings.language, "extras")
                     + f" {utils.PrintChat(chat=msg.chat)}",
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildExtraList(
                             chat_settings=msg.chat.settings, page=0
                         )
@@ -515,7 +510,7 @@ def CmdExtras(client: pyrogram.Client, msg: pyrogram.Message):
                     msg=msg,
                     text=_(msg.chat.settings.language, "extras")
                     + f" {utils.PrintChat(chat=msg.chat)}",
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildExtraList(
                             chat_settings=msg.chat.settings, page=0
                         )
@@ -524,10 +519,10 @@ def CmdExtras(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["extras"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["extras"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdExtrasChat(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdExtrasChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
@@ -549,7 +544,7 @@ def CmdExtrasChat(client: pyrogram.Client, msg: pyrogram.Message):
                         msg=msg,
                         text=_(chat_settings.language, "extras")
                         + f" {utils.PrintChat(chat=chat_settings.chat)}",
-                        reply_markup=pyrogram.InlineKeyboardMarkup(
+                        reply_markup=pyrogram.types.InlineKeyboardMarkup(
                             keyboards.BuildExtraList(
                                 chat_settings=chat_settings, page=0
                             )

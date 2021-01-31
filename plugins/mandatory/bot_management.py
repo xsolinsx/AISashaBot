@@ -16,17 +16,16 @@ from pytz import utc
 import db_management
 import keyboards
 import methods
-import my_filters
 import utils
 
 _ = utils.GetLocalizedString
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(commands=["oldping"], prefixes=["/", "!", "#", "."])
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(commands=["oldping"], prefixes=["/", "!", "#", "."])
 )
-def CmdOldPing(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdOldPing(client: pyrogram.Client, msg: pyrogram.types.Message):
     methods.ReplyText(
         client=client,
         msg=msg,
@@ -35,13 +34,13 @@ def CmdOldPing(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(commands=["ping"], prefixes=["/", "!", "#", "."])
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(commands=["ping"], prefixes=["/", "!", "#", "."])
 )
-def CmdPing(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdPing(client: pyrogram.Client, msg: pyrogram.types.Message):
     # adapted from https://git.colinshark.de/PyroBot/PyroBot/src/branch/develop/pyrobot/modules/www.py
     start = datetime.datetime.utcnow()
-    tmp: pyrogram.Message = methods.ReplyText(
+    tmp: pyrogram.types.Message = methods.ReplyText(
         client=client, msg=msg, text="pong!",
     )
     end = datetime.datetime.utcnow()
@@ -49,20 +48,20 @@ def CmdPing(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(commands=["uptime"], prefixes=["/", "!", "#", "."])
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(commands=["uptime"], prefixes=["/", "!", "#", "."])
 )
-def CmdUptime(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdUptime(client: pyrogram.Client, msg: pyrogram.types.Message):
     methods.ReplyText(
         client=client, msg=msg, text=f"{datetime.datetime.utcnow() - utils.start_date}"
     )
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(commands=["pm"], prefixes=["/", "!", "#", "."])
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(commands=["pm"], prefixes=["/", "!", "#", "."])
 )
-def CmdPm(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdPm(client: pyrogram.Client, msg: pyrogram.types.Message):
     user_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     if isinstance(user_id, str):
         methods.ReplyText(client=client, msg=msg, text=user_id)
@@ -75,13 +74,13 @@ def CmdPm(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["todo"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
 )
-def CmdTodo(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdTodo(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = f"#{msg.text[1:]}"
     fwd = None
     if msg.reply_to_message:
@@ -95,13 +94,13 @@ def CmdTodo(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["getip"], del_=True, pvt=True),
         prefixes=["/", "!", "#", "."],
     )
 )
-def CmdGetIP(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdGetIP(client: pyrogram.Client, msg: pyrogram.types.Message):
     ip = urllib.request.urlopen("https://ipecho.net/plain").read().decode("utf8")
     methods.ReplyText(client=client, msg=msg, text=ip)
     utils.Log(
@@ -113,10 +112,10 @@ def CmdGetIP(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(commands=["broadcast"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(commands=["broadcast"], prefixes=["/", "!", "#", "."],)
 )
-def CmdBroadcast(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdBroadcast(client: pyrogram.Client, msg: pyrogram.types.Message):
     text_to_broadcast = msg.text[len(msg.command[0]) + 2 :]
     run_date = None
     for i, chat in enumerate(
@@ -145,10 +144,10 @@ def CmdBroadcast(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(commands=["backup"], prefixes=["/", "!", "#", "."])
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(commands=["backup"], prefixes=["/", "!", "#", "."])
 )
-def CmdBackup(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdBackup(client: pyrogram.Client, msg: pyrogram.types.Message):
     utils.Log(
         client=client,
         chat_id=client.ME.id,
@@ -159,13 +158,13 @@ def CmdBackup(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["exec"], del_=True, pvt=True),
         prefixes=["/", "!", "#", "."],
     )
 )
-def CmdExec(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdExec(client: pyrogram.Client, msg: pyrogram.types.Message):
     expression = msg.text[len(msg.command[0]) + 2 :]
 
     if expression:
@@ -224,13 +223,13 @@ def CmdExec(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["eval"], del_=True, pvt=True),
         prefixes=["/", "!", "#", "."],
     )
 )
-def CmdEval(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdEval(client: pyrogram.Client, msg: pyrogram.types.Message):
     expression = msg.text[len(msg.command[0]) + 2 :]
 
     if expression:
@@ -288,13 +287,13 @@ def CmdEval(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["vardump"], del_=True, pvt=True),
         prefixes=["/", "!", "#", "."],
     )
 )
-def CmdVardump(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdVardump(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = None
     try:
         if msg.reply_to_message:
@@ -345,10 +344,10 @@ def CmdVardump(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(commands=["setstring"], prefixes=["/", "!", "#", "."])
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(commands=["setstring"], prefixes=["/", "!", "#", "."])
 )
-def CmdSetString(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdSetString(client: pyrogram.Client, msg: pyrogram.types.Message):
     if len(msg.command) == 4:
         utils.langs[msg.command[1]][msg.command[2]] = msg.command[3]
         with open(file="langs.json", mode="w", encoding="utf-8") as f:
@@ -375,13 +374,13 @@ def CmdSetString(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["getstring"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
 )
-def CmdGetString(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdGetString(client: pyrogram.Client, msg: pyrogram.types.Message):
     if len(msg.command) == 3:
         methods.ReplyText(
             client=client, msg=msg, text=_(msg.command[1], msg.command[2])
@@ -395,10 +394,10 @@ def CmdGetString(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(commands=["reboot"], prefixes=["/", "!", "#", "."])
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(commands=["reboot"], prefixes=["/", "!", "#", "."])
 )
-def CmdReboot(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdReboot(client: pyrogram.Client, msg: pyrogram.types.Message):
     utils.Log(
         client=client,
         chat_id=client.ME.id,
@@ -411,10 +410,10 @@ def CmdReboot(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(commands=["reload"], prefixes=["/", "!", "#", "."])
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(commands=["reload"], prefixes=["/", "!", "#", "."])
 )
-def CmdReload(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdReload(client: pyrogram.Client, msg: pyrogram.types.Message):
     with open(file="config.json", encoding="utf-8") as f:
         utils.config = json.load(fp=f)
     with open(file="langs.json", encoding="utf-8") as f:
@@ -429,9 +428,9 @@ def CmdReload(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^\(i\)botplugins", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^\(i\)botplugins", flags=re.I)
 )
-def CbQryBotPluginsInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryBotPluginsInfo(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     methods.CallbackQueryAnswer(
         cb_qry=cb_qry,
         text=_(cb_qry.from_user.settings.language, cb_qry.data[3:]),
@@ -440,10 +439,10 @@ def CbQryBotPluginsInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery)
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^botplugins is_enabled (\w+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^botplugins is_enabled (\w+)", flags=re.I)
 )
 def CbQryBotPluginsEnableDisable(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -491,7 +490,7 @@ def CbQryBotPluginsEnableDisable(
             )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildBotPluginsMenu(
                     user_settings=cb_qry.from_user.settings, page=page
                 )
@@ -506,10 +505,10 @@ def CbQryBotPluginsEnableDisable(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^botplugins is_optional (\w+)", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^botplugins is_optional (\w+)", flags=re.I)
 )
 def CbQryBotPluginsMandatoryOptional(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
@@ -557,7 +556,7 @@ def CbQryBotPluginsMandatoryOptional(
             )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildBotPluginsMenu(
                     user_settings=cb_qry.from_user.settings, page=page
                 )
@@ -572,9 +571,9 @@ def CbQryBotPluginsMandatoryOptional(
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^botplugins PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^botplugins PAGES[<<|\-|\+|>>]", flags=re.I)
 )
-def CbQryBotPluginsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryBotPluginsPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -585,7 +584,7 @@ def CbQryBotPluginsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
         )
         if cb_qry.data.endswith("<<"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildBotPluginsMenu(
                         user_settings=cb_qry.from_user.settings, page=0
                     )
@@ -593,7 +592,7 @@ def CbQryBotPluginsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
             )
         elif cb_qry.data.endswith("-"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildBotPluginsMenu(
                         user_settings=cb_qry.from_user.settings, page=page - 1
                     )
@@ -601,7 +600,7 @@ def CbQryBotPluginsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
             )
         elif cb_qry.data.endswith("+"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildBotPluginsMenu(
                         user_settings=cb_qry.from_user.settings, page=page + 1
                     )
@@ -609,7 +608,7 @@ def CbQryBotPluginsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
             )
         elif cb_qry.data.endswith(">>"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildBotPluginsMenu(
                         user_settings=cb_qry.from_user.settings, page=-1
                     )
@@ -624,24 +623,24 @@ def CbQryBotPluginsPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user(utils.config["masters"])
-    & pyrogram.Filters.command(commands=["botplugins"], prefixes=["/", "!", "#", "."])
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(commands=["botplugins"], prefixes=["/", "!", "#", "."])
 )
-def CmdBotPlugins(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdBotPlugins(client: pyrogram.Client, msg: pyrogram.types.Message):
     methods.ReplyText(
         client=client,
         msg=msg,
         text=_(msg.chat.settings.language, "botplugins"),
-        reply_markup=pyrogram.InlineKeyboardMarkup(
+        reply_markup=pyrogram.types.InlineKeyboardMarkup(
             keyboards.BuildBotPluginsMenu(user_settings=msg.from_user.settings)
         ),
     )
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^\(i\)gbanned", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^\(i\)gbanned", flags=re.I)
 )
-def CbQryGbannedInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryGbannedInfo(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     text = ""
     if cb_qry.data == "(i)gbanned":
         text = _(cb_qry.from_user.settings.language, cb_qry.data)
@@ -659,9 +658,9 @@ def CbQryGbannedInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^gbanned PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^gbanned PAGES[<<|\-|\+|>>]", flags=re.I)
 )
-def CbQryGbannedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryGbannedPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -672,7 +671,7 @@ def CbQryGbannedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         )
         if cb_qry.data.endswith("<<"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildGloballyBannedUsersList(
                         chat_settings=cb_qry.from_user.settings, page=0
                     )
@@ -680,7 +679,7 @@ def CbQryGbannedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             )
         elif cb_qry.data.endswith("-"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildGloballyBannedUsersList(
                         chat_settings=cb_qry.from_user.settings, page=page - 1
                     )
@@ -688,7 +687,7 @@ def CbQryGbannedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             )
         elif cb_qry.data.endswith("+"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildGloballyBannedUsersList(
                         chat_settings=cb_qry.from_user.settings, page=page + 1
                     )
@@ -696,7 +695,7 @@ def CbQryGbannedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             )
         elif cb_qry.data.endswith(">>"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildGloballyBannedUsersList(
                         chat_settings=cb_qry.from_user.settings, page=-1,
                     )
@@ -711,9 +710,9 @@ def CbQryGbannedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^gbanned add", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^gbanned add", flags=re.I)
 )
-def CbQryGbannedAdd(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryGbannedAdd(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     if utils.IsMasterOrBot(user_id=cb_qry.from_user.id):
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
@@ -723,10 +722,10 @@ def CbQryGbannedAdd(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         utils.tmp_steps[cb_qry.message.chat.id] = (cb_qry, cb_qry.data)
         cb_qry.message.edit_text(
             text=_(cb_qry.from_user.settings.language, "send_user_to_gban"),
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 [
                     [
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=_(cb_qry.from_user.settings.language, "cancel"),
                             callback_data=f"cancel gbanned",
                         )
@@ -743,9 +742,9 @@ def CbQryGbannedAdd(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^gbanned remove", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^gbanned remove", flags=re.I)
 )
-def CbQryGbannedRemove(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryGbannedRemove(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -765,7 +764,7 @@ def CbQryGbannedRemove(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             show_alert=False,
         )
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGloballyBannedUsersList(
                     chat_settings=cb_qry.from_user.settings, page=page
                 )
@@ -780,19 +779,19 @@ def CbQryGbannedRemove(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["gbanned"], del_=True, pvt=True),
         prefixes=["/", "!", "#", "."],
     )
 )
-def CmdGbanned(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdGbanned(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsMasterOrBot(user_id=msg.from_user.id):
         if msg.command[0].lower().endswith("pvt"):
             methods.SendMessage(
                 client=client,
                 chat_id=msg.from_user.id,
                 text=_(msg.chat.settings.language, "globally_banned_users"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildGloballyBannedUsersList(
                         chat_settings=msg.chat.settings, page=0
                     )
@@ -812,7 +811,7 @@ def CmdGbanned(client: pyrogram.Client, msg: pyrogram.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "globally_banned_users"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildGloballyBannedUsersList(
                         chat_settings=msg.chat.settings, page=0
                     )
@@ -821,9 +820,9 @@ def CmdGbanned(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^\(i\)blocked", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^\(i\)blocked", flags=re.I)
 )
-def CbQryBlockedInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryBlockedInfo(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     text = ""
     if cb_qry.data == "(i)blocked":
         text = _(cb_qry.from_user.settings.language, cb_qry.data)
@@ -841,9 +840,9 @@ def CbQryBlockedInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^blocked PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^blocked PAGES[<<|\-|\+|>>]", flags=re.I)
 )
-def CbQryBlockedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryBlockedPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -854,7 +853,7 @@ def CbQryBlockedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         )
         if cb_qry.data.endswith("<<"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildBlockedUsersList(
                         chat_settings=cb_qry.from_user.settings, page=0
                     )
@@ -862,7 +861,7 @@ def CbQryBlockedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             )
         elif cb_qry.data.endswith("-"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildBlockedUsersList(
                         chat_settings=cb_qry.from_user.settings, page=page - 1
                     )
@@ -870,7 +869,7 @@ def CbQryBlockedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             )
         elif cb_qry.data.endswith("+"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildBlockedUsersList(
                         chat_settings=cb_qry.from_user.settings, page=page + 1
                     )
@@ -878,7 +877,7 @@ def CbQryBlockedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             )
         elif cb_qry.data.endswith(">>"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildBlockedUsersList(
                         chat_settings=cb_qry.from_user.settings, page=-1,
                     )
@@ -893,9 +892,9 @@ def CbQryBlockedPages(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^blocked add", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^blocked add", flags=re.I)
 )
-def CbQryBlockedAdd(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryBlockedAdd(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     if utils.IsMasterOrBot(user_id=cb_qry.from_user.id):
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
@@ -905,10 +904,10 @@ def CbQryBlockedAdd(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
         utils.tmp_steps[cb_qry.message.chat.id] = (cb_qry, cb_qry.data)
         cb_qry.message.edit_text(
             text=_(cb_qry.from_user.settings.language, "send_user_to_block"),
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 [
                     [
-                        pyrogram.InlineKeyboardButton(
+                        pyrogram.types.InlineKeyboardButton(
                             text=_(cb_qry.from_user.settings.language, "cancel"),
                             callback_data=f"cancel blocked",
                         )
@@ -925,9 +924,9 @@ def CbQryBlockedAdd(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^blocked remove", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^blocked remove", flags=re.I)
 )
-def CbQryBlockedRemove(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryBlockedRemove(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
@@ -947,7 +946,7 @@ def CbQryBlockedRemove(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
             show_alert=False,
         )
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.InlineKeyboardMarkup(
+            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildBlockedUsersList(
                     chat_settings=cb_qry.from_user.settings, page=page
                 )
@@ -962,19 +961,19 @@ def CbQryBlockedRemove(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["blocked"], del_=True, pvt=True),
         prefixes=["/", "!", "#", "."],
     )
 )
-def CmdBlocked(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdBlocked(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsMasterOrBot(user_id=msg.from_user.id):
         if msg.command[0].lower().endswith("pvt"):
             methods.SendMessage(
                 client=client,
                 chat_id=msg.from_user.id,
                 text=_(msg.chat.settings.language, "blocked_users"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildBlockedUsersList(
                         chat_settings=msg.chat.settings, page=0
                     )
@@ -994,7 +993,7 @@ def CmdBlocked(client: pyrogram.Client, msg: pyrogram.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "blocked_users"),
-                reply_markup=pyrogram.InlineKeyboardMarkup(
+                reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildBlockedUsersList(
                         chat_settings=msg.chat.settings, page=0
                     )

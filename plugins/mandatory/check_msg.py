@@ -18,30 +18,37 @@ _ = utils.GetLocalizedString
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.create(
-        lambda _, m: bool(m.forward_from_chat and not m.from_user),
-        name="LinkedChannelFilter",
-    ),
-    group=-9,
-)  # TODO use pyrogram's built-in filter as soon as it is implemented
-def MessageFromConnectedChannel(client: pyrogram.Client, msg: pyrogram.Message):
+    my_filters.message_anonymous, group=-9,
+)  # TODO implement pyrogram filter as soon as it is available
+def MessageFromAnonymousAdmin(client: pyrogram.Client, msg: pyrogram.types.Message):
     msg.stop_propagation()
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.channel, group=-9)
-def MessageFromChannel(client: pyrogram.Client, msg: pyrogram.Message):
+@pyrogram.Client.on_message(
+    pyrogram.filters.linked_channel, group=-9,
+)
+def MessageFromConnectedChannel(client: pyrogram.Client, msg: pyrogram.types.Message):
+    msg.stop_propagation()
+
+
+@pyrogram.Client.on_message(pyrogram.filters.channel, group=-9)
+def MessageFromChannel(client: pyrogram.Client, msg: pyrogram.types.Message):
     msg.stop_propagation()
 
 
 @pyrogram.Client.on_callback_query(my_filters.callback_channel, group=-9)
-def CallbackQueryFromChannel(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CallbackQueryFromChannel(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     cb_qry.stop_propagation()
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.text | pyrogram.Filters.caption, group=-9,
+    pyrogram.filters.text | pyrogram.filters.caption, group=-9,
 )
-def CheckMessageStartingWithBotUsername(client: pyrogram.Client, msg: pyrogram.Message):
+def CheckMessageStartingWithBotUsername(
+    client: pyrogram.Client, msg: pyrogram.types.Message
+):
     text_to_use = ""
     if msg.text:
         text_to_use = msg.text
@@ -55,14 +62,14 @@ def CheckMessageStartingWithBotUsername(client: pyrogram.Client, msg: pyrogram.M
     msg.continue_propagation()
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.migrate_from_chat_id, group=-9)
-def MigrationFromGroup(client: pyrogram.Client, msg: pyrogram.Message):
+@pyrogram.Client.on_message(pyrogram.filters.migrate_from_chat_id, group=-9)
+def MigrationFromGroup(client: pyrogram.Client, msg: pyrogram.types.Message):
     # managing migration to supergroup so ignore
     msg.stop_propagation()
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.migrate_to_chat_id, group=-9)
-def MigrationToSupergroup(client: pyrogram.Client, msg: pyrogram.Message):
+@pyrogram.Client.on_message(pyrogram.filters.migrate_to_chat_id, group=-9)
+def MigrationToSupergroup(client: pyrogram.Client, msg: pyrogram.types.Message):
     utils.Log(
         client=client,
         chat_id=msg.chat.id,
@@ -87,8 +94,8 @@ def MigrationToSupergroup(client: pyrogram.Client, msg: pyrogram.Message):
     msg.stop_propagation()
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.private, group=-9)
-def CheckPrivateMessage(client: pyrogram.Client, msg: pyrogram.Message):
+@pyrogram.Client.on_message(pyrogram.filters.private, group=-9)
+def CheckPrivateMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
     utils.InstantiatePunishmentDictionary(chat_id=msg.chat.id, id_=msg.message_id)
 
     # if user is blocked don't process
@@ -166,8 +173,8 @@ def CheckPrivateMessage(client: pyrogram.Client, msg: pyrogram.Message):
         msg.stop_propagation()
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.group, group=-9)
-def InitGroupMessage(client: pyrogram.Client, msg: pyrogram.Message):
+@pyrogram.Client.on_message(pyrogram.filters.group, group=-9)
+def InitGroupMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
     utils.InstantiatePunishmentDictionary(chat_id=msg.chat.id, id_=msg.message_id)
     utils.InstantiateKickedPeopleDictionary(chat_id=msg.chat.id)
 
@@ -289,8 +296,8 @@ def InitGroupMessage(client: pyrogram.Client, msg: pyrogram.Message):
     msg.continue_propagation()
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.group & pyrogram.Filters.bot, group=-9)
-def CheckGroupMessageFromBot(client: pyrogram.Client, msg: pyrogram.Message):
+@pyrogram.Client.on_message(pyrogram.filters.group & pyrogram.filters.bot, group=-9)
+def CheckGroupMessageFromBot(client: pyrogram.Client, msg: pyrogram.types.Message):
     # is bot?
     if msg.chat.settings.bot_punishment and msg.from_user.is_bot:
         utils.ChangePunishmentAddReason(
@@ -303,9 +310,11 @@ def CheckGroupMessageFromBot(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group & pyrogram.Filters.forwarded, group=-9,
+    pyrogram.filters.group & pyrogram.filters.forwarded, group=-9,
 )
-def CheckGroupMessageForwardFromChat(client: pyrogram.Client, msg: pyrogram.Message):
+def CheckGroupMessageForwardFromChat(
+    client: pyrogram.Client, msg: pyrogram.types.Message
+):
     # forward from chat
     if msg.chat.settings.forward_punishment and msg.forward_from_chat:
         if not db_management.ChatWhitelistedChats.get_or_none(
@@ -321,9 +330,11 @@ def CheckGroupMessageForwardFromChat(client: pyrogram.Client, msg: pyrogram.Mess
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group, group=-9,
+    pyrogram.filters.group, group=-9,
 )
-def CheckGroupMessageTextCaptionName(client: pyrogram.Client, msg: pyrogram.Message):
+def CheckGroupMessageTextCaptionName(
+    client: pyrogram.Client, msg: pyrogram.types.Message
+):
     # CHECKS THAT REQUIRE TEXT
     text_to_use = ""
     if msg.text:
@@ -429,7 +440,7 @@ def CheckGroupMessageTextCaptionName(client: pyrogram.Client, msg: pyrogram.Mess
                     break
     # links and public usernames
     if msg.chat.settings.link_spam_punishment:
-        entities_to_use: typing.List[pyrogram.MessageEntity] = list()
+        entities_to_use: typing.List[pyrogram.types.MessageEntity] = list()
         if msg.caption_entities:
             entities_to_use = msg.caption_entities
         elif msg.entities:
@@ -662,9 +673,9 @@ def CheckGroupMessageTextCaptionName(client: pyrogram.Client, msg: pyrogram.Mess
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group & pyrogram.Filters.media, group=-9,
+    pyrogram.filters.group & pyrogram.filters.media, group=-9,
 )
-def InitCheckGroupMessageMedia(client: pyrogram.Client, msg: pyrogram.Message):
+def InitCheckGroupMessageMedia(client: pyrogram.Client, msg: pyrogram.types.Message):
     # CHECKS THAT REQUIRE MEDIA
     # anti shitstorm (media)
     if msg.chat.settings.shitstorm_punishment:
@@ -728,9 +739,9 @@ def InitCheckGroupMessageMedia(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group & pyrogram.Filters.animation, group=-9,
+    pyrogram.filters.group & pyrogram.filters.animation, group=-9,
 )
-def CheckGroupAnimation(client: pyrogram.Client, msg: pyrogram.Message):
+def CheckGroupAnimation(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti animation
     if msg.chat.settings.anti_animation or utils.IsInNightMode(
         chat_settings=msg.chat.settings
@@ -752,9 +763,9 @@ def CheckGroupAnimation(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group & pyrogram.Filters.audio, group=-9,
+    pyrogram.filters.group & pyrogram.filters.audio, group=-9,
 )
-def CheckGroupAudio(client: pyrogram.Client, msg: pyrogram.Message):
+def CheckGroupAudio(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti audio
     if msg.chat.settings.anti_audio:
         utils.ChangePunishmentAddReason(
@@ -767,9 +778,9 @@ def CheckGroupAudio(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group & pyrogram.Filters.contact, group=-9,
+    pyrogram.filters.group & pyrogram.filters.contact, group=-9,
 )
-def CheckGroupContact(client: pyrogram.Client, msg: pyrogram.Message):
+def CheckGroupContact(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti contact
     if msg.chat.settings.anti_contact:
         utils.ChangePunishmentAddReason(
@@ -782,9 +793,9 @@ def CheckGroupContact(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group & pyrogram.Filters.document, group=-9,
+    pyrogram.filters.group & pyrogram.filters.document, group=-9,
 )
-def CheckGroupDocument(client: pyrogram.Client, msg: pyrogram.Message):
+def CheckGroupDocument(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti document
     if msg.chat.settings.anti_document:
         utils.ChangePunishmentAddReason(
@@ -797,10 +808,10 @@ def CheckGroupDocument(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group & (pyrogram.Filters.game | pyrogram.Filters.game_high_score),
+    pyrogram.filters.group & (pyrogram.filters.game | pyrogram.filters.game_high_score),
     group=-9,
 )
-def CheckGroupGame(client: pyrogram.Client, msg: pyrogram.Message):
+def CheckGroupGame(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti game
     if msg.chat.settings.anti_game:
         utils.ChangePunishmentAddReason(
@@ -813,9 +824,9 @@ def CheckGroupGame(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group & pyrogram.Filters.location, group=-9,
+    pyrogram.filters.group & pyrogram.filters.location, group=-9,
 )
-def CheckGroupLocation(client: pyrogram.Client, msg: pyrogram.Message):
+def CheckGroupLocation(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti location
     if msg.chat.settings.anti_location:
         utils.ChangePunishmentAddReason(
@@ -828,9 +839,9 @@ def CheckGroupLocation(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group & pyrogram.Filters.photo, group=-9,
+    pyrogram.filters.group & pyrogram.filters.photo, group=-9,
 )
-def CheckGroupPhoto(client: pyrogram.Client, msg: pyrogram.Message):
+def CheckGroupPhoto(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti photo
     if msg.chat.settings.anti_photo or utils.IsInNightMode(
         chat_settings=msg.chat.settings
@@ -850,8 +861,8 @@ def CheckGroupPhoto(client: pyrogram.Client, msg: pyrogram.Message):
     msg.continue_propagation()
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.group & pyrogram.Filters.poll, group=-9)
-def CheckGroupPoll(client: pyrogram.Client, msg: pyrogram.Message):
+@pyrogram.Client.on_message(pyrogram.filters.group & pyrogram.filters.poll, group=-9)
+def CheckGroupPoll(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti poll
     if msg.chat.settings.anti_poll:
         utils.ChangePunishmentAddReason(
@@ -864,9 +875,9 @@ def CheckGroupPoll(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group & pyrogram.Filters.sticker, group=-9,
+    pyrogram.filters.group & pyrogram.filters.sticker, group=-9,
 )
-def CheckGroupSticker(client: pyrogram.Client, msg: pyrogram.Message):
+def CheckGroupSticker(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti sticker
     if msg.chat.settings.anti_sticker or utils.IsInNightMode(
         chat_settings=msg.chat.settings
@@ -887,9 +898,9 @@ def CheckGroupSticker(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group & pyrogram.Filters.venue, group=-9,
+    pyrogram.filters.group & pyrogram.filters.venue, group=-9,
 )
-def CheckGroupVenue(client: pyrogram.Client, msg: pyrogram.Message):
+def CheckGroupVenue(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti location
     if msg.chat.settings.anti_venue:
         utils.ChangePunishmentAddReason(
@@ -902,9 +913,9 @@ def CheckGroupVenue(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group & pyrogram.Filters.video, group=-9,
+    pyrogram.filters.group & pyrogram.filters.video, group=-9,
 )
-def CheckGroupVideo(client: pyrogram.Client, msg: pyrogram.Message):
+def CheckGroupVideo(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti video
     if msg.chat.settings.anti_video or utils.IsInNightMode(
         chat_settings=msg.chat.settings
@@ -925,9 +936,9 @@ def CheckGroupVideo(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group & pyrogram.Filters.video_note, group=-9,
+    pyrogram.filters.group & pyrogram.filters.video_note, group=-9,
 )
-def CheckGroupVideoNote(client: pyrogram.Client, msg: pyrogram.Message):
+def CheckGroupVideoNote(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti video_note
     if msg.chat.settings.anti_video_note:
         utils.ChangePunishmentAddReason(
@@ -940,9 +951,9 @@ def CheckGroupVideoNote(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group & pyrogram.Filters.voice, group=-9,
+    pyrogram.filters.group & pyrogram.filters.voice, group=-9,
 )
-def CheckGroupVoice(client: pyrogram.Client, msg: pyrogram.Message):
+def CheckGroupVoice(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti voice
     if msg.chat.settings.anti_voice:
         utils.ChangePunishmentAddReason(
@@ -955,9 +966,9 @@ def CheckGroupVoice(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group & pyrogram.Filters.new_chat_members, group=-9,
+    pyrogram.filters.group & pyrogram.filters.new_chat_members, group=-9,
 )
-def CheckGroupMessageAdder(client: pyrogram.Client, msg: pyrogram.Message):
+def CheckGroupMessageAdder(client: pyrogram.Client, msg: pyrogram.types.Message):
     # if user didn't add (him/her)self (didn't join via invite link)
     if msg.from_user.id != msg.new_chat_members[0].id:
         # add users/bots
@@ -1004,8 +1015,8 @@ def CheckGroupMessageAdder(client: pyrogram.Client, msg: pyrogram.Message):
     msg.continue_propagation()
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.group, group=-9)
-def CheckGroupMessagePunish(client: pyrogram.Client, msg: pyrogram.Message):
+@pyrogram.Client.on_message(pyrogram.filters.group, group=-9)
+def CheckGroupMessagePunish(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.tmp_dicts["punishments"][msg.chat.id][msg.message_id]["punishment"]:
         # punish user
         if (
@@ -1056,9 +1067,9 @@ def CheckGroupMessagePunish(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group & pyrogram.Filters.new_chat_members, group=-9,
+    pyrogram.filters.group & pyrogram.filters.new_chat_members, group=-9,
 )
-def CheckGroupMessageAdded(client: pyrogram.Client, msg: pyrogram.Message):
+def CheckGroupMessageAdded(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
     if msg.from_user.id != msg.new_chat_members[0].id:
         # user added someone else
@@ -1275,8 +1286,8 @@ def CheckGroupMessageAdded(client: pyrogram.Client, msg: pyrogram.Message):
     msg.continue_propagation()
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.group, group=-8)
-def CheckGroupMessageTime(client: pyrogram.Client, msg: pyrogram.Message):
+@pyrogram.Client.on_message(pyrogram.filters.group, group=-8)
+def CheckGroupMessageTime(client: pyrogram.Client, msg: pyrogram.types.Message):
     # if someone has already been punished don't process
     if msg.message_id in utils.tmp_dicts["punishments"][msg.chat.id]:
         if utils.tmp_dicts["punishments"][msg.chat.id][msg.message_id]["punishment"]:
@@ -1304,7 +1315,9 @@ def CheckGroupMessageTime(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_callback_query(my_filters.callback_private, group=-9)
-def InitPrivateCallbackQuery(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def InitPrivateCallbackQuery(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     utils.InstantiatePunishmentDictionary(chat_id=cb_qry.message.chat.id, id_=cb_qry.id)
 
     # if user is blocked don't process
@@ -1322,7 +1335,9 @@ def InitPrivateCallbackQuery(client: pyrogram.Client, cb_qry: pyrogram.CallbackQ
 
 
 @pyrogram.Client.on_callback_query(my_filters.callback_group, group=-9)
-def InitGroupCallbackQuery(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def InitGroupCallbackQuery(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     utils.InstantiatePunishmentDictionary(chat_id=cb_qry.message.chat.id, id_=cb_qry.id)
     utils.InstantiateKickedPeopleDictionary(chat_id=cb_qry.message.chat.id)
 
@@ -1478,11 +1493,11 @@ def InitGroupCallbackQuery(client: pyrogram.Client, cb_qry: pyrogram.CallbackQue
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(r"^useless(.*)", re.I)
+    pyrogram.filters.regex(r"^useless(.*)", re.I)
     & (my_filters.callback_private | my_filters.callback_group),
     group=-9,
 )
-def CallbackQueryUseless(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CallbackQueryUseless(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     methods.CallbackQueryAnswer(
         cb_qry=cb_qry,
         text=_(cb_qry.from_user.settings.language, "useless_button"),
@@ -1494,7 +1509,9 @@ def CallbackQueryUseless(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
 @pyrogram.Client.on_callback_query(
     my_filters.callback_private | my_filters.callback_group, group=-9
 )
-def CheckFloodCallbackQuery(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CheckFloodCallbackQuery(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     # flood
     # take the current time
     timestamp_ = time.time()
@@ -1616,20 +1633,20 @@ def CheckFloodCallbackQuery(client: pyrogram.Client, cb_qry: pyrogram.CallbackQu
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.pinned_message & pyrogram.Filters.group, group=-1
+    pyrogram.filters.pinned_message & pyrogram.filters.group, group=-1
 )
-def CheckPinnedMessages(client: pyrogram.Client, msg: pyrogram.Message):
+def CheckPinnedMessages(client: pyrogram.Client, msg: pyrogram.types.Message):
     if msg.chat.settings.has_pin_markers:
         methods.ReplyText(client=client, msg=msg, text=f"#pin{abs(msg.chat.id)}")
     msg.continue_propagation()
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.group
-    & (pyrogram.Filters.left_chat_member | pyrogram.Filters.new_chat_members),
+    pyrogram.filters.group
+    & (pyrogram.filters.left_chat_member | pyrogram.filters.new_chat_members),
     group=-1,
 )
-def CheckGroupMessageService(client: pyrogram.Client, msg: pyrogram.Message):
+def CheckGroupMessageService(client: pyrogram.Client, msg: pyrogram.types.Message):
     if not msg.chat.settings.allow_service_messages:
         try:
             msg.delete()

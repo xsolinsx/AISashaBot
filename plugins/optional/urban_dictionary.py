@@ -13,14 +13,14 @@ _ = utils.GetLocalizedString
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(
             commands=["ud", "urban", "urbandictionary"], del_=True
         ),
         prefixes=["/", "!", "#", "."],
     )
 )
-def CmdUrbanDictionary(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdUrbanDictionary(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(

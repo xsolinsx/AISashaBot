@@ -11,13 +11,13 @@ _ = utils.GetLocalizedString
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["echo"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.text
+    & pyrogram.filters.text
 )
-def CmdEcho(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdEcho(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
@@ -36,13 +36,13 @@ def CmdEcho(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["echomarkdown"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.text
+    & pyrogram.filters.text
 )
-def CmdEchoMarkdown(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdEchoMarkdown(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
@@ -60,13 +60,13 @@ def CmdEchoMarkdown(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["echohtml"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.text
+    & pyrogram.filters.text
 )
-def CmdEchoHTML(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdEchoHTML(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
@@ -84,14 +84,14 @@ def CmdEchoHTML(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["edit"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.text
-    & pyrogram.Filters.reply
+    & pyrogram.filters.text
+    & pyrogram.filters.reply
 )
-def CmdEdit(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdEdit(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
@@ -110,14 +110,14 @@ def CmdEdit(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["editmarkdown"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.text
-    & pyrogram.Filters.reply
+    & pyrogram.filters.text
+    & pyrogram.filters.reply
 )
-def CmdEditMarkdown(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdEditMarkdown(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
@@ -135,14 +135,14 @@ def CmdEditMarkdown(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["edithtml"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.text
-    & pyrogram.Filters.reply
+    & pyrogram.filters.text
+    & pyrogram.filters.reply
 )
-def CmdEditHTML(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdEditHTML(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
@@ -160,7 +160,7 @@ def CmdEditHTML(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(
             commands=[
                 "typing",
@@ -181,9 +181,9 @@ def CmdEditHTML(client: pyrogram.Client, msg: pyrogram.Message):
         ),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.text
+    & pyrogram.filters.text
 )
-def CmdChatAction(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdChatAction(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
@@ -209,13 +209,13 @@ def CmdChatAction(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["test"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & pyrogram.Filters.reply
+    & pyrogram.filters.reply
 )
-def CmdTestReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdTestReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
@@ -241,7 +241,7 @@ def CmdTestReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
                     client=client,
                     msg=msg,
                     text=_(msg.chat.settings.language, "select_target"),
-                    reply_markup=pyrogram.InlineKeyboardMarkup(
+                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
                         keyboards.BuildActionOnAddedUsersList(
                             chat_settings=msg.chat.settings,
                             action="test",
@@ -278,13 +278,13 @@ def CmdTestReplyUser(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(
+    pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["test"], del_=True),
         prefixes=["/", "!", "#", "."],
     )
-    & ~pyrogram.Filters.reply
+    & ~pyrogram.filters.reply
 )
-def CmdTestChat(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdTestChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
         r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(

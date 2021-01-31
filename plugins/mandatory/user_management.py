@@ -14,8 +14,8 @@ import utils
 _ = utils.GetLocalizedString
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.group, group=-4)
-def SendTagAlerts(client: pyrogram.Client, msg: pyrogram.Message):
+@pyrogram.Client.on_message(pyrogram.filters.group, group=-4)
+def SendTagAlerts(client: pyrogram.Client, msg: pyrogram.types.Message):
     if msg.chat.settings.has_tag_alerts:
         query: peewee.ModelSelect = None
         if msg.chat.settings.has_tag_alerts == 1:
@@ -91,7 +91,6 @@ def SendTagAlerts(client: pyrogram.Client, msg: pyrogram.Message):
                                         client.send_cached_media(
                                             chat_id=user.user_id,
                                             file_id=media.file_id,
-                                            file_ref=media.file_ref,
                                             caption=_(
                                                 user.language, "tag_message"
                                             ).format(
@@ -108,7 +107,7 @@ def SendTagAlerts(client: pyrogram.Client, msg: pyrogram.Message):
                                                 + "...",
                                                 user.user_id,
                                             ),
-                                            reply_markup=pyrogram.InlineKeyboardMarkup(
+                                            reply_markup=pyrogram.types.InlineKeyboardMarkup(
                                                 keyboards.BuildTagKeyboard(
                                                     chat=msg.chat,
                                                     message_id=msg.message_id,
@@ -133,7 +132,7 @@ def SendTagAlerts(client: pyrogram.Client, msg: pyrogram.Message):
                                             + "...",
                                             user.user_id,
                                         ),
-                                        reply_markup=pyrogram.InlineKeyboardMarkup(
+                                        reply_markup=pyrogram.types.InlineKeyboardMarkup(
                                             keyboards.BuildTagKeyboard(
                                                 chat=msg.chat,
                                                 message_id=msg.message_id,
@@ -145,10 +144,10 @@ def SendTagAlerts(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^\(i\)mysettings", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^\(i\)mysettings", flags=re.I)
     & my_filters.callback_private
 )
-def CbQryMySettingsInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryMySettingsInfo(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     methods.CallbackQueryAnswer(
         cb_qry=cb_qry,
         text=_(cb_qry.from_user.settings.language, cb_qry.data),
@@ -157,11 +156,11 @@ def CbQryMySettingsInfo(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery)
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^mysettings language", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^mysettings language", flags=re.I)
     & my_filters.callback_private
 )
 def CbQryMySettingsLanguageChange(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     i = (
         utils.config["available_languages"].index(cb_qry.from_user.settings.language)
@@ -183,24 +182,24 @@ def CbQryMySettingsLanguageChange(
         cb_qry=cb_qry,
         text=_(cb_qry.from_user.settings.language, "selected_language").format(
             dictionaries.LANGUAGE_EMOJI.get(
-                cb_qry.from_user.settings.language, pyrogram.Emoji.PIRATE_FLAG
+                cb_qry.from_user.settings.language, pyrogram.emoji.PIRATE_FLAG
             )
         ),
         show_alert=False,
     )
     cb_qry.message.edit_reply_markup(
-        reply_markup=pyrogram.InlineKeyboardMarkup(
+        reply_markup=pyrogram.types.InlineKeyboardMarkup(
             keyboards.BuildPrivateSettingsMenu(user_settings=cb_qry.from_user.settings)
         ),
     )
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^mysettings wants_tag_alerts", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^mysettings wants_tag_alerts", flags=re.I)
     & my_filters.callback_private
 )
 def CbQryMySettingsWantsTagAlertsChange(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     cb_qry.from_user.settings.wants_tag_alerts += 1
     if cb_qry.from_user.settings.wants_tag_alerts > 2:
@@ -228,17 +227,19 @@ def CbQryMySettingsWantsTagAlertsChange(
         show_alert=True,
     )
     cb_qry.message.edit_reply_markup(
-        reply_markup=pyrogram.InlineKeyboardMarkup(
+        reply_markup=pyrogram.types.InlineKeyboardMarkup(
             keyboards.BuildPrivateSettingsMenu(user_settings=cb_qry.from_user.settings)
         ),
     )
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^mysettings set_nickname", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^mysettings set_nickname", flags=re.I)
     & my_filters.callback_private
 )
-def CbQryMySettingsSetNickname(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryMySettingsSetNickname(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     utils.tmp_steps[cb_qry.message.chat.id] = (cb_qry, cb_qry.data)
     methods.CallbackQueryAnswer(
         cb_qry=cb_qry,
@@ -250,10 +251,10 @@ def CbQryMySettingsSetNickname(client: pyrogram.Client, cb_qry: pyrogram.Callbac
         text=_(cb_qry.from_user.settings.language, f"nickname_help").format(
             utils.config["max_nicknames"]
         ),
-        reply_markup=pyrogram.InlineKeyboardMarkup(
+        reply_markup=pyrogram.types.InlineKeyboardMarkup(
             [
                 [
-                    pyrogram.InlineKeyboardButton(
+                    pyrogram.types.InlineKeyboardButton(
                         text=_(cb_qry.from_user.settings.language, "cancel"),
                         callback_data=f"cancel mysettings",
                     )
@@ -265,10 +266,12 @@ def CbQryMySettingsSetNickname(client: pyrogram.Client, cb_qry: pyrogram.Callbac
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^mysettings get_nickname", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^mysettings get_nickname", flags=re.I)
     & my_filters.callback_private
 )
-def CbQryMySettingsGetNickname(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryMySettingsGetNickname(
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
+):
     if cb_qry.from_user.settings.nickname:
         methods.ReplyText(
             client=client, msg=cb_qry.message, text=cb_qry.from_user.settings.nickname
@@ -287,11 +290,11 @@ def CbQryMySettingsGetNickname(client: pyrogram.Client, cb_qry: pyrogram.Callbac
 
 
 @pyrogram.Client.on_callback_query(
-    my_filters.callback_regex(pattern=r"^mysettings unset_nickname", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^mysettings unset_nickname", flags=re.I)
     & my_filters.callback_private
 )
 def CbQryMySettingsUnsetNickname(
-    client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery
+    client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 ):
     cb_qry.from_user.settings.nickname = None
     cb_qry.from_user.settings.save()
@@ -302,7 +305,7 @@ def CbQryMySettingsUnsetNickname(
     )
 
     cb_qry.message.edit_reply_markup(
-        reply_markup=pyrogram.InlineKeyboardMarkup(
+        reply_markup=pyrogram.types.InlineKeyboardMarkup(
             keyboards.BuildPrivateSettingsMenu(user_settings=cb_qry.from_user.settings)
         )
     )
@@ -311,7 +314,7 @@ def CbQryMySettingsUnsetNickname(
 @pyrogram.Client.on_callback_query(
     my_filters.callback_command(commands=["mysettings"]) & my_filters.callback_private
 )
-def CbQryMySettings(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
+def CbQryMySettings(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     methods.CallbackQueryAnswer(
         cb_qry=cb_qry,
         text=_(cb_qry.from_user.settings.language, "updating"),
@@ -319,22 +322,22 @@ def CbQryMySettings(client: pyrogram.Client, cb_qry: pyrogram.CallbackQuery):
     )
     cb_qry.message.edit_text(
         text=_(cb_qry.from_user.settings.language, "mysettings"),
-        reply_markup=pyrogram.InlineKeyboardMarkup(
+        reply_markup=pyrogram.types.InlineKeyboardMarkup(
             keyboards.BuildPrivateSettingsMenu(user_settings=cb_qry.from_user.settings)
         ),
     )
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.command(commands=["mysettings"], prefixes=["/", "!", "#", "."],)
-    & pyrogram.Filters.private
+    pyrogram.filters.command(commands=["mysettings"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.private
 )
-def CmdMySettings(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdMySettings(client: pyrogram.Client, msg: pyrogram.types.Message):
     methods.ReplyText(
         client=client,
         msg=msg,
         text=_(msg.from_user.settings.language, "mysettings"),
-        reply_markup=pyrogram.InlineKeyboardMarkup(
+        reply_markup=pyrogram.types.InlineKeyboardMarkup(
             keyboards.BuildPrivateSettingsMenu(user_settings=msg.from_user.settings)
         ),
     )
