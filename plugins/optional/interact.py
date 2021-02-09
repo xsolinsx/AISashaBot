@@ -105,7 +105,7 @@ def CmdEdit(client: pyrogram.Client, msg: pyrogram.types.Message):
         allowed = msg.chat.type == "private"
     if allowed:
         text = utils.RemoveCommand(cmd=msg.command)
-        if text != "" and msg.reply_to_message.from_user.id != client.ME.id:
+        if text != "" and msg.reply_to_message.from_user.id == client.ME.id:
             msg.reply_to_message.edit_text(text=text)
 
 
@@ -131,7 +131,8 @@ def CmdEditMarkdown(client: pyrogram.Client, msg: pyrogram.types.Message):
         allowed = msg.chat.type == "private"
     if allowed:
         text = utils.RemoveCommand(cmd=msg.command)
-        msg.reply_to_message.edit_text(text=text, parse_mode="markdown")
+        if text != "" and msg.reply_to_message.from_user.id == client.ME.id:
+            msg.reply_to_message.edit_text(text=text, parse_mode="markdown")
 
 
 @pyrogram.Client.on_message(
@@ -156,7 +157,8 @@ def CmdEditHTML(client: pyrogram.Client, msg: pyrogram.types.Message):
         allowed = msg.chat.type == "private"
     if allowed:
         text = utils.RemoveCommand(cmd=msg.command)
-        msg.reply_to_message.edit_text(text=text, parse_mode="html")
+        if text != "" and msg.reply_to_message.from_user.id == client.ME.id:
+            msg.reply_to_message.edit_text(text=text, parse_mode="html")
 
 
 @pyrogram.Client.on_message(
