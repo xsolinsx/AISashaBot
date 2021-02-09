@@ -3646,7 +3646,7 @@ def BuildBotPluginsMenu(
                 pyrogram.types.InlineKeyboardButton(
                     text=dictionaries.YES_NO_EMOJI[query[i].is_enabled]
                     if query[i].is_optional
-                    else pyrogram.emoji.HEAVY_CHECK_MARK,
+                    else dictionaries.YES_NO_EMOJI[1],
                     callback_data=f"botplugins is_enabled {query[i].name}",
                 ),
                 pyrogram.types.InlineKeyboardButton(
