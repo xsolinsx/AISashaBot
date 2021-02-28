@@ -21,8 +21,8 @@ _ = utils.GetLocalizedString
 def CmdQrEncode(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="qrify", chat=msg.chat.id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(plugin="qrify", chat=msg.chat.id)
         )
         allowed = (
             r_chat_plugin.min_rank <= msg.r_user_chat.rank
@@ -53,8 +53,8 @@ def CmdQrEncode(client: pyrogram.Client, msg: pyrogram.types.Message):
 def CmdQrDecode(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="qrify", chat=msg.chat.id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(plugin="qrify", chat=msg.chat.id)
         )
         allowed = (
             r_chat_plugin.min_rank <= msg.r_user_chat.rank

@@ -41,7 +41,9 @@ def CmdPing(client: pyrogram.Client, msg: pyrogram.types.Message):
     # adapted from https://git.colinshark.de/PyroBot/PyroBot/src/branch/develop/pyrobot/modules/www.py
     start = datetime.datetime.utcnow()
     tmp: pyrogram.types.Message = methods.ReplyText(
-        client=client, msg=msg, text="pong!",
+        client=client,
+        msg=msg,
+        text="pong!",
     )
     end = datetime.datetime.utcnow()
     tmp.edit(f"pong!\n{utils.TimeFormatter((end - start).microseconds / 1000)}")
@@ -113,7 +115,10 @@ def CmdGetIP(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 @pyrogram.Client.on_message(
     pyrogram.filters.user(utils.config["masters"])
-    & pyrogram.filters.command(commands=["broadcast"], prefixes=["/", "!", "#", "."],)
+    & pyrogram.filters.command(
+        commands=["broadcast"],
+        prefixes=["/", "!", "#", "."],
+    )
 )
 def CmdBroadcast(client: pyrogram.Client, msg: pyrogram.types.Message):
     text_to_broadcast = msg.text[len(msg.command[0]) + 2 :]
@@ -653,7 +658,9 @@ def CbQryGbannedInfo(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
         else:
             text = int(cb_qry.data.replace("(i)gbanned ", ""))
     methods.CallbackQueryAnswer(
-        cb_qry=cb_qry, text=text, show_alert=True,
+        cb_qry=cb_qry,
+        text=text,
+        show_alert=True,
     )
 
 
@@ -697,7 +704,8 @@ def CbQryGbannedPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQu
             cb_qry.message.edit_reply_markup(
                 reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildGloballyBannedUsersList(
-                        chat_settings=cb_qry.from_user.settings, page=-1,
+                        chat_settings=cb_qry.from_user.settings,
+                        page=-1,
                     )
                 )
             )
@@ -727,7 +735,7 @@ def CbQryGbannedAdd(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
                     [
                         pyrogram.types.InlineKeyboardButton(
                             text=_(cb_qry.from_user.settings.language, "cancel"),
-                            callback_data=f"cancel gbanned",
+                            callback_data="cancel gbanned",
                         )
                     ]
                 ]
@@ -835,7 +843,9 @@ def CbQryBlockedInfo(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
         else:
             text = int(cb_qry.data.replace("(i)blocked ", ""))
     methods.CallbackQueryAnswer(
-        cb_qry=cb_qry, text=text, show_alert=True,
+        cb_qry=cb_qry,
+        text=text,
+        show_alert=True,
     )
 
 
@@ -879,7 +889,8 @@ def CbQryBlockedPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQu
             cb_qry.message.edit_reply_markup(
                 reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildBlockedUsersList(
-                        chat_settings=cb_qry.from_user.settings, page=-1,
+                        chat_settings=cb_qry.from_user.settings,
+                        page=-1,
                     )
                 )
             )
@@ -909,7 +920,7 @@ def CbQryBlockedAdd(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
                     [
                         pyrogram.types.InlineKeyboardButton(
                             text=_(cb_qry.from_user.settings.language, "cancel"),
-                            callback_data=f"cancel blocked",
+                            callback_data="cancel blocked",
                         )
                     ]
                 ]

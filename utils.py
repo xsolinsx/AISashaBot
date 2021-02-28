@@ -636,7 +636,11 @@ def TimeFormatter(milliseconds: int) -> str:
 
 
 def DFromUToTelegramProgress(
-    current: int, total: int, msg: pyrogram.types.Message, text: str, start: float,
+    current: int,
+    total: int,
+    msg: pyrogram.types.Message,
+    text: str,
+    start: float,
 ) -> None:
     """
     Use this method to update the progress of a download from/an upload to Telegram, this method is called every 512KB.
@@ -774,10 +778,10 @@ def ResolveCommandToId(
                 # t.me/username or @username or username
                 value = CleanUsername(username=tmp)
                 value = f"@{value}" if not value.startswith("@") else value
-                query: peewee.ModelSelect = db_management.ResolvedObjects.select().where(
-                    db_management.ResolvedObjects.username == value[1:].lower()
-                ).order_by(
-                    db_management.ResolvedObjects.timestamp.desc()
+                query: peewee.ModelSelect = (
+                    db_management.ResolvedObjects.select()
+                    .where(db_management.ResolvedObjects.username == value[1:].lower())
+                    .order_by(db_management.ResolvedObjects.timestamp.desc())
                 )
                 try:
                     resolved_obj = query.get()
@@ -840,7 +844,8 @@ def AdjustMarkers(
             else:
                 # invited users
                 value = value.replace(
-                    "$user_id", ", ".join([str(x.id) for x in new_chat_members]),
+                    "$user_id",
+                    ", ".join([str(x.id) for x in new_chat_members]),
                 )
                 value = value.replace(
                     "$first_name",
@@ -978,11 +983,15 @@ def AdjustChatMarkers(value: str, chat: pyrogram.types.Chat) -> str:
 
 
 def IsTelegramAdministrator(
-    user_id: int, chat_id: int = 0, r_user_chat: db_management.RUserChat = None,
+    user_id: int,
+    chat_id: int = 0,
+    r_user_chat: db_management.RUserChat = None,
 ) -> bool:
     if chat_id < 0:
-        relationship: db_management.RUserChat = r_user_chat if r_user_chat else db_management.RUserChat.get_or_none(
-            user_id=user_id, chat_id=chat_id
+        relationship: db_management.RUserChat = (
+            r_user_chat
+            if r_user_chat
+            else db_management.RUserChat.get_or_none(user_id=user_id, chat_id=chat_id)
         )
         if relationship and relationship.is_admin:
             # includes telegram admins
@@ -1005,14 +1014,20 @@ def IsMasterOrBot(user_id: int) -> bool:
 
 
 def IsOwnerOrHigher(
-    user_id: int, chat_id: int = 0, r_user_chat: db_management.RUserChat = None,
+    user_id: int,
+    chat_id: int = 0,
+    r_user_chat: db_management.RUserChat = None,
 ) -> bool:
     if IsMasterOrBot(user_id=user_id):
         return True
     else:
         if chat_id < 0:
-            relationship: db_management.RUserChat = r_user_chat if r_user_chat else db_management.RUserChat.get_or_none(
-                user_id=user_id, chat_id=chat_id
+            relationship: db_management.RUserChat = (
+                r_user_chat
+                if r_user_chat
+                else db_management.RUserChat.get_or_none(
+                    user_id=user_id, chat_id=chat_id
+                )
             )
             if relationship and relationship.rank > 3:
                 # includes owner
@@ -1028,14 +1043,20 @@ def IsOwnerOrHigher(
 
 
 def IsSeniorModOrHigher(
-    user_id: int, chat_id: int = 0, r_user_chat: db_management.RUserChat = None,
+    user_id: int,
+    chat_id: int = 0,
+    r_user_chat: db_management.RUserChat = None,
 ) -> bool:
     if IsMasterOrBot(user_id=user_id):
         return True
     else:
         if chat_id < 0:
-            relationship: db_management.RUserChat = r_user_chat if r_user_chat else db_management.RUserChat.get_or_none(
-                user_id=user_id, chat_id=chat_id
+            relationship: db_management.RUserChat = (
+                r_user_chat
+                if r_user_chat
+                else db_management.RUserChat.get_or_none(
+                    user_id=user_id, chat_id=chat_id
+                )
             )
             if relationship and relationship.rank > 2:
                 # includes senior mods and owner
@@ -1051,14 +1072,20 @@ def IsSeniorModOrHigher(
 
 
 def IsJuniorModOrHigher(
-    user_id: int, chat_id: int = 0, r_user_chat: db_management.RUserChat = None,
+    user_id: int,
+    chat_id: int = 0,
+    r_user_chat: db_management.RUserChat = None,
 ) -> bool:
     if IsMasterOrBot(user_id=user_id):
         return True
     else:
         if chat_id < 0:
-            relationship: db_management.RUserChat = r_user_chat if r_user_chat else db_management.RUserChat.get_or_none(
-                user_id=user_id, chat_id=chat_id
+            relationship: db_management.RUserChat = (
+                r_user_chat
+                if r_user_chat
+                else db_management.RUserChat.get_or_none(
+                    user_id=user_id, chat_id=chat_id
+                )
             )
             if relationship and relationship.rank > 1:
                 # includes junior mods, senior mods and owner
@@ -1074,14 +1101,20 @@ def IsJuniorModOrHigher(
 
 
 def IsPrivilegedOrHigher(
-    user_id: int, chat_id: int = 0, r_user_chat: db_management.RUserChat = None,
+    user_id: int,
+    chat_id: int = 0,
+    r_user_chat: db_management.RUserChat = None,
 ) -> bool:
     if IsMasterOrBot(user_id=user_id):
         return True
     else:
         if chat_id < 0:
-            relationship: db_management.RUserChat = r_user_chat if r_user_chat else db_management.RUserChat.get_or_none(
-                user_id=user_id, chat_id=chat_id
+            relationship: db_management.RUserChat = (
+                r_user_chat
+                if r_user_chat
+                else db_management.RUserChat.get_or_none(
+                    user_id=user_id, chat_id=chat_id
+                )
             )
             if relationship and relationship.rank > 0:
                 # includes privileged, junior mods, senior mods and owner
@@ -1097,18 +1130,26 @@ def IsPrivilegedOrHigher(
 
 
 def GetRank(
-    user_id: int, chat_id: int = 0, r_user_chat: db_management.RUserChat = None,
+    user_id: int,
+    chat_id: int = 0,
+    r_user_chat: db_management.RUserChat = None,
 ) -> int:
     # TODO IMPLEMENT NETWORK CHECKS
     if IsPrivilegedOrHigher(user_id=user_id, chat_id=chat_id, r_user_chat=r_user_chat):
         if IsJuniorModOrHigher(
-            user_id=user_id, chat_id=chat_id, r_user_chat=r_user_chat,
+            user_id=user_id,
+            chat_id=chat_id,
+            r_user_chat=r_user_chat,
         ):
             if IsSeniorModOrHigher(
-                user_id=user_id, chat_id=chat_id, r_user_chat=r_user_chat,
+                user_id=user_id,
+                chat_id=chat_id,
+                r_user_chat=r_user_chat,
             ):
                 if IsOwnerOrHigher(
-                    user_id=user_id, chat_id=chat_id, r_user_chat=r_user_chat,
+                    user_id=user_id,
+                    chat_id=chat_id,
+                    r_user_chat=r_user_chat,
                 ):
                     if IsMasterOrBot(user_id=user_id):
                         return dictionaries.RANK_STRING["master"]
@@ -1133,7 +1174,9 @@ def CompareRanks(
     min_rank: int = 0,
 ) -> bool:
     executer_rank = GetRank(
-        user_id=executer, chat_id=chat_id, r_user_chat=r_executer_chat,
+        user_id=executer,
+        chat_id=chat_id,
+        r_user_chat=r_executer_chat,
     )
     target_rank = GetRank(user_id=target, chat_id=chat_id, r_user_chat=r_target_chat)
     if executer_rank > target_rank and executer_rank >= min_rank:
@@ -1188,7 +1231,10 @@ def Log(
         db_management.ChatSettings.get_or_none(chat_id=chat_id)
     )
     db_management.Logs.create(
-        chat_id=chat_id, executer=executer, action=action, target=target,
+        chat_id=chat_id,
+        executer=executer,
+        action=action,
+        target=target,
     )
     if chat_settings and chat_settings.log_channel:
         chat_str = PrintChat(chat_settings.chat)

@@ -15,13 +15,15 @@ _ = utils.GetLocalizedString
 def FlameUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="flame", chat=msg.chat.id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(plugin="flame", chat=msg.chat.id)
         )
         allowed = r_chat_plugin.is_enabled_on_chat
     if allowed:
-        r_flameduser_chat: db_management.RFlamedUserChat = db_management.RFlamedUserChat.get_or_none(
-            chat_id=msg.chat.id, flamed_user_id=msg.from_user.id
+        r_flameduser_chat: db_management.RFlamedUserChat = (
+            db_management.RFlamedUserChat.get_or_none(
+                chat_id=msg.chat.id, flamed_user_id=msg.from_user.id
+            )
         )
         if r_flameduser_chat:
             # atomic update
@@ -71,8 +73,8 @@ def FlameUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 def CmdFlameReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="flame", chat=msg.chat.id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(plugin="flame", chat=msg.chat.id)
         )
         allowed = (
             r_chat_plugin.min_rank <= msg.r_user_chat.rank
@@ -162,8 +164,8 @@ def CmdFlameReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 def CmdFlameUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="flame", chat=msg.chat.id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(plugin="flame", chat=msg.chat.id)
         )
         allowed = (
             r_chat_plugin.min_rank <= msg.r_user_chat.rank
@@ -174,8 +176,10 @@ def CmdFlameUser(client: pyrogram.Client, msg: pyrogram.types.Message):
         if isinstance(user_id, str):
             methods.ReplyText(client=client, msg=msg, text=user_id)
         else:
-            r_target_chat: db_management.RUserChat = db_management.RUserChat.get_or_none(
-                user_id=user_id, chat_id=msg.chat.id
+            r_target_chat: db_management.RUserChat = (
+                db_management.RUserChat.get_or_none(
+                    user_id=user_id, chat_id=msg.chat.id
+                )
             )
             if not r_target_chat:
                 r_target_chat = db_management.RUserChat.create(
@@ -191,7 +195,8 @@ def CmdFlameUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                     min_rank=dictionaries.RANK_STRING["junior_mod"],
                 ):
                     if not db_management.RFlamedUserChat.get_or_none(
-                        chat_id=msg.chat.id, flamed_user_id=user_id,
+                        chat_id=msg.chat.id,
+                        flamed_user_id=user_id,
                     ):
                         flame_strings: list = utils.GetLocalizedDictionary(
                             msg.chat.settings.language
@@ -259,7 +264,10 @@ def CmdFlameUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["flame"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["flame"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdFlameChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -271,8 +279,8 @@ def CmdFlameChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
         if isinstance(user_id, str):
             methods.ReplyText(client=client, msg=msg, text=user_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             r_executer_chat = db_management.RUserChat.get_or_none(
@@ -284,16 +292,18 @@ def CmdFlameChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                 )
             allowed = False
             if chat_id < 0:
-                r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-                    plugin="flame", chat=chat_id
+                r_chat_plugin: db_management.RChatPlugin = (
+                    db_management.RChatPlugin.get_or_none(plugin="flame", chat=chat_id)
                 )
                 allowed = (
                     r_chat_plugin.min_rank <= r_executer_chat.rank
                     and r_chat_plugin.is_enabled_on_chat
                 )
             if allowed:
-                r_target_chat: db_management.RUserChat = db_management.RUserChat.get_or_none(
-                    user_id=user_id, chat_id=chat_id
+                r_target_chat: db_management.RUserChat = (
+                    db_management.RUserChat.get_or_none(
+                        user_id=user_id, chat_id=chat_id
+                    )
                 )
                 if not r_target_chat:
                     r_target_chat = db_management.RUserChat.create(
@@ -309,7 +319,8 @@ def CmdFlameChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                         min_rank=dictionaries.RANK_STRING["junior_mod"],
                     ):
                         if not db_management.RFlamedUserChat.get_or_none(
-                            chat_id=chat_id, flamed_user_id=user_id,
+                            chat_id=chat_id,
+                            flamed_user_id=user_id,
                         ):
                             flame_strings: list = utils.GetLocalizedDictionary(
                                 msg.chat.settings.language
@@ -393,8 +404,8 @@ def CmdFlameChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 def CmdStopFlameReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="flame", chat=msg.chat.id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(plugin="flame", chat=msg.chat.id)
         )
         allowed = (
             r_chat_plugin.min_rank <= msg.r_user_chat.rank
@@ -410,9 +421,11 @@ def CmdStopFlameReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                 r_target_chat=msg.reply_to_message.r_user_chat,
                 min_rank=dictionaries.RANK_STRING["junior_mod"],
             ):
-                r_flameduser_chat: db_management.RFlamedUserChat = db_management.RFlamedUserChat.get_or_none(
-                    chat_id=msg.chat.id,
-                    flamed_user_id=msg.reply_to_message.from_user.id,
+                r_flameduser_chat: db_management.RFlamedUserChat = (
+                    db_management.RFlamedUserChat.get_or_none(
+                        chat_id=msg.chat.id,
+                        flamed_user_id=msg.reply_to_message.from_user.id,
+                    )
                 )
                 if r_flameduser_chat:
                     r_flameduser_chat.delete_instance()
@@ -442,8 +455,8 @@ def CmdStopFlameReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 def CmdStopFlameUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="flame", chat=msg.chat.id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(plugin="flame", chat=msg.chat.id)
         )
         allowed = (
             r_chat_plugin.min_rank <= msg.r_user_chat.rank
@@ -454,8 +467,10 @@ def CmdStopFlameUser(client: pyrogram.Client, msg: pyrogram.types.Message):
         if isinstance(user_id, str):
             methods.ReplyText(client=client, msg=msg, text=user_id)
         else:
-            r_target_chat: db_management.RUserChat = db_management.RUserChat.get_or_none(
-                user_id=user_id, chat_id=msg.chat.id
+            r_target_chat: db_management.RUserChat = (
+                db_management.RUserChat.get_or_none(
+                    user_id=user_id, chat_id=msg.chat.id
+                )
             )
             if not r_target_chat:
                 r_target_chat = db_management.RUserChat.create(
@@ -470,8 +485,11 @@ def CmdStopFlameUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                     r_target_chat=r_target_chat,
                     min_rank=dictionaries.RANK_STRING["junior_mod"],
                 ):
-                    r_flameduser_chat: db_management.RFlamedUserChat = db_management.RFlamedUserChat.get_or_none(
-                        chat_id=msg.chat.id, flamed_user_id=user_id,
+                    r_flameduser_chat: db_management.RFlamedUserChat = (
+                        db_management.RFlamedUserChat.get_or_none(
+                            chat_id=msg.chat.id,
+                            flamed_user_id=user_id,
+                        )
                     )
                     if r_flameduser_chat:
                         r_flameduser_chat.delete_instance()
@@ -491,7 +509,10 @@ def CmdStopFlameUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["stopflame"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["stopflame"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdStopFlameChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -503,8 +524,8 @@ def CmdStopFlameChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
         if isinstance(user_id, str):
             methods.ReplyText(client=client, msg=msg, text=user_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             r_executer_chat = db_management.RUserChat.get_or_none(
@@ -516,16 +537,18 @@ def CmdStopFlameChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                 )
             allowed = False
             if chat_id < 0:
-                r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-                    plugin="flame", chat=chat_id
+                r_chat_plugin: db_management.RChatPlugin = (
+                    db_management.RChatPlugin.get_or_none(plugin="flame", chat=chat_id)
                 )
                 allowed = (
                     r_chat_plugin.min_rank <= r_executer_chat.rank
                     and r_chat_plugin.is_enabled_on_chat
                 )
             if allowed:
-                r_target_chat: db_management.RUserChat = db_management.RUserChat.get_or_none(
-                    user_id=user_id, chat_id=chat_id
+                r_target_chat: db_management.RUserChat = (
+                    db_management.RUserChat.get_or_none(
+                        user_id=user_id, chat_id=chat_id
+                    )
                 )
                 if not r_target_chat:
                     r_target_chat = db_management.RUserChat.create(
@@ -540,8 +563,11 @@ def CmdStopFlameChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                         r_target_chat=r_target_chat,
                         min_rank=dictionaries.RANK_STRING["junior_mod"],
                     ):
-                        r_flameduser_chat: db_management.RFlamedUserChat = db_management.RFlamedUserChat.get_or_none(
-                            chat_id=chat_id, flamed_user_id=user_id,
+                        r_flameduser_chat: db_management.RFlamedUserChat = (
+                            db_management.RFlamedUserChat.get_or_none(
+                                chat_id=chat_id,
+                                flamed_user_id=user_id,
+                            )
                         )
                         if r_flameduser_chat:
                             r_flameduser_chat.delete_instance()

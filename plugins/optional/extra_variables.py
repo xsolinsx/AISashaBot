@@ -52,12 +52,16 @@ def SendExtra(client: pyrogram.Client, msg: pyrogram.types.Message):
                             caption = utils.AdjustMarkers(value=caption, msg=msg)
                         try:
                             msg.reply_cached_media(
-                                file_id=media_id, caption=caption, parse_mode="html",
+                                file_id=media_id,
+                                caption=caption,
+                                parse_mode="html",
                             )
                         except pyrogram.errors.FilerefUpgradeNeeded:
-                            original_media_message: pyrogram.types.Message = client.get_messages(
-                                chat_id=element.original_chat_id,
-                                message_id=element.original_message_id,
+                            original_media_message: pyrogram.types.Message = (
+                                client.get_messages(
+                                    chat_id=element.original_chat_id,
+                                    message_id=element.original_message_id,
+                                )
                             )
                             type_, media = utils.ExtractMedia(
                                 msg=original_media_message
@@ -101,10 +105,14 @@ def CbQryExtrasInfo(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
     chat_id = int(parameters[1])
     text = ""
 
-    query: peewee.ModelSelect = db_management.ChatExtras.select().where(
-        (db_management.ChatExtras.chat == chat_id)
-        & (~db_management.ChatExtras.is_group_data)
-    ).order_by(peewee.fn.LOWER(db_management.ChatExtras.key))
+    query: peewee.ModelSelect = (
+        db_management.ChatExtras.select()
+        .where(
+            (db_management.ChatExtras.chat == chat_id)
+            & (~db_management.ChatExtras.is_group_data)
+        )
+        .order_by(peewee.fn.LOWER(db_management.ChatExtras.key))
+    )
     if utils.IsInt(cb_qry.data.replace("(i)extras ", "")) and int(
         cb_qry.data.replace("(i)extras ", "")
     ) < len(query):
@@ -115,7 +123,9 @@ def CbQryExtrasInfo(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
         text = _(cb_qry.from_user.settings.language, "error_try_again")
 
     methods.CallbackQueryAnswer(
-        cb_qry=cb_qry, text=text, show_alert=True,
+        cb_qry=cb_qry,
+        text=text,
+        show_alert=True,
     )
 
 
@@ -128,8 +138,10 @@ def CbQryExtrasReplace(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQ
     )
     chat_id = int(parameters[1])
     if chat_id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="extra_variables", chat=chat_id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(
+                plugin="extra_variables", chat=chat_id
+            )
         )
     if (
         r_chat_plugin.min_rank
@@ -198,8 +210,10 @@ def CbQryExtrasGet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
     )
     chat_id = int(parameters[1])
     if chat_id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="extra_variables", chat=chat_id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(
+                plugin="extra_variables", chat=chat_id
+            )
         )
     if (
         r_chat_plugin.min_rank
@@ -231,17 +245,23 @@ def CbQryExtrasGet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 
                     try:
                         cb_qry.message.reply_cached_media(
-                            file_id=media_id, caption=caption, parse_mode="html",
+                            file_id=media_id,
+                            caption=caption,
+                            parse_mode="html",
                         )
                     except pyrogram.errors.FilerefUpgradeNeeded:
-                        original_media_message: pyrogram.types.Message = client.get_messages(
-                            chat_id=element.original_chat_id,
-                            message_id=element.original_message_id,
+                        original_media_message: pyrogram.types.Message = (
+                            client.get_messages(
+                                chat_id=element.original_chat_id,
+                                message_id=element.original_message_id,
+                            )
                         )
                         type_, media = utils.ExtractMedia(msg=original_media_message)
                         if media:
                             cb_qry.message.reply_cached_media(
-                                file_id=media_id, caption=caption, parse_mode="html",
+                                file_id=media_id,
+                                caption=caption,
+                                parse_mode="html",
                             )
                         else:
                             element.delete_instance()
@@ -284,8 +304,10 @@ def CbQryExtrasPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
     )
     chat_id = int(parameters[1])
     if chat_id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="extra_variables", chat=chat_id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(
+                plugin="extra_variables", chat=chat_id
+            )
         )
     if (
         r_chat_plugin.min_rank
@@ -346,8 +368,10 @@ def CbQryExtrasSet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
     )
     chat_id = int(parameters[1])
     if chat_id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="extra_variables", chat=chat_id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(
+                plugin="extra_variables", chat=chat_id
+            )
         )
     if (
         r_chat_plugin.min_rank
@@ -410,8 +434,10 @@ def CbQryExtrasUnset(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
     )
     chat_id = int(parameters[1])
     if chat_id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="extra_variables", chat=chat_id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(
+                plugin="extra_variables", chat=chat_id
+            )
         )
     if (
         r_chat_plugin.min_rank
@@ -472,8 +498,10 @@ def CbQryExtrasUnset(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
 def CmdExtras(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="extra_variables", chat=msg.chat.id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(
+                plugin="extra_variables", chat=msg.chat.id
+            )
         )
         allowed = (
             r_chat_plugin.min_rank <= msg.r_user_chat.rank
@@ -519,7 +547,10 @@ def CmdExtras(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["extras"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["extras"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdExtrasChat(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -527,12 +558,14 @@ def CmdExtrasChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
-            r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-                plugin="extra_variables", chat=chat_id
+            r_chat_plugin: db_management.RChatPlugin = (
+                db_management.RChatPlugin.get_or_none(
+                    plugin="extra_variables", chat=chat_id
+                )
             )
             if (
                 r_chat_plugin.min_rank <= msg.r_user_chat.rank

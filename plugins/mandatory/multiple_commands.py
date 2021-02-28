@@ -12,7 +12,10 @@ _ = utils.GetLocalizedString
 
 
 def MultipleFunctionExecution(
-    msg: pyrogram.types.Message, value: str, func: callable, func_kwargs: dict,
+    msg: pyrogram.types.Message,
+    value: str,
+    func: callable,
+    func_kwargs: dict,
 ):
     user_id = utils.ResolveCommandToId(
         client=func_kwargs["client"], value=value, msg=msg
@@ -85,8 +88,8 @@ def CmdMultipleInviteChatUser(client: pyrogram.Client, msg: pyrogram.types.Messa
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             r_executer_chat = db_management.RUserChat.get_or_none(
@@ -194,8 +197,8 @@ def CmdMultipleWarnChatUser(client: pyrogram.Client, msg: pyrogram.types.Message
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             r_executer_chat = db_management.RUserChat.get_or_none(
@@ -303,8 +306,8 @@ def CmdMultipleUnwarnChatUser(client: pyrogram.Client, msg: pyrogram.types.Messa
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             r_executer_chat = db_management.RUserChat.get_or_none(
@@ -412,8 +415,8 @@ def CmdMultipleUnwarnAllChatUser(client: pyrogram.Client, msg: pyrogram.types.Me
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             r_executer_chat = db_management.RUserChat.get_or_none(
@@ -521,8 +524,8 @@ def CmdMultipleKickChatUser(client: pyrogram.Client, msg: pyrogram.types.Message
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             r_executer_chat = db_management.RUserChat.get_or_none(
@@ -638,8 +641,8 @@ def CmdMultipleTempRestrictChatUser(
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             r_executer_chat = db_management.RUserChat.get_or_none(
@@ -749,8 +752,8 @@ def CmdMultipleRestrictChatUser(client: pyrogram.Client, msg: pyrogram.types.Mes
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             r_executer_chat = db_management.RUserChat.get_or_none(
@@ -858,8 +861,8 @@ def CmdMultipleUnrestrictChatUser(client: pyrogram.Client, msg: pyrogram.types.M
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             r_executer_chat = db_management.RUserChat.get_or_none(
@@ -969,8 +972,8 @@ def CmdMultipleTempBanChatUser(client: pyrogram.Client, msg: pyrogram.types.Mess
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             r_executer_chat = db_management.RUserChat.get_or_none(
@@ -1080,8 +1083,8 @@ def CmdMultipleBanChatUser(client: pyrogram.Client, msg: pyrogram.types.Message)
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             r_executer_chat = db_management.RUserChat.get_or_none(
@@ -1189,8 +1192,8 @@ def CmdMultipleUnbanChatUser(client: pyrogram.Client, msg: pyrogram.types.Messag
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             r_executer_chat = db_management.RUserChat.get_or_none(

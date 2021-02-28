@@ -20,8 +20,8 @@ _ = utils.GetLocalizedString
 def CmdEcho(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="interact", chat=msg.chat.id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(plugin="interact", chat=msg.chat.id)
         )
         allowed = (
             r_chat_plugin.min_rank <= msg.r_user_chat.rank
@@ -45,8 +45,8 @@ def CmdEcho(client: pyrogram.Client, msg: pyrogram.types.Message):
 def CmdEchoMarkdown(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="interact", chat=msg.chat.id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(plugin="interact", chat=msg.chat.id)
         )
         allowed = (
             r_chat_plugin.min_rank <= msg.r_user_chat.rank
@@ -69,8 +69,8 @@ def CmdEchoMarkdown(client: pyrogram.Client, msg: pyrogram.types.Message):
 def CmdEchoHTML(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="interact", chat=msg.chat.id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(plugin="interact", chat=msg.chat.id)
         )
         allowed = (
             r_chat_plugin.min_rank <= msg.r_user_chat.rank
@@ -94,8 +94,8 @@ def CmdEchoHTML(client: pyrogram.Client, msg: pyrogram.types.Message):
 def CmdEdit(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="interact", chat=msg.chat.id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(plugin="interact", chat=msg.chat.id)
         )
         allowed = (
             r_chat_plugin.min_rank <= msg.r_user_chat.rank
@@ -120,8 +120,8 @@ def CmdEdit(client: pyrogram.Client, msg: pyrogram.types.Message):
 def CmdEditMarkdown(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="interact", chat=msg.chat.id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(plugin="interact", chat=msg.chat.id)
         )
         allowed = (
             r_chat_plugin.min_rank <= msg.r_user_chat.rank
@@ -146,8 +146,8 @@ def CmdEditMarkdown(client: pyrogram.Client, msg: pyrogram.types.Message):
 def CmdEditHTML(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="interact", chat=msg.chat.id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(plugin="interact", chat=msg.chat.id)
         )
         allowed = (
             r_chat_plugin.min_rank <= msg.r_user_chat.rank
@@ -188,8 +188,8 @@ def CmdEditHTML(client: pyrogram.Client, msg: pyrogram.types.Message):
 def CmdChatAction(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="interact", chat=msg.chat.id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(plugin="interact", chat=msg.chat.id)
         )
         allowed = (
             r_chat_plugin.min_rank <= msg.r_user_chat.rank
@@ -220,8 +220,8 @@ def CmdChatAction(client: pyrogram.Client, msg: pyrogram.types.Message):
 def CmdTestReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="interact", chat=msg.chat.id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(plugin="interact", chat=msg.chat.id)
         )
         allowed = (
             r_chat_plugin.min_rank <= msg.r_user_chat.rank
@@ -289,8 +289,8 @@ def CmdTestReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 def CmdTestChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            plugin="interact", chat=msg.chat.id
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(plugin="interact", chat=msg.chat.id)
         )
         allowed = (
             r_chat_plugin.min_rank <= msg.r_user_chat.rank

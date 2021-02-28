@@ -18,14 +18,16 @@ _ = utils.GetLocalizedString
 
 
 @pyrogram.Client.on_message(
-    my_filters.message_anonymous, group=-9,
+    my_filters.message_anonymous,
+    group=-9,
 )  # TODO implement pyrogram filter as soon as it is available
 def MessageFromAnonymousAdmin(client: pyrogram.Client, msg: pyrogram.types.Message):
     msg.stop_propagation()
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.linked_channel, group=-9,
+    pyrogram.filters.linked_channel,
+    group=-9,
 )
 def MessageFromConnectedChannel(client: pyrogram.Client, msg: pyrogram.types.Message):
     msg.stop_propagation()
@@ -44,7 +46,8 @@ def CallbackQueryFromChannel(
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.text | pyrogram.filters.caption, group=-9,
+    pyrogram.filters.text | pyrogram.filters.caption,
+    group=-9,
 )
 def CheckMessageStartingWithBotUsername(
     client: pyrogram.Client, msg: pyrogram.types.Message
@@ -212,8 +215,10 @@ def InitGroupMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
         return
 
     # pre action
-    pre_action: db_management.ChatPreActionList = db_management.ChatPreActionList.get_or_none(
-        chat_id=msg.chat.id, user_id=msg.from_user.id
+    pre_action: db_management.ChatPreActionList = (
+        db_management.ChatPreActionList.get_or_none(
+            chat_id=msg.chat.id, user_id=msg.from_user.id
+        )
     )
     if pre_action:
         punishment = 0
@@ -310,7 +315,8 @@ def CheckGroupMessageFromBot(client: pyrogram.Client, msg: pyrogram.types.Messag
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.group & pyrogram.filters.forwarded, group=-9,
+    pyrogram.filters.group & pyrogram.filters.forwarded,
+    group=-9,
 )
 def CheckGroupMessageForwardFromChat(
     client: pyrogram.Client, msg: pyrogram.types.Message
@@ -330,7 +336,8 @@ def CheckGroupMessageForwardFromChat(
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.group, group=-9,
+    pyrogram.filters.group,
+    group=-9,
 )
 def CheckGroupMessageTextCaptionName(
     client: pyrogram.Client, msg: pyrogram.types.Message
@@ -492,10 +499,10 @@ def CheckGroupMessageTextCaptionName(
                         reason="link_spam",
                     )
             elif utils.USERNAME_REGEX.findall(string=tmp):
-                query: peewee.ModelSelect = db_management.ResolvedObjects.select().where(
-                    db_management.ResolvedObjects.username == tmp[1:].lower()
-                ).order_by(
-                    db_management.ResolvedObjects.timestamp.desc()
+                query: peewee.ModelSelect = (
+                    db_management.ResolvedObjects.select()
+                    .where(db_management.ResolvedObjects.username == tmp[1:].lower())
+                    .order_by(db_management.ResolvedObjects.timestamp.desc())
                 )
                 resolved_obj = None
                 try:
@@ -577,11 +584,15 @@ def CheckGroupMessageTextCaptionName(
                                     reason="link_spam",
                                 )
                         elif utils.USERNAME_REGEX.findall(string=tmp):
-                            query: peewee.ModelSelect = db_management.ResolvedObjects.select().where(
-                                db_management.ResolvedObjects.username
-                                == tmp[1:].lower()
-                            ).order_by(
-                                db_management.ResolvedObjects.timestamp.desc()
+                            query: peewee.ModelSelect = (
+                                db_management.ResolvedObjects.select()
+                                .where(
+                                    db_management.ResolvedObjects.username
+                                    == tmp[1:].lower()
+                                )
+                                .order_by(
+                                    db_management.ResolvedObjects.timestamp.desc()
+                                )
                             )
                             try:
                                 resolved_obj = query.get()
@@ -673,7 +684,8 @@ def CheckGroupMessageTextCaptionName(
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.group & pyrogram.filters.media, group=-9,
+    pyrogram.filters.group & pyrogram.filters.media,
+    group=-9,
 )
 def InitCheckGroupMessageMedia(client: pyrogram.Client, msg: pyrogram.types.Message):
     # CHECKS THAT REQUIRE MEDIA
@@ -739,7 +751,8 @@ def InitCheckGroupMessageMedia(client: pyrogram.Client, msg: pyrogram.types.Mess
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.group & pyrogram.filters.animation, group=-9,
+    pyrogram.filters.group & pyrogram.filters.animation,
+    group=-9,
 )
 def CheckGroupAnimation(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti animation
@@ -763,7 +776,8 @@ def CheckGroupAnimation(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.group & pyrogram.filters.audio, group=-9,
+    pyrogram.filters.group & pyrogram.filters.audio,
+    group=-9,
 )
 def CheckGroupAudio(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti audio
@@ -778,7 +792,8 @@ def CheckGroupAudio(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.group & pyrogram.filters.contact, group=-9,
+    pyrogram.filters.group & pyrogram.filters.contact,
+    group=-9,
 )
 def CheckGroupContact(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti contact
@@ -793,7 +808,8 @@ def CheckGroupContact(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.group & pyrogram.filters.document, group=-9,
+    pyrogram.filters.group & pyrogram.filters.document,
+    group=-9,
 )
 def CheckGroupDocument(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti document
@@ -824,7 +840,8 @@ def CheckGroupGame(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.group & pyrogram.filters.location, group=-9,
+    pyrogram.filters.group & pyrogram.filters.location,
+    group=-9,
 )
 def CheckGroupLocation(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti location
@@ -839,7 +856,8 @@ def CheckGroupLocation(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.group & pyrogram.filters.photo, group=-9,
+    pyrogram.filters.group & pyrogram.filters.photo,
+    group=-9,
 )
 def CheckGroupPhoto(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti photo
@@ -852,7 +870,8 @@ def CheckGroupPhoto(client: pyrogram.Client, msg: pyrogram.types.Message):
             punishment=msg.chat.settings.anti_photo
             if not utils.IsInNightMode(chat_settings=msg.chat.settings)
             else max(
-                msg.chat.settings.anti_photo, msg.chat.settings.night_mode_punishment,
+                msg.chat.settings.anti_photo,
+                msg.chat.settings.night_mode_punishment,
             ),
             reason="photo"
             if not utils.IsInNightMode(chat_settings=msg.chat.settings)
@@ -875,7 +894,8 @@ def CheckGroupPoll(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.group & pyrogram.filters.sticker, group=-9,
+    pyrogram.filters.group & pyrogram.filters.sticker,
+    group=-9,
 )
 def CheckGroupSticker(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti sticker
@@ -888,7 +908,8 @@ def CheckGroupSticker(client: pyrogram.Client, msg: pyrogram.types.Message):
             punishment=msg.chat.settings.anti_sticker
             if not utils.IsInNightMode(chat_settings=msg.chat.settings)
             else max(
-                msg.chat.settings.anti_sticker, msg.chat.settings.night_mode_punishment,
+                msg.chat.settings.anti_sticker,
+                msg.chat.settings.night_mode_punishment,
             ),
             reason="sticker"
             if not utils.IsInNightMode(chat_settings=msg.chat.settings)
@@ -898,7 +919,8 @@ def CheckGroupSticker(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.group & pyrogram.filters.venue, group=-9,
+    pyrogram.filters.group & pyrogram.filters.venue,
+    group=-9,
 )
 def CheckGroupVenue(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti location
@@ -913,7 +935,8 @@ def CheckGroupVenue(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.group & pyrogram.filters.video, group=-9,
+    pyrogram.filters.group & pyrogram.filters.video,
+    group=-9,
 )
 def CheckGroupVideo(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti video
@@ -926,7 +949,8 @@ def CheckGroupVideo(client: pyrogram.Client, msg: pyrogram.types.Message):
             punishment=msg.chat.settings.anti_video
             if not utils.IsInNightMode(chat_settings=msg.chat.settings)
             else max(
-                msg.chat.settings.anti_video, msg.chat.settings.night_mode_punishment,
+                msg.chat.settings.anti_video,
+                msg.chat.settings.night_mode_punishment,
             ),
             reason="video"
             if not utils.IsInNightMode(chat_settings=msg.chat.settings)
@@ -936,7 +960,8 @@ def CheckGroupVideo(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.group & pyrogram.filters.video_note, group=-9,
+    pyrogram.filters.group & pyrogram.filters.video_note,
+    group=-9,
 )
 def CheckGroupVideoNote(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti video_note
@@ -951,7 +976,8 @@ def CheckGroupVideoNote(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.group & pyrogram.filters.voice, group=-9,
+    pyrogram.filters.group & pyrogram.filters.voice,
+    group=-9,
 )
 def CheckGroupVoice(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti voice
@@ -966,7 +992,8 @@ def CheckGroupVoice(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.group & pyrogram.filters.new_chat_members, group=-9,
+    pyrogram.filters.group & pyrogram.filters.new_chat_members,
+    group=-9,
 )
 def CheckGroupMessageAdder(client: pyrogram.Client, msg: pyrogram.types.Message):
     # if user didn't add (him/her)self (didn't join via invite link)
@@ -1067,7 +1094,8 @@ def CheckGroupMessagePunish(client: pyrogram.Client, msg: pyrogram.types.Message
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.group & pyrogram.filters.new_chat_members, group=-9,
+    pyrogram.filters.group & pyrogram.filters.new_chat_members,
+    group=-9,
 )
 def CheckGroupMessageAdded(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = ""
@@ -1142,8 +1170,10 @@ def CheckGroupMessageAdded(client: pyrogram.Client, msg: pyrogram.types.Message)
                     )
                 continue
             # pre action
-            pre_action: db_management.ChatPreActionList = db_management.ChatPreActionList.get_or_none(
-                chat_id=msg.chat.id, user_id=user.id
+            pre_action: db_management.ChatPreActionList = (
+                db_management.ChatPreActionList.get_or_none(
+                    chat_id=msg.chat.id, user_id=user.id
+                )
             )
             if pre_action:
                 punishment = 0
@@ -1373,8 +1403,10 @@ def InitGroupCallbackQuery(
         cb_qry.continue_propagation()
 
     # pre action
-    pre_action: db_management.ChatPreActionList = db_management.ChatPreActionList.get_or_none(
-        chat_id=cb_qry.message.chat.id, user_id=cb_qry.from_user.id
+    pre_action: db_management.ChatPreActionList = (
+        db_management.ChatPreActionList.get_or_none(
+            chat_id=cb_qry.message.chat.id, user_id=cb_qry.from_user.id
+        )
     )
     if pre_action:
         punishment = 0
@@ -1541,7 +1573,8 @@ def CheckFloodCallbackQuery(
             if cb_qry.id in utils.tmp_dicts["punishments"][cb_qry.message.chat.id]:
                 utils.tmp_dicts["punishments"][cb_qry.message.chat.id].pop(cb_qry.id)
             text = _(
-                cb_qry.from_user.settings.language, "wait_X_seconds_inline_flood",
+                cb_qry.from_user.settings.language,
+                "wait_X_seconds_inline_flood",
             ).format(
                 utils.TimeFormatter(
                     (

@@ -59,7 +59,8 @@ def SendWelcome(client: pyrogram.Client, msg: pyrogram.types.Message):
                     caption = utils.AdjustMarkers(value=caption, msg=msg, welcome=True)
                 try:
                     client.send_chat_action(
-                        chat_id=msg.chat.id, action="upload_document",
+                        chat_id=msg.chat.id,
+                        action="upload_document",
                     )
                 except pyrogram.errors.ChatWriteForbidden as ex:
                     print(ex)
@@ -163,7 +164,8 @@ def SendGoodbye(client: pyrogram.Client, msg: pyrogram.types.Message):
                 caption = utils.AdjustMarkers(value=caption, msg=msg)
                 try:
                     client.send_chat_action(
-                        chat_id=msg.chat.id, action="typing",
+                        chat_id=msg.chat.id,
+                        action="typing",
                     )
                 except pyrogram.errors.ChatWriteForbidden as ex:
                     print(ex)
@@ -191,7 +193,9 @@ def SendGoodbye(client: pyrogram.Client, msg: pyrogram.types.Message):
                 else:
                     try:
                         tmp: pyrogram.types.Message = msg.reply_cached_media(
-                            file_id=media_id, caption=caption, parse_mode="html",
+                            file_id=media_id,
+                            caption=caption,
+                            parse_mode="html",
                         )
                     except pyrogram.errors.FloodWait as ex:
                         print(ex)
@@ -365,7 +369,8 @@ def CbQrySettingsAreLockedChange(
         cb_qry.message.edit_reply_markup(
             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings, current_keyboard=kybrd,
+                    chat_settings=chat_settings,
+                    current_keyboard=kybrd,
                 )
             ),
         )
@@ -418,7 +423,8 @@ def CbQrySettingsLanguageChange(
         cb_qry.message.edit_reply_markup(
             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings, current_keyboard=kybrd,
+                    chat_settings=chat_settings,
+                    current_keyboard=kybrd,
                 )
             ),
         )
@@ -469,7 +475,8 @@ def CbQrySettingsIsBotOnChange(
         cb_qry.message.edit_reply_markup(
             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings, current_keyboard=kybrd,
+                    chat_settings=chat_settings,
+                    current_keyboard=kybrd,
                 )
             ),
         )
@@ -522,7 +529,8 @@ def CbQrySettingsAllowTemporaryPunishmentsChange(
         cb_qry.message.edit_reply_markup(
             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings, current_keyboard=kybrd,
+                    chat_settings=chat_settings,
+                    current_keyboard=kybrd,
                 )
             ),
         )
@@ -579,7 +587,8 @@ def CbQrySettingsHasTagAlertsChange(
         cb_qry.message.edit_reply_markup(
             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings, current_keyboard=kybrd,
+                    chat_settings=chat_settings,
+                    current_keyboard=kybrd,
                 )
             ),
         )
@@ -630,7 +639,8 @@ def CbQrySettingsHasPinMarkersChange(
         cb_qry.message.edit_reply_markup(
             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings, current_keyboard=kybrd,
+                    chat_settings=chat_settings,
+                    current_keyboard=kybrd,
                 )
             ),
         )
@@ -760,7 +770,8 @@ def CbQrySettingsIsLinkPublicChange(
         cb_qry.message.edit_reply_markup(
             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings, current_keyboard=kybrd,
+                    chat_settings=chat_settings,
+                    current_keyboard=kybrd,
                 )
             ),
         )
@@ -1121,7 +1132,8 @@ def CbQrySettingsAllowServiceMessagesChange(
         cb_qry.message.edit_reply_markup(
             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings, current_keyboard=kybrd,
+                    chat_settings=chat_settings,
+                    current_keyboard=kybrd,
                 )
             ),
         )
@@ -1172,7 +1184,8 @@ def CbQrySettingsAllowMediaGroupChange(
         cb_qry.message.edit_reply_markup(
             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings, current_keyboard=kybrd,
+                    chat_settings=chat_settings,
+                    current_keyboard=kybrd,
                 )
             ),
         )
@@ -1239,7 +1252,8 @@ def CbQrySettingsGenerateLinkChange(
         cb_qry.message.edit_reply_markup(
             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings, current_keyboard=kybrd,
+                    chat_settings=chat_settings,
+                    current_keyboard=kybrd,
                 )
             ),
         )
@@ -1586,7 +1600,8 @@ def CbQrySettingsWelcomeMembersPlusMinus(
             chat_settings.welcome_members = max(chat_settings.welcome_members - 1, 0)
         elif "++" in cb_qry.data:
             chat_settings.welcome_members = min(
-                chat_settings.welcome_members + 1, utils.config["max_welcome_members"],
+                chat_settings.welcome_members + 1,
+                utils.config["max_welcome_members"],
             )
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
@@ -1611,7 +1626,8 @@ def CbQrySettingsWelcomeMembersPlusMinus(
         cb_qry.message.edit_reply_markup(
             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings, current_keyboard=kybrd,
+                    chat_settings=chat_settings,
+                    current_keyboard=kybrd,
                 )
             ),
         )
@@ -1664,7 +1680,8 @@ def CbQrySettingsMaxInvitesPlusMinus(
         cb_qry.message.edit_reply_markup(
             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings, current_keyboard=kybrd,
+                    chat_settings=chat_settings,
+                    current_keyboard=kybrd,
                 )
             ),
         )
@@ -1693,11 +1710,13 @@ def CbQrySettingsMaxFloodTimePlusMinus(
     if utils.IsSeniorModOrHigher(user_id=cb_qry.from_user.id, chat_id=chat_id):
         if "--" in cb_qry.data:
             chat_settings.max_flood_time = max(
-                chat_settings.max_flood_time - 1, utils.config["min_flood_time"],
+                chat_settings.max_flood_time - 1,
+                utils.config["min_flood_time"],
             )
         elif "++" in cb_qry.data:
             chat_settings.max_flood_time = min(
-                chat_settings.max_flood_time + 1, utils.config["max_flood_time"],
+                chat_settings.max_flood_time + 1,
+                utils.config["max_flood_time"],
             )
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
@@ -1719,7 +1738,8 @@ def CbQrySettingsMaxFloodTimePlusMinus(
         cb_qry.message.edit_reply_markup(
             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings, current_keyboard=kybrd,
+                    chat_settings=chat_settings,
+                    current_keyboard=kybrd,
                 )
             ),
         )
@@ -1774,7 +1794,8 @@ def CbQrySettingsMaxFloodPlusMinus(
         cb_qry.message.edit_reply_markup(
             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings, current_keyboard=kybrd,
+                    chat_settings=chat_settings,
+                    current_keyboard=kybrd,
                 )
             ),
         )
@@ -1809,9 +1830,10 @@ def CbQrySettingsMaxWarnsPlusMinus(
             )
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
-            text=_(cb_qry.from_user.settings.language, "max_warns_X",).format(
-                chat_settings.max_warns
-            ),
+            text=_(
+                cb_qry.from_user.settings.language,
+                "max_warns_X",
+            ).format(chat_settings.max_warns),
             show_alert=True,
         )
 
@@ -1827,7 +1849,8 @@ def CbQrySettingsMaxWarnsPlusMinus(
         cb_qry.message.edit_reply_markup(
             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings, current_keyboard=kybrd,
+                    chat_settings=chat_settings,
+                    current_keyboard=kybrd,
                 )
             ),
         )
@@ -1934,7 +1957,8 @@ def CbQrySettingsModifyTempPunishmentTime(
         cb_qry.message.edit_reply_markup(
             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings, current_keyboard=kybrd,
+                    chat_settings=chat_settings,
+                    current_keyboard=kybrd,
                 )
             ),
         )
@@ -1966,7 +1990,8 @@ def CbQrySettingsMaxTempPunishmentChange(
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
             text=_(
-                cb_qry.from_user.settings.language, "max_temp_punishment_select_time",
+                cb_qry.from_user.settings.language,
+                "max_temp_punishment_select_time",
             ),
             show_alert=False,
         )
@@ -1974,7 +1999,8 @@ def CbQrySettingsMaxTempPunishmentChange(
         cb_qry.message.edit_reply_markup(
             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings, current_keyboard=kybrd,
+                    chat_settings=chat_settings,
+                    current_keyboard=kybrd,
                 )
             ),
         )
@@ -2173,7 +2199,10 @@ def CmdSettings(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["settings"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["settings"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdSettingsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -2191,7 +2220,8 @@ def CmdSettingsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
             + f" {utils.PrintChat(chat=chat_settings.chat)}",
             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings, current_keyboard="mainsettings",
+                    chat_settings=chat_settings,
+                    current_keyboard="mainsettings",
                 )
             ),
         )
@@ -2211,10 +2241,14 @@ def CmdSettingsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     & pyrogram.filters.group
 )
 def CmdStaff(client: pyrogram.Client, msg: pyrogram.types.Message):
-    query: peewee.ModelSelect = db_management.RUserChat.select().where(
-        (db_management.RUserChat.chat_id == msg.chat.id)
-        & ((db_management.RUserChat.rank > 1) | (db_management.RUserChat.is_admin))
-    ).order_by(db_management.RUserChat.rank.desc())
+    query: peewee.ModelSelect = (
+        db_management.RUserChat.select()
+        .where(
+            (db_management.RUserChat.chat_id == msg.chat.id)
+            & ((db_management.RUserChat.rank > 1) | (db_management.RUserChat.is_admin))
+        )
+        .order_by(db_management.RUserChat.rank.desc())
+    )
     already_listed = list()
     text = (
         "<b>"
@@ -2291,7 +2325,8 @@ def CmdStaff(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 @pyrogram.Client.on_message(
     pyrogram.filters.command(
-        commands=["getstaff", "staff"], prefixes=["/", "!", "#", "."],
+        commands=["getstaff", "staff"],
+        prefixes=["/", "!", "#", "."],
     )
     & pyrogram.filters.private
 )
@@ -2301,17 +2336,21 @@ def CmdStaffChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
-            query: peewee.ModelSelect = db_management.RUserChat.select().where(
-                (db_management.RUserChat.chat_id == chat_id)
-                & (
-                    (db_management.RUserChat.rank > 1)
-                    | (db_management.RUserChat.is_admin)
+            query: peewee.ModelSelect = (
+                db_management.RUserChat.select()
+                .where(
+                    (db_management.RUserChat.chat_id == chat_id)
+                    & (
+                        (db_management.RUserChat.rank > 1)
+                        | (db_management.RUserChat.is_admin)
+                    )
                 )
-            ).order_by(db_management.RUserChat.rank.desc())
+                .order_by(db_management.RUserChat.rank.desc())
+            )
             already_listed = list()
             text = (
                 _(chat_settings.language, "staff").upper()
@@ -2445,7 +2484,10 @@ def CmdSyncAdmins(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["syncadmins"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["syncadmins"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdSyncAdminsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -2453,8 +2495,8 @@ def CmdSyncAdminsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             if utils.IsJuniorModOrHigher(user_id=msg.from_user.id, chat_id=chat_id):
@@ -2511,17 +2553,25 @@ def CmdSyncAdminsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 @pyrogram.Client.on_message(
     pyrogram.filters.command(
-        commands=["admins", "admin"], prefixes=["@", "/", "!", "#", "."],
+        commands=["admins", "admin"],
+        prefixes=["@", "/", "!", "#", "."],
     )
     & pyrogram.filters.group
 )
 def CmdAdmins(client: pyrogram.Client, msg: pyrogram.types.Message):
     if msg.chat.id not in utils.tmp_dicts["staffContacted"]:
         utils.tmp_dicts["staffContacted"].add(msg.chat.id)
-        query: peewee.ModelSelect = db_management.RUserChat.select().where(
-            (db_management.RUserChat.chat_id == msg.chat.id)
-            & ((db_management.RUserChat.rank > 1) | (db_management.RUserChat.is_admin))
-        ).order_by(db_management.RUserChat.rank.desc())
+        query: peewee.ModelSelect = (
+            db_management.RUserChat.select()
+            .where(
+                (db_management.RUserChat.chat_id == msg.chat.id)
+                & (
+                    (db_management.RUserChat.rank > 1)
+                    | (db_management.RUserChat.is_admin)
+                )
+            )
+            .order_by(db_management.RUserChat.rank.desc())
+        )
 
         admins = list()
         cant_contact = list()
@@ -2815,7 +2865,10 @@ def CmdLink(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["link"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["link"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdLinkChat(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -2823,8 +2876,8 @@ def CmdLinkChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             if chat_settings.is_link_public == 1 and not utils.IsJuniorModOrHigher(
@@ -2898,9 +2951,11 @@ def CbQryCensorshipsInfo(client: pyrogram.Client, cb_qry: pyrogram.types.Callbac
     chat_id = int(parameters[1])
     text = ""
 
-    query: peewee.ModelSelect = db_management.ChatCensorships.select().where(
-        db_management.ChatCensorships.chat == chat_id
-    ).order_by(peewee.fn.LOWER(db_management.ChatCensorships.value))
+    query: peewee.ModelSelect = (
+        db_management.ChatCensorships.select()
+        .where(db_management.ChatCensorships.chat == chat_id)
+        .order_by(peewee.fn.LOWER(db_management.ChatCensorships.value))
+    )
     if utils.IsInt(cb_qry.data.replace("(i)censorships ", "")):
         if int(cb_qry.data.replace("(i)censorships ", "")) < len(query):
             text = _(cb_qry.from_user.settings.language, "(i)censorships").format(
@@ -2912,7 +2967,9 @@ def CbQryCensorshipsInfo(client: pyrogram.Client, cb_qry: pyrogram.types.Callbac
         text = _(cb_qry.from_user.settings.language, cb_qry.data)
 
     methods.CallbackQueryAnswer(
-        cb_qry=cb_qry, text=text, show_alert=True,
+        cb_qry=cb_qry,
+        text=text,
+        show_alert=True,
     )
 
 
@@ -2942,7 +2999,8 @@ def CbQryCensorshipsGet(client: pyrogram.Client, cb_qry: pyrogram.types.Callback
             if element.is_media:
                 try:
                     client.send_chat_action(
-                        chat_id=cb_qry.message.chat.id, action="upload_document",
+                        chat_id=cb_qry.message.chat.id,
+                        action="upload_document",
                     )
                 except pyrogram.errors.ChatWriteForbidden as ex:
                     print(ex)
@@ -2974,9 +3032,11 @@ def CbQryCensorshipsGet(client: pyrogram.Client, cb_qry: pyrogram.types.Callback
                         cb_qry.message.reply_cached_media(file_id=element.value)
                     except pyrogram.errors.FilerefUpgradeNeeded:
                         try:
-                            original_media_message: pyrogram.types.Message = client.get_messages(
-                                chat_id=element.original_chat_id,
-                                message_id=element.original_message_id,
+                            original_media_message: pyrogram.types.Message = (
+                                client.get_messages(
+                                    chat_id=element.original_chat_id,
+                                    message_id=element.original_message_id,
+                                )
                             )
                             type_, media = utils.ExtractMedia(
                                 msg=original_media_message
@@ -3003,7 +3063,8 @@ def CbQryCensorshipsGet(client: pyrogram.Client, cb_qry: pyrogram.types.Callback
                                 client=client,
                                 msg=cb_qry.message,
                                 text=_(
-                                    cb_qry.message.chat.settings.language, "tg_error_X",
+                                    cb_qry.message.chat.settings.language,
+                                    "tg_error_X",
                                 ).format(ex),
                             )
                     except pyrogram.errors.FloodWait as ex:
@@ -3082,7 +3143,8 @@ def CbQryCensorshipsPages(
             cb_qry.message.edit_reply_markup(
                 reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildCensorshipsList(
-                        chat_settings=chat_settings, page=-1,
+                        chat_settings=chat_settings,
+                        page=-1,
                     )
                 )
             )
@@ -3423,7 +3485,10 @@ def CmdCensorships(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["censorships"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["censorships"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdCensorshipsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -3431,8 +3496,8 @@ def CmdCensorshipsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             if utils.IsJuniorModOrHigher(user_id=msg.from_user.id, chat_id=chat_id):
@@ -3587,7 +3652,10 @@ def CmdUnpin(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["setlog"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["setlog"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.group
     & pyrogram.filters.forwarded
 )
@@ -3632,7 +3700,10 @@ def CmdSetlog(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["setlog"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["setlog"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.group
     & ~pyrogram.filters.forwarded
 )
@@ -3671,7 +3742,9 @@ def CbQryWhitelistedChatsInfo(
                 cb_qry.from_user.settings.language, "whitelistedchat_no_correspondence"
             ).format(f"-100{weird_id}", f"-{weird_id}")
     methods.CallbackQueryAnswer(
-        cb_qry=cb_qry, text=text, show_alert=True,
+        cb_qry=cb_qry,
+        text=text,
+        show_alert=True,
     )
 
 
@@ -3721,7 +3794,8 @@ def CbQryWhitelistedChatsPages(
             cb_qry.message.edit_reply_markup(
                 reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedChatsList(
-                        chat_settings=chat_settings, page=-1,
+                        chat_settings=chat_settings,
+                        page=-1,
                     )
                 )
             )
@@ -3905,7 +3979,8 @@ def CmdWhitelistedChats(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 @pyrogram.Client.on_message(
     pyrogram.filters.command(
-        commands=["whitelistedchats", "chatswhitelist"], prefixes=["/", "!", "#", "."],
+        commands=["whitelistedchats", "chatswhitelist"],
+        prefixes=["/", "!", "#", "."],
     )
     & pyrogram.filters.private
 )
@@ -3914,8 +3989,8 @@ def CmdWhitelistedChatsChat(client: pyrogram.Client, msg: pyrogram.types.Message
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             if utils.IsJuniorModOrHigher(user_id=msg.from_user.id, chat_id=chat_id):
@@ -3956,7 +4031,9 @@ def CbQryWhitelistedGbannedInfo(
         else:
             text = int(cb_qry.data.replace("(i)whitelistedgbanned ", ""))
     methods.CallbackQueryAnswer(
-        cb_qry=cb_qry, text=text, show_alert=True,
+        cb_qry=cb_qry,
+        text=text,
+        show_alert=True,
     )
 
 
@@ -4008,7 +4085,8 @@ def CbQryWhitelistedGbannedPages(
             cb_qry.message.edit_reply_markup(
                 reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedGbannedUsersList(
-                        chat_settings=chat_settings, page=-1,
+                        chat_settings=chat_settings,
+                        page=-1,
                     )
                 )
             )
@@ -4201,8 +4279,8 @@ def CmdWhitelistedGbannedChat(client: pyrogram.Client, msg: pyrogram.types.Messa
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             if utils.IsJuniorModOrHigher(user_id=msg.from_user.id, chat_id=chat_id):
@@ -4241,7 +4319,9 @@ def CbQryWhitelistedInfo(client: pyrogram.Client, cb_qry: pyrogram.types.Callbac
         else:
             text = int(cb_qry.data.replace("(i)whitelisted ", ""))
     methods.CallbackQueryAnswer(
-        cb_qry=cb_qry, text=text, show_alert=True,
+        cb_qry=cb_qry,
+        text=text,
+        show_alert=True,
     )
 
 
@@ -4291,7 +4371,8 @@ def CbQryWhitelistedPages(
             cb_qry.message.edit_reply_markup(
                 reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildWhitelistedUsersList(
-                        chat_settings=chat_settings, page=-1,
+                        chat_settings=chat_settings,
+                        page=-1,
                     )
                 )
             )
@@ -4469,7 +4550,10 @@ def CmdWhitelisted(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["whitelisted"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["whitelisted"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdWhitelistedChat(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -4477,8 +4561,8 @@ def CmdWhitelistedChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             if utils.IsJuniorModOrHigher(user_id=msg.from_user.id, chat_id=chat_id):
@@ -4502,7 +4586,10 @@ def CmdWhitelistedChat(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["del", "delete"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["del", "delete"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.reply
     & pyrogram.filters.group,
 )
@@ -4550,8 +4637,8 @@ def CmdLeaveChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             if utils.IsSeniorModOrHigher(user_id=msg.from_user.id, chat_id=chat_id):
@@ -4571,7 +4658,8 @@ def CmdLeaveChat(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 @pyrogram.Client.on_message(
     pyrogram.filters.command(
-        commands=["delfrom", "deletefrom"], prefixes=["/", "!", "#", "."],
+        commands=["delfrom", "deletefrom"],
+        prefixes=["/", "!", "#", "."],
     )
     & pyrogram.filters.reply
     & pyrogram.filters.group,
@@ -4597,9 +4685,11 @@ def CbQryLogsPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry, text=_(cb_qry.from_user.settings.language, "turning_page")
         )
-        query: peewee.ModelSelect = db_management.Logs.select().where(
-            db_management.Logs.chat_id == chat_id
-        ).order_by(db_management.Logs.timestamp.desc())
+        query: peewee.ModelSelect = (
+            db_management.Logs.select()
+            .where(db_management.Logs.chat_id == chat_id)
+            .order_by(db_management.Logs.timestamp.desc())
+        )
 
         if cb_qry.data.endswith("<<"):
             page = 0
@@ -4672,9 +4762,11 @@ def CmdLog(client: pyrogram.Client, msg: pyrogram.types.Message):
             action=f"{msg.command[0]}",
             target=msg.chat.id,
         )
-        query: peewee.ModelSelect = db_management.Logs.select().where(
-            db_management.Logs.chat_id == msg.chat.id
-        ).order_by(db_management.Logs.timestamp.desc())
+        query: peewee.ModelSelect = (
+            db_management.Logs.select()
+            .where(db_management.Logs.chat_id == msg.chat.id)
+            .order_by(db_management.Logs.timestamp.desc())
+        )
         query = query[0 : utils.config["max_items_keyboard"]]
         text = (
             _(msg.chat.settings.language, "logs_of_X").format(
@@ -4727,7 +4819,10 @@ def CmdLog(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["logs", "log"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["logs", "log"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private,
 )
 def CmdLogChat(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -4735,8 +4830,8 @@ def CmdLogChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             if utils.IsJuniorModOrHigher(user_id=msg.from_user.id, chat_id=chat_id):
@@ -4747,9 +4842,11 @@ def CmdLogChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                     action=f"{msg.command[0]}",
                     target=chat_id,
                 )
-                query: peewee.ModelSelect = db_management.Logs.select().where(
-                    db_management.Logs.chat_id == chat_id
-                ).order_by(db_management.Logs.timestamp.desc())
+                query: peewee.ModelSelect = (
+                    db_management.Logs.select()
+                    .where(db_management.Logs.chat_id == chat_id)
+                    .order_by(db_management.Logs.timestamp.desc())
+                )
                 query = query[0 : utils.config["max_items_keyboard"]]
                 text = (
                     _(chat_settings.language, "logs_of_X").format(
@@ -4877,7 +4974,8 @@ def CmdSendLog(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 @pyrogram.Client.on_message(
     pyrogram.filters.command(
-        commands=["sendlogs", "sendlog"], prefixes=["/", "!", "#", "."],
+        commands=["sendlogs", "sendlog"],
+        prefixes=["/", "!", "#", "."],
     )
     & pyrogram.filters.private,
 )
@@ -4886,8 +4984,8 @@ def CmdSendLogChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             if utils.IsJuniorModOrHigher(user_id=msg.from_user.id, chat_id=chat_id):

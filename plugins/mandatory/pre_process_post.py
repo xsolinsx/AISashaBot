@@ -93,7 +93,8 @@ def PreProcessRawUpdate(
 
 
 @pyrogram.Client.on_callback_query(
-    pyrogram.filters.regex(pattern=r"^cancel(.+)", flags=re.I), group=-7,
+    pyrogram.filters.regex(pattern=r"^cancel(.+)", flags=re.I),
+    group=-7,
 )
 def CbQryCancelTmpSteps(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     if cb_qry.message.chat.id in utils.tmp_steps:
@@ -133,7 +134,8 @@ def CbQryCancelTmpSteps(client: pyrogram.Client, cb_qry: pyrogram.types.Callback
                 + f" {utils.PrintChat(chat=chat_settings.chat)}",
                 reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildGroupSettingsMenu(
-                        chat_settings=chat_settings, current_keyboard="mainsettings",
+                        chat_settings=chat_settings,
+                        current_keyboard="mainsettings",
                     )
                 ),
             )
@@ -162,7 +164,8 @@ def CbQryCancelTmpSteps(client: pyrogram.Client, cb_qry: pyrogram.types.Callback
                 + f" {utils.PrintChat(chat=chat_settings.chat)}",
                 reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildGroupSettingsMenu(
-                        chat_settings=chat_settings, current_keyboard="invitesettings",
+                        chat_settings=chat_settings,
+                        current_keyboard="invitesettings",
                     )
                 ),
             )
@@ -306,8 +309,8 @@ def CmdCancelTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
 
             if kybrd == "mainsettings":
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 original_cb_qry.message.edit_text(
                     text=_(msg.from_user.settings.language, "settings")
@@ -321,8 +324,8 @@ def CmdCancelTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                 )
             elif kybrd == "greetingsettings":
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 original_cb_qry.message.edit_text(
                     text=_(msg.from_user.settings.language, "settings")
@@ -336,8 +339,8 @@ def CmdCancelTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                 )
             elif kybrd == "invitesettings":
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 original_cb_qry.message.edit_text(
                     text=_(msg.from_user.settings.language, "settings")
@@ -360,8 +363,8 @@ def CmdCancelTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                 )
             elif kybrd == "censorships":
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 original_cb_qry.message.edit_text(
                     text=_(chat_settings.language, "censorships")
@@ -374,8 +377,8 @@ def CmdCancelTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                 )
             elif kybrd == "extras":
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 original_cb_qry.message.edit_text(
                     text=_(chat_settings.language, "extras")
@@ -386,8 +389,8 @@ def CmdCancelTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                 )
             elif kybrd == "whitelistedchats":
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 original_cb_qry.message.edit_text(
                     text=_(chat_settings.language, "whitelisted_chats")
@@ -400,8 +403,8 @@ def CmdCancelTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                 )
             elif kybrd == "whitelistedgbanned":
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 original_cb_qry.message.edit_text(
                     text=_(chat_settings.language, "whitelistedgbanned_users")
@@ -414,8 +417,8 @@ def CmdCancelTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                 )
             elif kybrd == "whitelisted":
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 original_cb_qry.message.edit_text(
                     text=_(chat_settings.language, "whitelisted_users")
@@ -446,8 +449,8 @@ def CmdCancelTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                 )
             elif kybrd == "alternatives":
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 original_cb_qry.message.edit_text(
                     text=_(msg.from_user.settings.language, "alternatives")
@@ -475,8 +478,8 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
             dont_pop = False
             if variable == "settings set_goodbye" or variable == "settings set_welcome":
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 media_variable = None
                 if msg.media:
@@ -504,8 +507,8 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                 or variable == "settings set_welcome_buttons"
             ):
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 if variable.replace("settings set_", "") == "welcome_buttons":
                     welcome_buttons = keyboards.BuildWelcomeButtonsKeyboard(
@@ -531,8 +534,8 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                     ).execute()
             elif variable == "settings set_link":
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 chat_settings.link = msg.text
                 try:
@@ -573,8 +576,8 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                     success = False
             elif variable == "censorships add text":
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 if db_management.ChatCensorships.get_or_none(
                     chat_id=chat_id, value=msg.text, is_media=False, is_regex=False
@@ -597,8 +600,8 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                 )
             elif variable == "censorships add media":
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 media, type_ = utils.ExtractMedia(msg=msg)
                 if media:
@@ -633,8 +636,8 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                     )
             elif variable == "censorships add regex":
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 if db_management.ChatCensorships.get_or_none(
                     chat_id=chat_id, value=msg.text, is_media=False, is_regex=True
@@ -659,8 +662,8 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                 "extras set text"
             ):
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 if (
                     variable == "extras set text text"
@@ -744,8 +747,8 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                     success = False
             elif variable == "whitelistedchats add":
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 whitelisted_chat_id = None
                 tmp = str(utils.CleanLink(url=msg.text))
@@ -785,8 +788,8 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                     success = False
             elif variable == "whitelistedgbanned add":
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 user_id = utils.ResolveCommandToId(client=client, value=msg.text)
                 if isinstance(user_id, str) or int(user_id) < 0:
@@ -810,8 +813,8 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                     )
             elif variable == "whitelisted add":
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 user_id = utils.ResolveCommandToId(client=client, value=msg.text)
                 if isinstance(user_id, str) or int(user_id) < 0:
@@ -897,8 +900,8 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                         )
             elif variable.startswith("alternatives set"):
                 chat_id = int(parameters[1])
-                chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
-                    chat_id=chat_id
+                chat_settings: db_management.ChatSettings = (
+                    db_management.ChatSettings.get(chat_id=chat_id)
                 )
                 if variable == "alternatives set":
                     if msg.text:
@@ -1005,7 +1008,8 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                             text=text,
                             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                                 keyboards.BuildGroupSettingsMenu(
-                                    chat_settings=chat_settings, current_keyboard=kybrd,
+                                    chat_settings=chat_settings,
+                                    current_keyboard=kybrd,
                                 )
                             ),
                         )
@@ -1162,7 +1166,8 @@ def CbQryUseless(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
 
 
 @pyrogram.Client.on_callback_query(
-    pyrogram.filters.regex(pattern=r"^(\w+)_all", flags=re.I), group=-7,
+    pyrogram.filters.regex(pattern=r"^(\w+)_all", flags=re.I),
+    group=-7,
 )
 def CbQryActionAll(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     if utils.IsJuniorModOrHigher(
@@ -1349,7 +1354,8 @@ def CbQryActionAll(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 
 
 @pyrogram.Client.on_callback_query(
-    pyrogram.filters.regex(pattern=r"^(\w+) (\d+)", flags=re.I), group=-7,
+    pyrogram.filters.regex(pattern=r"^(\w+) (\d+)", flags=re.I),
+    group=-7,
 )
 def CbQryActionUser(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     if utils.IsJuniorModOrHigher(
@@ -1509,7 +1515,9 @@ def CbQryActionUser(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
                 )
                 return
         methods.CallbackQueryAnswer(
-            cb_qry=cb_qry, text=text, show_alert=True,
+            cb_qry=cb_qry,
+            text=text,
+            show_alert=True,
         )
         utils.Log(
             client=client,

@@ -97,7 +97,10 @@ def CmdInviteUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["invite"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["invite"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdInviteChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -110,8 +113,8 @@ def CmdInviteChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
         if isinstance(user_id, str):
             methods.ReplyText(client=client, msg=msg, text=user_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             text = methods.Invite(
@@ -256,7 +259,10 @@ def CmdWarnUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["warn"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["warn"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdWarnChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -272,8 +278,8 @@ def CmdWarnChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
         if isinstance(user_id, str):
             methods.ReplyText(client=client, msg=msg, text=user_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             text = methods.Warn(
@@ -383,7 +389,10 @@ def CmdUnwarnUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["unwarn"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["unwarn"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdUnwarnChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -399,8 +408,8 @@ def CmdUnwarnChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
         if isinstance(user_id, str):
             methods.ReplyText(client=client, msg=msg, text=user_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             text = methods.Unwarn(
@@ -510,7 +519,10 @@ def CmdUnwarnAllUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["unwarnall"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["unwarnall"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdUnwarnAllChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -526,8 +538,8 @@ def CmdUnwarnAllChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
         if isinstance(user_id, str):
             methods.ReplyText(client=client, msg=msg, text=user_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             text = methods.UnwarnAll(
@@ -638,7 +650,10 @@ def CmdKickUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["kick"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["kick"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdKickChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -654,8 +669,8 @@ def CmdKickChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
         if isinstance(user_id, str):
             methods.ReplyText(client=client, msg=msg, text=user_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             text = methods.Kick(
@@ -769,7 +784,10 @@ def CmdTempRestrictUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["temprestrict"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["temprestrict"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdTempRestrictChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -785,8 +803,8 @@ def CmdTempRestrictChatUser(client: pyrogram.Client, msg: pyrogram.types.Message
         if isinstance(user_id, str):
             methods.ReplyText(client=client, msg=msg, text=user_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             text = methods.Restrict(
@@ -898,7 +916,10 @@ def CmdRestrictUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["restrict"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["restrict"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdRestrictChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -914,8 +935,8 @@ def CmdRestrictChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
         if isinstance(user_id, str):
             methods.ReplyText(client=client, msg=msg, text=user_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             text = methods.Restrict(
@@ -1026,7 +1047,10 @@ def CmdUnrestrictUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["unrestrict"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["unrestrict"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdUnrestrictChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -1042,8 +1066,8 @@ def CmdUnrestrictChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
         if isinstance(user_id, str):
             methods.ReplyText(client=client, msg=msg, text=user_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             text = methods.Unrestrict(
@@ -1157,7 +1181,10 @@ def CmdTempBanUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["tempban"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["tempban"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdTempBanChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -1173,8 +1200,8 @@ def CmdTempBanChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
         if isinstance(user_id, str):
             methods.ReplyText(client=client, msg=msg, text=user_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             text = methods.Ban(
@@ -1286,7 +1313,10 @@ def CmdBanUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["ban"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["ban"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdBanChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -1302,8 +1332,8 @@ def CmdBanChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
         if isinstance(user_id, str):
             methods.ReplyText(client=client, msg=msg, text=user_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             text = methods.Ban(
@@ -1414,7 +1444,10 @@ def CmdUnbanUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["unban"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["unban"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdUnbanChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -1430,8 +1463,8 @@ def CmdUnbanChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
         if isinstance(user_id, str):
             methods.ReplyText(client=client, msg=msg, text=user_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             text = methods.Unban(
@@ -1469,17 +1502,21 @@ def CbQryInactives(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
             show_alert=False,
         )
         action = cb_qry.data.replace("inactives ", "")
-        query: peewee.ModelSelect = db_management.RUserChat.select().join(
-            db_management.Users,
-            on=(db_management.RUserChat.user_id == db_management.Users.id),
-        ).where(
-            (db_management.RUserChat.chat == chat_id)
-            & (db_management.RUserChat.timestamp < min_date)
-            & (db_management.RUserChat.is_member)
-            & (db_management.RUserChat.rank < 1)
-            & (~db_management.RUserChat.is_admin)
-            & (~db_management.RUserChat.is_whitelisted)
-            & (~db_management.Users.is_bot)
+        query: peewee.ModelSelect = (
+            db_management.RUserChat.select()
+            .join(
+                db_management.Users,
+                on=(db_management.RUserChat.user_id == db_management.Users.id),
+            )
+            .where(
+                (db_management.RUserChat.chat == chat_id)
+                & (db_management.RUserChat.timestamp < min_date)
+                & (db_management.RUserChat.is_member)
+                & (db_management.RUserChat.rank < 1)
+                & (~db_management.RUserChat.is_admin)
+                & (~db_management.RUserChat.is_whitelisted)
+                & (~db_management.Users.is_bot)
+            )
         )
         if "list" in action:
             file_name = f"./downloads/{method}inactives_{abs(chat_id)}_{secrets.token_hex(5)}_{time.time()}.txt"
@@ -1553,7 +1590,10 @@ def CbQryInactives(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["kickinactives"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["kickinactives"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.group
 )
 def CmdKickInactives(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -1587,7 +1627,7 @@ def CmdKickInactives(client: pyrogram.Client, msg: pyrogram.types.Message):
                     client=client,
                     chat_id=msg.chat.id,
                     executer=msg.from_user.id,
-                    action=f"members updated",
+                    action="members updated",
                     target=msg.chat.id,
                 )
         min_date = datetime.date.min
@@ -1603,17 +1643,21 @@ def CmdKickInactives(client: pyrogram.Client, msg: pyrogram.types.Message):
                 text=_(msg.chat.settings.language, "error_try_again"),
             )
         else:
-            query: peewee.ModelSelect = db_management.RUserChat.select().join(
-                db_management.Users,
-                on=(db_management.RUserChat.user_id == db_management.Users.id),
-            ).where(
-                (db_management.RUserChat.chat == msg.chat.id)
-                & (db_management.RUserChat.timestamp < min_date)
-                & (db_management.RUserChat.is_member)
-                & (db_management.RUserChat.rank < 1)
-                & (~db_management.RUserChat.is_admin)
-                & (~db_management.RUserChat.is_whitelisted)
-                & (~db_management.Users.is_bot)
+            query: peewee.ModelSelect = (
+                db_management.RUserChat.select()
+                .join(
+                    db_management.Users,
+                    on=(db_management.RUserChat.user_id == db_management.Users.id),
+                )
+                .where(
+                    (db_management.RUserChat.chat == msg.chat.id)
+                    & (db_management.RUserChat.timestamp < min_date)
+                    & (db_management.RUserChat.is_member)
+                    & (db_management.RUserChat.rank < 1)
+                    & (~db_management.RUserChat.is_admin)
+                    & (~db_management.RUserChat.is_whitelisted)
+                    & (~db_management.Users.is_bot)
+                )
             )
             if len(query) > 0:
                 methods.ReplyText(
@@ -1633,7 +1677,10 @@ def CmdKickInactives(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["kickinactives"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["kickinactives"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdKickInactivesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -1641,8 +1688,8 @@ def CmdKickInactivesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             if utils.IsSeniorModOrHigher(user_id=msg.from_user.id, chat_id=chat_id):
@@ -1675,7 +1722,7 @@ def CmdKickInactivesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                             client=client,
                             chat_id=chat_id,
                             executer=msg.from_user.id,
-                            action=f"members updated",
+                            action="members updated",
                             target=chat_id,
                         )
                 min_date = datetime.date.min
@@ -1691,17 +1738,24 @@ def CmdKickInactivesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                         text=_(chat_settings.language, "error_try_again"),
                     )
                 else:
-                    query: peewee.ModelSelect = db_management.RUserChat.select().join(
-                        db_management.Users,
-                        on=(db_management.RUserChat.user_id == db_management.Users.id),
-                    ).where(
-                        (db_management.RUserChat.chat == chat_id)
-                        & (db_management.RUserChat.timestamp < min_date)
-                        & (db_management.RUserChat.is_member)
-                        & (db_management.RUserChat.rank < 1)
-                        & (~db_management.RUserChat.is_admin)
-                        & (~db_management.RUserChat.is_whitelisted)
-                        & (~db_management.Users.is_bot)
+                    query: peewee.ModelSelect = (
+                        db_management.RUserChat.select()
+                        .join(
+                            db_management.Users,
+                            on=(
+                                db_management.RUserChat.user_id
+                                == db_management.Users.id
+                            ),
+                        )
+                        .where(
+                            (db_management.RUserChat.chat == chat_id)
+                            & (db_management.RUserChat.timestamp < min_date)
+                            & (db_management.RUserChat.is_member)
+                            & (db_management.RUserChat.rank < 1)
+                            & (~db_management.RUserChat.is_admin)
+                            & (~db_management.RUserChat.is_whitelisted)
+                            & (~db_management.Users.is_bot)
+                        )
                     )
                     if len(query) > 0:
                         methods.ReplyText(
@@ -1727,7 +1781,10 @@ def CmdKickInactivesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["baninactives"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["baninactives"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.group
 )
 def CmdBanInactives(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -1761,7 +1818,7 @@ def CmdBanInactives(client: pyrogram.Client, msg: pyrogram.types.Message):
                     client=client,
                     chat_id=msg.chat.id,
                     executer=msg.from_user.id,
-                    action=f"members updated",
+                    action="members updated",
                     target=msg.chat.id,
                 )
         min_date = datetime.date.min
@@ -1777,17 +1834,21 @@ def CmdBanInactives(client: pyrogram.Client, msg: pyrogram.types.Message):
                 text=_(msg.chat.settings.language, "error_try_again"),
             )
         else:
-            query: peewee.ModelSelect = db_management.RUserChat.select().join(
-                db_management.Users,
-                on=(db_management.RUserChat.user_id == db_management.Users.id),
-            ).where(
-                (db_management.RUserChat.chat == msg.chat.id)
-                & (db_management.RUserChat.timestamp < min_date)
-                & (db_management.RUserChat.is_member)
-                & (db_management.RUserChat.rank < 1)
-                & (~db_management.RUserChat.is_admin)
-                & (~db_management.RUserChat.is_whitelisted)
-                & (~db_management.Users.is_bot)
+            query: peewee.ModelSelect = (
+                db_management.RUserChat.select()
+                .join(
+                    db_management.Users,
+                    on=(db_management.RUserChat.user_id == db_management.Users.id),
+                )
+                .where(
+                    (db_management.RUserChat.chat == msg.chat.id)
+                    & (db_management.RUserChat.timestamp < min_date)
+                    & (db_management.RUserChat.is_member)
+                    & (db_management.RUserChat.rank < 1)
+                    & (~db_management.RUserChat.is_admin)
+                    & (~db_management.RUserChat.is_whitelisted)
+                    & (~db_management.Users.is_bot)
+                )
             )
             if len(query) > 0:
                 methods.ReplyText(
@@ -1807,7 +1868,10 @@ def CmdBanInactives(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["baninactives"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["baninactives"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdBanInactivesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -1815,8 +1879,8 @@ def CmdBanInactivesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             if utils.IsSeniorModOrHigher(user_id=msg.from_user.id, chat_id=chat_id):
@@ -1849,7 +1913,7 @@ def CmdBanInactivesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                             client=client,
                             chat_id=chat_id,
                             executer=msg.from_user.id,
-                            action=f"members updated",
+                            action="members updated",
                             target=chat_id,
                         )
                 min_date = datetime.date.min
@@ -1865,17 +1929,24 @@ def CmdBanInactivesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                         text=_(chat_settings.language, "error_try_again"),
                     )
                 else:
-                    query: peewee.ModelSelect = db_management.RUserChat.select().join(
-                        db_management.Users,
-                        on=(db_management.RUserChat.user_id == db_management.Users.id),
-                    ).where(
-                        (db_management.RUserChat.chat == chat_id)
-                        & (db_management.RUserChat.timestamp < min_date)
-                        & (db_management.RUserChat.is_member)
-                        & (db_management.RUserChat.rank < 1)
-                        & (~db_management.RUserChat.is_admin)
-                        & (~db_management.RUserChat.is_whitelisted)
-                        & (~db_management.Users.is_bot)
+                    query: peewee.ModelSelect = (
+                        db_management.RUserChat.select()
+                        .join(
+                            db_management.Users,
+                            on=(
+                                db_management.RUserChat.user_id
+                                == db_management.Users.id
+                            ),
+                        )
+                        .where(
+                            (db_management.RUserChat.chat == chat_id)
+                            & (db_management.RUserChat.timestamp < min_date)
+                            & (db_management.RUserChat.is_member)
+                            & (db_management.RUserChat.rank < 1)
+                            & (~db_management.RUserChat.is_admin)
+                            & (~db_management.RUserChat.is_whitelisted)
+                            & (~db_management.Users.is_bot)
+                        )
                     )
                     if len(query) > 0:
                         methods.ReplyText(

@@ -67,7 +67,8 @@ def CbQryChatPluginsPages(
             cb_qry.message.edit_reply_markup(
                 reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildChatPluginsMenu(
-                        chat_settings=chat_settings, page=-1,
+                        chat_settings=chat_settings,
+                        page=-1,
                     )
                 )
             )
@@ -94,9 +95,11 @@ def CbQryChatPluginsEnableDisableOnChat(
         chat_id=chat_id
     )
     if utils.IsSeniorModOrHigher(user_id=cb_qry.from_user.id, chat_id=chat_id):
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            chat=chat_id,
-            plugin=cb_qry.data.replace("chatplugins is_enabled_on_chat ", ""),
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(
+                chat=chat_id,
+                plugin=cb_qry.data.replace("chatplugins is_enabled_on_chat ", ""),
+            )
         )
         if r_chat_plugin:
             r_chat_plugin.is_enabled_on_chat = not r_chat_plugin.is_enabled_on_chat
@@ -163,8 +166,10 @@ def CbQryChatPluginsMinRank(
         chat_id=chat_id
     )
     if utils.IsSeniorModOrHigher(user_id=cb_qry.from_user.id, chat_id=chat_id):
-        r_chat_plugin: db_management.RChatPlugin = db_management.RChatPlugin.get_or_none(
-            chat=chat_id, plugin=cb_qry.data.replace("chatplugins min_rank ", "")
+        r_chat_plugin: db_management.RChatPlugin = (
+            db_management.RChatPlugin.get_or_none(
+                chat=chat_id, plugin=cb_qry.data.replace("chatplugins min_rank ", "")
+            )
         )
         if r_chat_plugin:
             i = r_chat_plugin.min_rank + 1
@@ -301,7 +306,8 @@ def CmdChatPlugins(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 @pyrogram.Client.on_message(
     pyrogram.filters.command(
-        commands=["chatplugins", "plugins"], prefixes=["/", "!", "#", "."],
+        commands=["chatplugins", "plugins"],
+        prefixes=["/", "!", "#", "."],
     )
     & pyrogram.filters.private
 )
@@ -310,8 +316,8 @@ def CmdChatPluginsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             if utils.IsJuniorModOrHigher(user_id=msg.from_user.id, chat_id=chat_id):

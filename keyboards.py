@@ -2273,7 +2273,7 @@ def BuildCensorshipsList(
             [
                 pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "add_censorship"),
-                    callback_data=f"censorships add",
+                    callback_data="censorships add",
                 )
             ]
         )
@@ -2292,7 +2292,8 @@ def BuildCensorshipsList(
             keyboard.append(
                 [
                     pyrogram.types.InlineKeyboardButton(
-                        text=query[i].value, callback_data=f"(i)censorships {i}",
+                        text=query[i].value,
+                        callback_data=f"(i)censorships {i}",
                     ),
                     pyrogram.types.InlineKeyboardButton(
                         text=pyrogram.emoji.EYE + _(chat_settings.language, "get"),
@@ -2367,7 +2368,7 @@ def BuildExtraList(
             [
                 pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "set_extra"),
-                    callback_data=f"extras set",
+                    callback_data="extras set",
                 )
             ]
         )
@@ -2385,7 +2386,8 @@ def BuildExtraList(
             keyboard.append(
                 [
                     pyrogram.types.InlineKeyboardButton(
-                        text=query[i].key, callback_data=f"(i)extras {i}",
+                        text=query[i].key,
+                        callback_data=f"(i)extras {i}",
                     ),
                     pyrogram.types.InlineKeyboardButton(
                         text=pyrogram.emoji.MEMO + _(chat_settings.language, "set"),
@@ -2418,7 +2420,7 @@ def BuildExtraList(
             [
                 pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "key_text_value_text"),
-                    callback_data=f"extras set text text",
+                    callback_data="extras set text text",
                 ),
             ]
         )
@@ -2426,7 +2428,7 @@ def BuildExtraList(
             [
                 pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "key_text_value_media"),
-                    callback_data=f"extras set text media",
+                    callback_data="extras set text media",
                 ),
             ]
         )
@@ -2434,7 +2436,7 @@ def BuildExtraList(
             [
                 pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "key_regex_value_text"),
-                    callback_data=f"extras set regex text",
+                    callback_data="extras set regex text",
                 ),
             ]
         )
@@ -2442,7 +2444,7 @@ def BuildExtraList(
             [
                 pyrogram.types.InlineKeyboardButton(
                     text=_(chat_settings.language, "key_regex_value_media"),
-                    callback_data=f"extras set regex media",
+                    callback_data="extras set regex media",
                 ),
             ]
         )
@@ -2525,7 +2527,9 @@ def BuildMessagesList(
         )
     )
     page = AdjustPage(
-        page=page, max_n=len(query), max_items_page=utils.config["max_items_keyboard"],
+        page=page,
+        max_n=len(query),
+        max_items_page=utils.config["max_items_keyboard"],
     )
     begin = page * utils.config["max_items_keyboard"]
     end = min(len(query), (page + 1) * utils.config["max_items_keyboard"])
@@ -2572,7 +2576,8 @@ def BuildInactivesConfirmation(
     keyboard = [
         [
             pyrogram.types.InlineKeyboardButton(
-                text=_(chat_settings.language, "yes"), callback_data="inactives yes",
+                text=_(chat_settings.language, "yes"),
+                callback_data="inactives yes",
             ),
         ],
         [
@@ -2601,7 +2606,8 @@ def BuildInactivesConfirmation(
         ],
         [
             pyrogram.types.InlineKeyboardButton(
-                text=_(chat_settings.language, "no"), callback_data="inactives no",
+                text=_(chat_settings.language, "no"),
+                callback_data="inactives no",
             ),
         ],
     ]
@@ -2610,7 +2616,8 @@ def BuildInactivesConfirmation(
 
 
 def BuildWhitelistedUsersList(
-    chat_settings: db_management.ChatSettings, page: int = 0,
+    chat_settings: db_management.ChatSettings,
+    page: int = 0,
 ) -> list:
     header = [
         [
@@ -2645,7 +2652,9 @@ def BuildWhitelistedUsersList(
         )
     )
     page = AdjustPage(
-        page=page, max_n=len(query), max_items_page=utils.config["max_items_keyboard"],
+        page=page,
+        max_n=len(query),
+        max_items_page=utils.config["max_items_keyboard"],
     )
     begin = page * utils.config["max_items_keyboard"]
     end = min(len(query), (page + 1) * utils.config["max_items_keyboard"])
@@ -2686,7 +2695,8 @@ def BuildWhitelistedUsersList(
 
 
 def BuildWhitelistedGbannedUsersList(
-    chat_settings: db_management.ChatSettings, page: int = 0,
+    chat_settings: db_management.ChatSettings,
+    page: int = 0,
 ) -> list:
     header = [
         [
@@ -2721,7 +2731,9 @@ def BuildWhitelistedGbannedUsersList(
         )
     )
     page = AdjustPage(
-        page=page, max_n=len(query), max_items_page=utils.config["max_items_keyboard"],
+        page=page,
+        max_n=len(query),
+        max_items_page=utils.config["max_items_keyboard"],
     )
     begin = page * utils.config["max_items_keyboard"]
     end = min(len(query), (page + 1) * utils.config["max_items_keyboard"])
@@ -2762,7 +2774,8 @@ def BuildWhitelistedGbannedUsersList(
 
 
 def BuildWhitelistedChatsList(
-    chat_settings: db_management.ChatSettings, page: int = 0,
+    chat_settings: db_management.ChatSettings,
+    page: int = 0,
 ) -> list:
     header = [
         [
@@ -2792,7 +2805,9 @@ def BuildWhitelistedChatsList(
         )
     )
     page = AdjustPage(
-        page=page, max_n=len(query), max_items_page=utils.config["max_items_keyboard"],
+        page=page,
+        max_n=len(query),
+        max_items_page=utils.config["max_items_keyboard"],
     )
     begin = page * utils.config["max_items_keyboard"]
     end = min(len(query), (page + 1) * utils.config["max_items_keyboard"])
@@ -2851,7 +2866,8 @@ def BuildGloballyBannedUsersList(
         ],
         [
             pyrogram.types.InlineKeyboardButton(
-                text=_(chat_settings.language, "add_user"), callback_data="gbanned add",
+                text=_(chat_settings.language, "add_user"),
+                callback_data="gbanned add",
             )
         ],
     ]
@@ -2871,7 +2887,9 @@ def BuildGloballyBannedUsersList(
         )
     )
     page = AdjustPage(
-        page=page, max_n=len(query), max_items_page=utils.config["max_items_keyboard"],
+        page=page,
+        max_n=len(query),
+        max_items_page=utils.config["max_items_keyboard"],
     )
     begin = page * utils.config["max_items_keyboard"]
     end = min(len(query), (page + 1) * utils.config["max_items_keyboard"])
@@ -2922,7 +2940,8 @@ def BuildBlockedUsersList(
         ],
         [
             pyrogram.types.InlineKeyboardButton(
-                text=_(chat_settings.language, "add_user"), callback_data="blocked add",
+                text=_(chat_settings.language, "add_user"),
+                callback_data="blocked add",
             )
         ],
     ]
@@ -2942,7 +2961,9 @@ def BuildBlockedUsersList(
         )
     )
     page = AdjustPage(
-        page=page, max_n=len(query), max_items_page=utils.config["max_items_keyboard"],
+        page=page,
+        max_n=len(query),
+        max_items_page=utils.config["max_items_keyboard"],
     )
     begin = page * utils.config["max_items_keyboard"]
     end = min(len(query), (page + 1) * utils.config["max_items_keyboard"])
@@ -2981,7 +3002,8 @@ def BuildBlockedUsersList(
 
 
 def BuildAlternativeCommandsList(
-    chat_settings: db_management.ChatSettings, page: int = 0,
+    chat_settings: db_management.ChatSettings,
+    page: int = 0,
 ) -> list:
     header = list()
     header.append(
@@ -2996,7 +3018,7 @@ def BuildAlternativeCommandsList(
         [
             pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "set_alternative"),
-                callback_data=f"alternatives set",
+                callback_data="alternatives set",
             )
         ]
     )
@@ -3007,7 +3029,9 @@ def BuildAlternativeCommandsList(
         peewee.fn.LOWER(db_management.ChatAlternatives.alternative),
     )
     page = AdjustPage(
-        page=page, max_n=len(query), max_items_page=utils.config["max_items_keyboard"],
+        page=page,
+        max_n=len(query),
+        max_items_page=utils.config["max_items_keyboard"],
     )
     begin = page * utils.config["max_items_keyboard"]
     end = min(len(query), (page + 1) * utils.config["max_items_keyboard"])
@@ -3015,7 +3039,8 @@ def BuildAlternativeCommandsList(
         keyboard.append(
             [
                 pyrogram.types.InlineKeyboardButton(
-                    text=f"/{query[i].original}", callback_data=f"(i)alternatives {i}",
+                    text=f"/{query[i].original}",
+                    callback_data=f"(i)alternatives {i}",
                 ),
                 pyrogram.types.InlineKeyboardButton(
                     text=f"{pyrogram.emoji.EYE} {query[i].alternative}",
@@ -3616,7 +3641,9 @@ def BuildBotPluginsMenu(
         peewee.fn.LOWER(db_management.Plugins.name)
     )
     page = AdjustPage(
-        page=page, max_n=len(query), max_items_page=utils.config["max_items_keyboard"],
+        page=page,
+        max_n=len(query),
+        max_items_page=utils.config["max_items_keyboard"],
     )
     begin = page * utils.config["max_items_keyboard"]
     end = min(len(query), (page + 1) * utils.config["max_items_keyboard"])
@@ -3641,7 +3668,8 @@ def BuildBotPluginsMenu(
         keyboard.append(
             [
                 pyrogram.types.InlineKeyboardButton(
-                    text=query[i].name, callback_data=f"(i)botplugins {query[i].name}",
+                    text=query[i].name,
+                    callback_data=f"(i)botplugins {query[i].name}",
                 ),
                 pyrogram.types.InlineKeyboardButton(
                     text=dictionaries.YES_NO_EMOJI[query[i].is_enabled]
@@ -3693,7 +3721,9 @@ def BuildChatPluginsMenu(
         .order_by(peewee.fn.LOWER(db_management.Plugins.name))
     )
     page = AdjustPage(
-        page=page, max_n=len(query), max_items_page=utils.config["max_items_keyboard"],
+        page=page,
+        max_n=len(query),
+        max_items_page=utils.config["max_items_keyboard"],
     )
     begin = page * utils.config["max_items_keyboard"]
     end = min(len(query), (page + 1) * utils.config["max_items_keyboard"])
@@ -3781,7 +3811,9 @@ def BuildGroupsMenu(
         .order_by(peewee.fn.LOWER(db_management.Chats.title))
     )
     page = AdjustPage(
-        page=page, max_n=len(query), max_items_page=utils.config["max_items_keyboard"],
+        page=page,
+        max_n=len(query),
+        max_items_page=utils.config["max_items_keyboard"],
     )
     begin = page * utils.config["max_items_keyboard"]
     end = min(len(query), (page + 1) * utils.config["max_items_keyboard"])
@@ -3827,7 +3859,9 @@ def BuildLogMenu(chat_settings: db_management.ChatSettings, page: int = 0) -> li
         .order_by(db_management.Logs.timestamp.desc())
     )
     page = AdjustPage(
-        page=page, max_n=len(query), max_items_page=utils.config["max_items_keyboard"],
+        page=page,
+        max_n=len(query),
+        max_items_page=utils.config["max_items_keyboard"],
     )
     footer_buttons = BuildPager(
         base_callback_data="logs",

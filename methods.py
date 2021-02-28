@@ -43,8 +43,10 @@ def Info(
         if chat_id < 0:
             chat_obj = db_management.Chats = db_management.Chats.get_or_none(id=chat_id)
             # info of target in chat_id
-            chat_settings: db_management.ChatSettings = chat_settings if chat_settings else db_management.ChatSettings.get_or_none(
-                chat_id=chat_id
+            chat_settings: db_management.ChatSettings = (
+                chat_settings
+                if chat_settings
+                else db_management.ChatSettings.get_or_none(chat_id=chat_id)
             )
             r_target_chat = r_target_chat or db_management.RUserChat.get_or_none(
                 user_id=target, chat_id=chat_id
@@ -155,9 +157,11 @@ def GetObjInfo(
     else:
         value = utils.CleanUsername(username=value)
         value = f"@{value}" if not value.startswith("@") else value
-        query: peewee.ModelSelect = db_management.ResolvedObjects.select().where(
-            db_management.ResolvedObjects.username == value[1:].lower()
-        ).order_by(db_management.ResolvedObjects.timestamp.desc())
+        query: peewee.ModelSelect = (
+            db_management.ResolvedObjects.select()
+            .where(db_management.ResolvedObjects.username == value[1:].lower())
+            .order_by(db_management.ResolvedObjects.timestamp.desc())
+        )
         try:
             resolved_obj = query.get()
             # if already resolved object return saved id
@@ -200,8 +204,8 @@ def GetObjInfo(
             # user
             user: db_management.Users = db_management.Users.get_or_none(id=value)
             if user:
-                user_settings: db_management.UserSettings = db_management.UserSettings.get_or_none(
-                    user_id=value
+                user_settings: db_management.UserSettings = (
+                    db_management.UserSettings.get_or_none(user_id=value)
                 )
                 if user_settings:
                     return (
@@ -550,7 +554,7 @@ def UnwarnAll(
             r_target_chat.warns = 0
             r_target_chat.save()
             text = _(chat_settings.language, "action_on_user").format(
-                f"#unwarnall", target, reasons, executer, abs(chat_id)
+                "#unwarnall", target, reasons, executer, abs(chat_id)
             )
 
             utils.Log(
@@ -1333,8 +1337,8 @@ def AutoPunish(
             r_target_chat = db_management.RUserChat.create(
                 user_id=target, chat_id=chat_id
             )
-        chat_settings: db_management.ChatSettings = chat_settings or db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            chat_settings or db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
 
         now = int(time.time())
@@ -1377,8 +1381,10 @@ def AutoPunish(
                         (db_management.RUserChat.user == target)
                         & (db_management.RUserChat.chat == chat_id)
                     ).execute()
-                    r_target_chat: db_management.RUserChat = db_management.RUserChat.get_or_none(
-                        user_id=target, chat_id=chat_id
+                    r_target_chat: db_management.RUserChat = (
+                        db_management.RUserChat.get_or_none(
+                            user_id=target, chat_id=chat_id
+                        )
                     )
                     hashtags.append(
                         f"#warn {r_target_chat.warns}/{chat_settings.max_warns}"
@@ -1594,7 +1600,11 @@ def AutoPunish(
         hashtags.append("#automatic")
         hashtags.reverse()
         text = _(chat_settings.language, "action_on_user").format(
-            " ".join(hashtags), target, "\n".join(reasons), client.ME.id, abs(chat_id),
+            " ".join(hashtags),
+            target,
+            "\n".join(reasons),
+            client.ME.id,
+            abs(chat_id),
         )
         utils.Log(
             client=client,
@@ -1715,7 +1725,8 @@ def SendMessage(
             chat_settings = db_management.UserSettings.create(user_id=chat_id)
     try:
         client.send_chat_action(
-            chat_id=chat_id, action="typing",
+            chat_id=chat_id,
+            action="typing",
         )
     except pyrogram.errors.ChatWriteForbidden as ex:
         print(ex)
@@ -1728,7 +1739,8 @@ def SendMessage(
         ):
             client.leave_chat(chat_id=chat_id)
         client.send_message(
-            chat_id=utils.config["log_chat"], text=_("en", "tg_error_X").format(ex),
+            chat_id=utils.config["log_chat"],
+            text=_("en", "tg_error_X").format(ex),
         )
     except pyrogram.errors.UserIsBlocked as ex:
         print(ex)
@@ -1816,7 +1828,8 @@ def ReplyText(
 
     try:
         client.send_chat_action(
-            chat_id=msg.chat.id, action="typing",
+            chat_id=msg.chat.id,
+            action="typing",
         )
     except pyrogram.errors.ChatWriteForbidden as ex:
         print(ex)
@@ -1829,7 +1842,8 @@ def ReplyText(
         ):
             client.leave_chat(chat_id=msg.chat.id)
         client.send_message(
-            chat_id=utils.config["log_chat"], text=_("en", "tg_error_X").format(ex),
+            chat_id=utils.config["log_chat"],
+            text=_("en", "tg_error_X").format(ex),
         )
     except pyrogram.errors.RPCError as ex:
         print(ex)
@@ -1904,7 +1918,8 @@ def ReplyPhoto(
 
     try:
         client.send_chat_action(
-            chat_id=msg.chat.id, action="upload_photo",
+            chat_id=msg.chat.id,
+            action="upload_photo",
         )
     except pyrogram.errors.ChatWriteForbidden as ex:
         print(ex)
@@ -1917,7 +1932,8 @@ def ReplyPhoto(
         ):
             client.leave_chat(chat_id=msg.chat.id)
         client.send_message(
-            chat_id=utils.config["log_chat"], text=_("en", "tg_error_X").format(ex),
+            chat_id=utils.config["log_chat"],
+            text=_("en", "tg_error_X").format(ex),
         )
     except pyrogram.errors.RPCError as ex:
         print(ex)
@@ -2000,7 +2016,8 @@ def SendDocument(
             chat_settings = db_management.UserSettings.create(user_id=chat_id)
     try:
         client.send_chat_action(
-            chat_id=chat_id, action="upload_document",
+            chat_id=chat_id,
+            action="upload_document",
         )
     except pyrogram.errors.ChatWriteForbidden as ex:
         print(ex)
@@ -2013,7 +2030,8 @@ def SendDocument(
         ):
             client.leave_chat(chat_id=chat_id)
         client.send_message(
-            chat_id=utils.config["log_chat"], text=_("en", "tg_error_X").format(ex),
+            chat_id=utils.config["log_chat"],
+            text=_("en", "tg_error_X").format(ex),
         )
     except pyrogram.errors.RPCError as ex:
         print(ex)
@@ -2102,7 +2120,8 @@ def ReplyDocument(
 
     try:
         client.send_chat_action(
-            chat_id=msg.chat.id, action="upload_document",
+            chat_id=msg.chat.id,
+            action="upload_document",
         )
     except pyrogram.errors.ChatWriteForbidden as ex:
         print(ex)
@@ -2115,7 +2134,8 @@ def ReplyDocument(
         ):
             client.leave_chat(chat_id=msg.chat.id)
         client.send_message(
-            chat_id=utils.config["log_chat"], text=_("en", "tg_error_X").format(ex),
+            chat_id=utils.config["log_chat"],
+            text=_("en", "tg_error_X").format(ex),
         )
     except pyrogram.errors.RPCError as ex:
         print(ex)
@@ -2196,5 +2216,9 @@ def SendBackup(client: pyrogram.Client):
             document=backup_name,
             disable_notification=True,
             progress=utils.DFromUToTelegramProgress,
-            progress_args=(tmp_msgs[id_], _("en", "sending_backup"), time.time(),),
+            progress_args=(
+                tmp_msgs[id_],
+                _("en", "sending_backup"),
+                time.time(),
+            ),
         )

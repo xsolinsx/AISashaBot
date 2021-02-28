@@ -62,7 +62,8 @@ def AddGroup(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.left_chat_member, group=-10,
+    pyrogram.filters.left_chat_member,
+    group=-10,
 )
 def DeleteGroup(client: pyrogram.Client, msg: pyrogram.types.Message):
     if client.ME.id == msg.left_chat_member.id:
@@ -160,7 +161,8 @@ def CbQryHelpPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
         cb_qry.message.edit_reply_markup(
             reply_markup=pyrogram.types.InlineKeyboardMarkup(
                 keyboards.BuildHelpMenu(
-                    user_settings=cb_qry.from_user.settings, page=-1,
+                    user_settings=cb_qry.from_user.settings,
+                    page=-1,
                 )
             )
         )
@@ -202,7 +204,7 @@ def CbQryHelpPlugin(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
 
         if tmp_text:
             text = (
-                _(cb_qry.from_user.settings.language, f"help_intro")
+                _(cb_qry.from_user.settings.language, "help_intro")
                 + "<b>"
                 + _(cb_qry.from_user.settings.language, f"{plugin}").upper()
                 + "</b>\n"
@@ -319,7 +321,7 @@ def CmdHelp(client: pyrogram.Client, msg: pyrogram.types.Message):
 
             if tmp_text:
                 text = (
-                    _(msg.from_user.settings.language, f"help_intro")
+                    _(msg.from_user.settings.language, "help_intro")
                     + "<b>"
                     + _(msg.from_user.settings.language, f"{plugin}").upper()
                     + "</b>\n"
@@ -343,7 +345,7 @@ def CmdHelp(client: pyrogram.Client, msg: pyrogram.types.Message):
     pyrogram.filters.command(commands=["helpall"], prefixes=["/", "!", "#", "."])
 )
 def CmdHelpAll(client: pyrogram.Client, msg: pyrogram.types.Message):
-    text = _(msg.from_user.settings.language, f"help_intro")
+    text = _(msg.from_user.settings.language, "help_intro")
     rank = utils.GetRank(user_id=msg.from_user.id)
     user_viewable_plugins = (
         p.name

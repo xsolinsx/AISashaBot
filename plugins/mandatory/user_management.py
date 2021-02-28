@@ -49,13 +49,17 @@ def SendTagAlerts(client: pyrogram.Client, msg: pyrogram.types.Message):
             for user in query:
                 if user.user_id != msg.from_user.id:
                     username = user.user.username
-                    regex1 = re.compile(pattern=f"\\b([@]?{username})\\b", flags=re.I,)
+                    regex1 = re.compile(
+                        pattern=f"\\b([@]?{username})\\b",
+                        flags=re.I,
+                    )
                     match = regex1.match(text_to_use)
                     if not match and user.nickname:
                         # test all nicknames of the user
                         for nickname in user.nickname.split("|"):
                             regex2 = re.compile(
-                                pattern=f"\\b({nickname})\\b", flags=re.I | re.M,
+                                pattern=f"\\b({nickname})\\b",
+                                flags=re.I | re.M,
                             )
                             if match or regex2.match(text_to_use):
                                 match = True
@@ -248,7 +252,7 @@ def CbQryMySettingsSetNickname(
     )
 
     cb_qry.message.edit_text(
-        text=_(cb_qry.from_user.settings.language, f"nickname_help").format(
+        text=_(cb_qry.from_user.settings.language, "nickname_help").format(
             utils.config["max_nicknames"]
         ),
         reply_markup=pyrogram.types.InlineKeyboardMarkup(
@@ -256,7 +260,7 @@ def CbQryMySettingsSetNickname(
                 [
                     pyrogram.types.InlineKeyboardButton(
                         text=_(cb_qry.from_user.settings.language, "cancel"),
-                        callback_data=f"cancel mysettings",
+                        callback_data="cancel mysettings",
                     )
                 ]
             ]
@@ -329,7 +333,10 @@ def CbQryMySettings(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["mysettings"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["mysettings"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdMySettings(client: pyrogram.Client, msg: pyrogram.types.Message):

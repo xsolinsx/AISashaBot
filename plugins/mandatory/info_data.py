@@ -374,7 +374,9 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
 
             if text:
                 methods.CallbackQueryAnswer(
-                    cb_qry=cb_qry, text=text, show_alert=True,
+                    cb_qry=cb_qry,
+                    text=text,
+                    show_alert=True,
                 )
                 methods.SendMessage(client=client, chat_id=chat_id, text=text)
             else:
@@ -446,7 +448,9 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
 
                 if punishment and text:
                     methods.CallbackQueryAnswer(
-                        cb_qry=cb_qry, text=text, show_alert=True,
+                        cb_qry=cb_qry,
+                        text=text,
+                        show_alert=True,
                     )
                     methods.SendMessage(client=client, chat_id=chat_id, text=text)
                 else:
@@ -526,13 +530,13 @@ def CmdInfo(client: pyrogram.Client, msg: pyrogram.types.Message):
 
     if chat_id < 0:
         # chat
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
     else:
         # user
-        chat_settings: db_management.UserSettings = db_management.UserSettings.get_or_none(
-            user_id=chat_id
+        chat_settings: db_management.UserSettings = (
+            db_management.UserSettings.get_or_none(user_id=chat_id)
         )
     if chat_settings:
         if utils.IsJuniorModOrHigher(user_id=msg.from_user.id, chat_id=chat_id):
@@ -636,8 +640,10 @@ def CmdInfo(client: pyrogram.Client, msg: pyrogram.types.Message):
                             traceback.print_exc()
                             text = _(chat_settings.language, "tg_error_X").format(ex)
 
-                        r_target_chat: db_management.RUserChat = db_management.RUserChat.get_or_none(
-                            user_id=target_id, chat_id=chat_id
+                        r_target_chat: db_management.RUserChat = (
+                            db_management.RUserChat.get_or_none(
+                                user_id=target_id, chat_id=chat_id
+                            )
                         )
                         if not r_target_chat:
                             r_target_chat = db_management.RUserChat.create(
@@ -807,7 +813,9 @@ def CbQryMessagesInfoUser(
         else:
             text = int(cb_qry.data.replace("(i)messages ", ""))
     methods.CallbackQueryAnswer(
-        cb_qry=cb_qry, text=text, show_alert=True,
+        cb_qry=cb_qry,
+        text=text,
+        show_alert=True,
     )
 
 
@@ -869,7 +877,7 @@ def CbQryMessagesOnlyMembers(
                 client=client,
                 chat_id=chat_id,
                 executer=cb_qry.from_user.id,
-                action=f"members updated",
+                action="members updated",
                 target=chat_id,
             )
     cb_qry.message.edit_reply_markup(
@@ -930,7 +938,9 @@ def CbQryMessagesPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQ
             cb_qry.message.edit_reply_markup(
                 reply_markup=pyrogram.types.InlineKeyboardMarkup(
                     keyboards.BuildMessagesList(
-                        chat_settings=chat_settings, members_only=members_only, page=-1,
+                        chat_settings=chat_settings,
+                        members_only=members_only,
+                        page=-1,
                     )
                 )
             )
@@ -1009,7 +1019,7 @@ def CmdMessages(client: pyrogram.Client, msg: pyrogram.types.Message):
                     client=client,
                     chat_id=msg.chat.id,
                     executer=msg.from_user.id,
-                    action=f"members updated",
+                    action="members updated",
                     target=msg.chat.id,
                 )
         utils.Log(
@@ -1055,7 +1065,10 @@ def CmdMessages(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(commands=["messages"], prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.command(
+        commands=["messages"],
+        prefixes=["/", "!", "#", "."],
+    )
     & pyrogram.filters.private
 )
 def CmdMessagesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -1063,8 +1076,8 @@ def CmdMessagesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     if isinstance(chat_id, str):
         methods.ReplyText(client=client, msg=msg, text=chat_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             if utils.IsJuniorModOrHigher(user_id=msg.from_user.id, chat_id=chat_id):
@@ -1097,7 +1110,7 @@ def CmdMessagesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                             client=client,
                             chat_id=chat_id,
                             executer=msg.from_user.id,
-                            action=f"members updated",
+                            action="members updated",
                             target=chat_id,
                         )
                 utils.Log(
@@ -1214,10 +1227,10 @@ def CmdUsername(client: pyrogram.Client, msg: pyrogram.types.Message):
                 )
             elif len(msg.command) == 2:
                 if utils.IsInt(msg.command[1]):
-                    query: peewee.ModelSelect = db_management.ResolvedObjects.select().where(
-                        db_management.ResolvedObjects.id == int(msg.command[1])
-                    ).order_by(
-                        db_management.ResolvedObjects.timestamp.desc()
+                    query: peewee.ModelSelect = (
+                        db_management.ResolvedObjects.select()
+                        .where(db_management.ResolvedObjects.id == int(msg.command[1]))
+                        .order_by(db_management.ResolvedObjects.timestamp.desc())
                     )
                     try:
                         resolved_obj = query.get()
@@ -1298,16 +1311,20 @@ def CmdIsMember(client: pyrogram.Client, msg: pyrogram.types.Message):
                             break
                 if not member:
                     if utils.IsInt(msg.command[1]):
-                        query: peewee.ModelSelect = db_management.ResolvedObjects.select().where(
-                            db_management.ResolvedObjects.id == int(msg.command[1])
-                        ).order_by(
-                            db_management.ResolvedObjects.timestamp.desc()
+                        query: peewee.ModelSelect = (
+                            db_management.ResolvedObjects.select()
+                            .where(
+                                db_management.ResolvedObjects.id == int(msg.command[1])
+                            )
+                            .order_by(db_management.ResolvedObjects.timestamp.desc())
                         )
                     else:
-                        query: peewee.ModelSelect = db_management.ResolvedObjects.select().where(
-                            db_management.ResolvedObjects.username == msg.command[1]
-                        ).order_by(
-                            db_management.ResolvedObjects.timestamp.desc()
+                        query: peewee.ModelSelect = (
+                            db_management.ResolvedObjects.select()
+                            .where(
+                                db_management.ResolvedObjects.username == msg.command[1]
+                            )
+                            .order_by(db_management.ResolvedObjects.timestamp.desc())
                         )
 
                     try:
@@ -1388,8 +1405,8 @@ def CmdIsMemberChat(client: pyrogram.Client, msg: pyrogram.types.Message):
         if isinstance(user_id, str):
             methods.ReplyText(client=client, msg=msg, text=user_id)
     else:
-        chat_settings: db_management.ChatSettings = db_management.ChatSettings.get_or_none(
-            chat_id=chat_id
+        chat_settings: db_management.ChatSettings = (
+            db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
         if chat_settings:
             if utils.IsPrivilegedOrHigher(
@@ -1505,7 +1522,8 @@ def CbQryGroupsPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
 
 @pyrogram.Client.on_message(
     pyrogram.filters.command(
-        commands=["links", "groups"], prefixes=["/", "!", "#", "."],
+        commands=["links", "groups"],
+        prefixes=["/", "!", "#", "."],
     )
     & pyrogram.filters.private
 )

@@ -754,10 +754,14 @@ class RFlamedUserChat(peewee.Model):
     )
 
     counter = peewee.IntegerField(
-        default=0, null=False, constraints=[peewee.Check(constraint="counter >= 0")],
+        default=0,
+        null=False,
+        constraints=[peewee.Check(constraint="counter >= 0")],
     )
     max_flame = peewee.IntegerField(
-        default=10, null=False, constraints=[peewee.Check(constraint="max_flame >= 1")],
+        default=10,
+        null=False,
+        constraints=[peewee.Check(constraint="max_flame >= 1")],
     )
 
     class Meta:
@@ -1139,13 +1143,16 @@ def DBChatSettings(chat: pyrogram.types.Chat):
         # @username
         ChatWhitelistedChats.create(chat_id=chat.id, whitelisted_chat=-1001066197625)
 
-    query: peewee.ModelSelect = Plugins.select().where(Plugins.is_optional).order_by(
-        Plugins.name
+    query: peewee.ModelSelect = (
+        Plugins.select().where(Plugins.is_optional).order_by(Plugins.name)
     )
     try:
         RChatPlugin.bulk_create(
             RChatPlugin(
-                chat=chat.id, plugin=plugin.name, min_rank=1, is_enabled_on_chat=False,
+                chat=chat.id,
+                plugin=plugin.name,
+                min_rank=1,
+                is_enabled_on_chat=False,
             )
             for plugin in query
         )
@@ -1246,7 +1253,9 @@ def DBChatMembers(client: pyrogram.Client, chat_id: int, clean_up=True):
             ).execute()
         else:
             RUserChat.create(
-                user_id=member.user.id, chat_id=chat_id, is_member=member.is_member,
+                user_id=member.user.id,
+                chat_id=chat_id,
+                is_member=member.is_member,
             )
     # check members, admins and creator
     for member in client.iter_chat_members(chat_id=chat_id, filter="all"):
@@ -1257,7 +1266,9 @@ def DBChatMembers(client: pyrogram.Client, chat_id: int, clean_up=True):
             ).execute()
         else:
             RUserChat.create(
-                user_id=member.user.id, chat_id=chat_id, is_member=True,
+                user_id=member.user.id,
+                chat_id=chat_id,
+                is_member=True,
             )
 
 
