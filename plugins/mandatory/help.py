@@ -1,15 +1,15 @@
 import re
 import secrets
 
-import peewee
-import pyrogram
-
 import db_management
 import dictionaries
 import keyboards
 import methods
 import my_filters
+import peewee
+import pyrogram
 import utils
+from pykeyboard import InlineKeyboard
 
 _ = utils.GetLocalizedString
 
@@ -24,39 +24,26 @@ _ = utils.GetLocalizedString
     group=-10,
 )
 def AddGroup(client: pyrogram.Client, msg: pyrogram.types.Message):
+    added_to_group = False
     if msg.new_chat_members:
         if client.ME.id in map(lambda new_member: new_member.id, msg.new_chat_members):
-            methods.ReplyText(
-                client=client,
-                msg=msg,
-                text=_(msg.chat.settings.language, "group_start_message"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    [
-                        [
-                            pyrogram.types.InlineKeyboardButton(
-                                text=_(msg.chat.settings.language, "start_private"),
-                                url=f"t.me/{client.ME.username}",
-                            )
-                        ]
-                    ]
-                ),
-            )
-            msg.stop_propagation()
+            added_to_group = True
     else:
+        added_to_group = True
+
+    if added_to_group:
+        py_k = InlineKeyboard()
+        py_k.row(
+            pyrogram.types.InlineKeyboardButton(
+                text=_(msg.chat.settings.language, "start_private"),
+                url=f"t.me/{client.ME.username}",
+            )
+        )
         methods.ReplyText(
             client=client,
             msg=msg,
             text=_(msg.chat.settings.language, "group_start_message"),
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                [
-                    [
-                        pyrogram.types.InlineKeyboardButton(
-                            text=_(msg.chat.settings.language, "start_private"),
-                            url=f"t.me/{client.ME.username}",
-                        )
-                    ]
-                ]
-            ),
+            reply_markup=py_k,
         )
         msg.stop_propagation()
 
@@ -94,12 +81,10 @@ def CbQryStart(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     )
     cb_qry.message.edit_text(
         text=_(cb_qry.from_user.settings.language, "private_start_message"),
-        reply_markup=pyrogram.types.InlineKeyboardMarkup(
-            keyboards.BuildStartMenu(
-                user_settings=cb_qry.from_user.settings,
-                bot_username=client.ME.username,
-                channel_username=utils.config["channel"]["username"],
-            )
+        reply_markup=keyboards.BuildStartMenu(
+            user_settings=cb_qry.from_user.settings,
+            bot_username=client.ME.username,
+            channel_username=utils.config["channel"]["username"],
         ),
         parse_mode="html",
     )
@@ -114,12 +99,10 @@ def CmdStartPrivate(client: pyrogram.Client, msg: pyrogram.types.Message):
         client=client,
         msg=msg,
         text=_(msg.from_user.settings.language, "private_start_message"),
-        reply_markup=pyrogram.types.InlineKeyboardMarkup(
-            keyboards.BuildStartMenu(
-                user_settings=msg.from_user.settings,
-                bot_username=client.ME.username,
-                channel_username=utils.config["channel"]["username"],
-            )
+        reply_markup=keyboards.BuildStartMenu(
+            user_settings=msg.from_user.settings,
+            bot_username=client.ME.username,
+            channel_username=utils.config["channel"]["username"],
         ),
     )
 
@@ -137,33 +120,27 @@ def CbQryHelpPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
     )
     if cb_qry.data.endswith("<<"):
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildHelpMenu(user_settings=cb_qry.from_user.settings, page=0)
+            reply_markup=keyboards.BuildHelpMenu(
+                user_settings=cb_qry.from_user.settings, page=0
             )
         )
     elif cb_qry.data.endswith("-"):
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildHelpMenu(
-                    user_settings=cb_qry.from_user.settings, page=page - 1
-                )
+            reply_markup=keyboards.BuildHelpMenu(
+                user_settings=cb_qry.from_user.settings, page=page - 1
             )
         )
     elif cb_qry.data.endswith("+"):
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildHelpMenu(
-                    user_settings=cb_qry.from_user.settings, page=page + 1
-                )
+            reply_markup=keyboards.BuildHelpMenu(
+                user_settings=cb_qry.from_user.settings, page=page + 1
             )
         )
     elif cb_qry.data.endswith(">>"):
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildHelpMenu(
-                    user_settings=cb_qry.from_user.settings,
-                    page=-1,
-                )
+            reply_markup=keyboards.BuildHelpMenu(
+                user_settings=cb_qry.from_user.settings,
+                page=-1,
             )
         )
 
@@ -212,11 +189,9 @@ def CbQryHelpPlugin(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
             )
     cb_qry.message.edit_text(
         text=text,
-        reply_markup=pyrogram.types.InlineKeyboardMarkup(
-            keyboards.BuildHelpMenu(
-                user_settings=cb_qry.from_user.settings,
-                selected_setting=cb_qry.data.replace("mainhelp ", ""),
-            )
+        reply_markup=keyboards.BuildHelpMenu(
+            user_settings=cb_qry.from_user.settings,
+            selected_setting=cb_qry.data.replace("mainhelp ", ""),
         ),
         parse_mode="html",
     )
@@ -251,9 +226,7 @@ def CbQryHelp(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
         )
     cb_qry.message.edit_text(
         text=text,
-        reply_markup=pyrogram.types.InlineKeyboardMarkup(
-            keyboards.BuildHelpMenu(user_settings=cb_qry.from_user.settings)
-        ),
+        reply_markup=keyboards.BuildHelpMenu(user_settings=cb_qry.from_user.settings),
         parse_mode="html",
     )
 
@@ -289,9 +262,7 @@ def CmdHelp(client: pyrogram.Client, msg: pyrogram.types.Message):
             client=client,
             chat_id=msg.from_user.id,
             text=text,
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildHelpMenu(user_settings=msg.from_user.settings)
-            ),
+            reply_markup=keyboards.BuildHelpMenu(user_settings=msg.from_user.settings),
             parse_mode="html",
         )
     else:
@@ -332,10 +303,8 @@ def CmdHelp(client: pyrogram.Client, msg: pyrogram.types.Message):
             client=client,
             chat_id=msg.from_user.id,
             text=text,
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildHelpMenu(
-                    user_settings=msg.from_user.settings, selected_setting=plugin
-                )
+            reply_markup=keyboards.BuildHelpMenu(
+                user_settings=msg.from_user.settings, selected_setting=plugin
             ),
             parse_mode="html",
         )
@@ -413,19 +382,19 @@ def CbQryAbout(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
         show_alert=False,
     )
     services = [
-        [pyrogram.types.InlineKeyboardButton(text=service, url=url)]
+        pyrogram.types.InlineKeyboardButton(text=service, url=url)
         for service, url in utils.config["donations"].items()
     ]
     services.append(
-        [
-            pyrogram.types.InlineKeyboardButton(
-                text=_(cb_qry.from_user.settings.language, "back_to_main_menu"),
-                callback_data="start",
-            )
-        ]
+        pyrogram.types.InlineKeyboardButton(
+            text=_(cb_qry.from_user.settings.language, "back_to_main_menu"),
+            callback_data="start",
+        )
     )
+    py_k = InlineKeyboard(row_width=1)
+    py_k.add(*services)
     cb_qry.message.edit_text(
         text=_(cb_qry.from_user.settings.language, "about_message"),
-        reply_markup=pyrogram.types.InlineKeyboardMarkup(services),
+        reply_markup=py_k,
         parse_mode="html",
     )

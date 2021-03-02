@@ -1,13 +1,13 @@
 import re
 import traceback
 
-import peewee
-import pyrogram
-
 import db_management
 import keyboards
 import methods
+import peewee
+import pyrogram
 import utils
+from pykeyboard import InlineKeyboard
 
 _ = utils.GetLocalizedString
 
@@ -224,35 +224,27 @@ def CbQryAlternativesPages(
         )
         if cb_qry.data.endswith("<<"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildAlternativeCommandsList(
-                        chat_settings=chat_settings, page=0
-                    )
+                reply_markup=keyboards.BuildAlternativeCommandsList(
+                    chat_settings=chat_settings, page=0
                 )
             )
         elif cb_qry.data.endswith("-"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildAlternativeCommandsList(
-                        chat_settings=chat_settings, page=page - 1
-                    )
+                reply_markup=keyboards.BuildAlternativeCommandsList(
+                    chat_settings=chat_settings, page=page - 1
                 )
             )
         elif cb_qry.data.endswith("+"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildAlternativeCommandsList(
-                        chat_settings=chat_settings, page=page + 1
-                    )
+                reply_markup=keyboards.BuildAlternativeCommandsList(
+                    chat_settings=chat_settings, page=page + 1
                 )
             )
         elif cb_qry.data.endswith(">>"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildAlternativeCommandsList(
-                        chat_settings=chat_settings,
-                        page=-1,
-                    )
+                reply_markup=keyboards.BuildAlternativeCommandsList(
+                    chat_settings=chat_settings,
+                    page=-1,
                 )
             )
     else:
@@ -282,19 +274,17 @@ def CbQryAlternativesSet(client: pyrogram.Client, cb_qry: pyrogram.types.Callbac
             utils.tmp_steps[cb_qry.message.chat.id] = (cb_qry, cb_qry.data)
             text = _(cb_qry.from_user.settings.language, "send_original_command")
 
+        py_k = InlineKeyboard()
+        py_k.row(
+            pyrogram.types.InlineKeyboardButton(
+                text=_(cb_qry.from_user.settings.language, "cancel"),
+                callback_data=f"cancel alternatives {chat_id}",
+            )
+        )
         cb_qry.message.edit_text(
             text=f"{utils.PrintChat(chat=db_management.Chats.get(id=chat_id))}\n"
             + text,
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                [
-                    [
-                        pyrogram.types.InlineKeyboardButton(
-                            text=_(cb_qry.from_user.settings.language, "cancel"),
-                            callback_data=f"cancel alternatives {chat_id}",
-                        )
-                    ]
-                ]
-            ),
+            reply_markup=py_k,
         )
     else:
         methods.CallbackQueryAnswer(
@@ -340,10 +330,8 @@ def CbQryAlternativesUnset(
                 show_alert=False,
             )
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildAlternativeCommandsList(
-                        chat_settings=chat_settings, page=page
-                    )
+                reply_markup=keyboards.BuildAlternativeCommandsList(
+                    chat_settings=chat_settings, page=page
                 )
             )
         else:
@@ -374,10 +362,8 @@ def CbQryAlternatives(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQu
         cb_qry.message.edit_text(
             text=_(cb_qry.message.chat.settings.language, "alternatives")
             + f" {utils.PrintChat(chat=chat_settings.chat)}",
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildAlternativeCommandsList(
-                    chat_settings=chat_settings, page=page
-                )
+            reply_markup=keyboards.BuildAlternativeCommandsList(
+                chat_settings=chat_settings, page=page
             ),
         )
     else:
@@ -404,10 +390,8 @@ def CmdAlternatives(client: pyrogram.Client, msg: pyrogram.types.Message):
             msg=msg,
             text=_(msg.chat.settings.language, "alternatives")
             + f" {utils.PrintChat(chat=msg.chat)}",
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildAlternativeCommandsList(
-                    chat_settings=msg.chat.settings, page=0
-                )
+            reply_markup=keyboards.BuildAlternativeCommandsList(
+                chat_settings=msg.chat.settings, page=0
             ),
         )
 
@@ -434,10 +418,8 @@ def CmdAlternativesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                     msg=msg,
                     text=_(chat_settings.language, "alternatives")
                     + f" {utils.PrintChat(chat=chat_settings.chat)}",
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildAlternativeCommandsList(
-                            chat_settings=chat_settings, page=0
-                        )
+                    reply_markup=keyboards.BuildAlternativeCommandsList(
+                        chat_settings=chat_settings, page=0
                     ),
                 )
         else:

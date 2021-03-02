@@ -1,9 +1,8 @@
 import urllib
 
-import pyrogram
-
 import db_management
 import methods
+import pyrogram
 import utils
 
 _ = utils.GetLocalizedString

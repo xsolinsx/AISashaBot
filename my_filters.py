@@ -2,7 +2,6 @@ import typing
 
 import pyrogram
 
-
 """Filter anonymous messages."""
 message_anonymous = pyrogram.filters.create(
     lambda _, client, msg: bool(msg.sender_chat),

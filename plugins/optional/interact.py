@@ -1,10 +1,9 @@
 import traceback
 
-import pyrogram
-
 import db_management
 import keyboards
 import methods
+import pyrogram
 import utils
 
 _ = utils.GetLocalizedString
@@ -243,12 +242,10 @@ def CmdTestReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                     client=client,
                     msg=msg,
                     text=_(msg.chat.settings.language, "select_target"),
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildActionOnAddedUsersList(
-                            chat_settings=msg.chat.settings,
-                            action="test",
-                            new_chat_members=msg.reply_to_message.new_chat_members,
-                        )
+                    reply_markup=keyboards.BuildActionOnAddedUsersList(
+                        chat_settings=msg.chat.settings,
+                        action="test",
+                        new_chat_members=msg.reply_to_message.new_chat_members,
                     ),
                 )
             else:

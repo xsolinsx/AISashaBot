@@ -1,15 +1,15 @@
 import re
 import traceback
 
-import peewee
-import pyrogram
-
 import db_management
 import dictionaries
 import keyboards
 import methods
 import my_filters
+import peewee
+import pyrogram
 import utils
+from pykeyboard import InlineKeyboard
 
 _ = utils.GetLocalizedString
 
@@ -111,13 +111,11 @@ def SendTagAlerts(client: pyrogram.Client, msg: pyrogram.types.Message):
                                                 + "...",
                                                 user.user_id,
                                             ),
-                                            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                                                keyboards.BuildTagKeyboard(
-                                                    chat=msg.chat,
-                                                    message_id=msg.message_id,
-                                                    chat_settings=msg.chat.settings,
-                                                    is_member=is_member,
-                                                )
+                                            reply_markup=keyboards.BuildTagKeyboard(
+                                                chat=msg.chat,
+                                                message_id=msg.message_id,
+                                                chat_settings=msg.chat.settings,
+                                                is_member=is_member,
                                             ),
                                         )
                                 else:
@@ -136,13 +134,11 @@ def SendTagAlerts(client: pyrogram.Client, msg: pyrogram.types.Message):
                                             + "...",
                                             user.user_id,
                                         ),
-                                        reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                                            keyboards.BuildTagKeyboard(
-                                                chat=msg.chat,
-                                                message_id=msg.message_id,
-                                                chat_settings=msg.chat.settings,
-                                                is_member=is_member,
-                                            )
+                                        reply_markup=keyboards.BuildTagKeyboard(
+                                            chat=msg.chat,
+                                            message_id=msg.message_id,
+                                            chat_settings=msg.chat.settings,
+                                            is_member=is_member,
                                         ),
                                     )
 
@@ -192,8 +188,8 @@ def CbQryMySettingsLanguageChange(
         show_alert=False,
     )
     cb_qry.message.edit_reply_markup(
-        reply_markup=pyrogram.types.InlineKeyboardMarkup(
-            keyboards.BuildPrivateSettingsMenu(user_settings=cb_qry.from_user.settings)
+        reply_markup=keyboards.BuildPrivateSettingsMenu(
+            user_settings=cb_qry.from_user.settings
         ),
     )
 
@@ -231,8 +227,8 @@ def CbQryMySettingsWantsTagAlertsChange(
         show_alert=True,
     )
     cb_qry.message.edit_reply_markup(
-        reply_markup=pyrogram.types.InlineKeyboardMarkup(
-            keyboards.BuildPrivateSettingsMenu(user_settings=cb_qry.from_user.settings)
+        reply_markup=keyboards.BuildPrivateSettingsMenu(
+            user_settings=cb_qry.from_user.settings
         ),
     )
 
@@ -251,20 +247,18 @@ def CbQryMySettingsSetNickname(
         show_alert=False,
     )
 
+    py_k = InlineKeyboard()
+    py_k.row(
+        pyrogram.types.InlineKeyboardButton(
+            text=_(cb_qry.from_user.settings.language, "cancel"),
+            callback_data="cancel mysettings",
+        )
+    )
     cb_qry.message.edit_text(
         text=_(cb_qry.from_user.settings.language, "nickname_help").format(
             utils.config["max_nicknames"]
         ),
-        reply_markup=pyrogram.types.InlineKeyboardMarkup(
-            [
-                [
-                    pyrogram.types.InlineKeyboardButton(
-                        text=_(cb_qry.from_user.settings.language, "cancel"),
-                        callback_data="cancel mysettings",
-                    )
-                ]
-            ]
-        ),
+        reply_markup=py_k,
         parse_mode="html",
     )
 
@@ -309,8 +303,8 @@ def CbQryMySettingsUnsetNickname(
     )
 
     cb_qry.message.edit_reply_markup(
-        reply_markup=pyrogram.types.InlineKeyboardMarkup(
-            keyboards.BuildPrivateSettingsMenu(user_settings=cb_qry.from_user.settings)
+        reply_markup=keyboards.BuildPrivateSettingsMenu(
+            user_settings=cb_qry.from_user.settings
         )
     )
 
@@ -326,8 +320,8 @@ def CbQryMySettings(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
     )
     cb_qry.message.edit_text(
         text=_(cb_qry.from_user.settings.language, "mysettings"),
-        reply_markup=pyrogram.types.InlineKeyboardMarkup(
-            keyboards.BuildPrivateSettingsMenu(user_settings=cb_qry.from_user.settings)
+        reply_markup=keyboards.BuildPrivateSettingsMenu(
+            user_settings=cb_qry.from_user.settings
         ),
     )
 
@@ -344,7 +338,7 @@ def CmdMySettings(client: pyrogram.Client, msg: pyrogram.types.Message):
         client=client,
         msg=msg,
         text=_(msg.from_user.settings.language, "mysettings"),
-        reply_markup=pyrogram.types.InlineKeyboardMarkup(
-            keyboards.BuildPrivateSettingsMenu(user_settings=msg.from_user.settings)
+        reply_markup=keyboards.BuildPrivateSettingsMenu(
+            user_settings=msg.from_user.settings
         ),
     )

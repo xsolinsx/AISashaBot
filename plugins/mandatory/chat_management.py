@@ -4,15 +4,15 @@ import html
 import re
 import traceback
 
-import peewee
-import pyrogram
-
 import db_management
 import dictionaries
 import keyboards
 import methods
 import my_filters
+import peewee
+import pyrogram
 import utils
+from pykeyboard import InlineKeyboard
 
 _ = utils.GetLocalizedString
 
@@ -90,10 +90,8 @@ def SendWelcome(client: pyrogram.Client, msg: pyrogram.types.Message):
                         tmp: pyrogram.types.Message = msg.reply_cached_media(
                             file_id=media_id,
                             caption=caption,
-                            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                                keyboards.BuildWelcomeButtonsKeyboard(
-                                    welcome_buttons=welcome_buttons
-                                )
+                            reply_markup=keyboards.BuildWelcomeButtonsKeyboard(
+                                welcome_buttons=welcome_buttons
                             )
                             if welcome_buttons
                             else None,
@@ -117,10 +115,8 @@ def SendWelcome(client: pyrogram.Client, msg: pyrogram.types.Message):
                         client=client,
                         msg=msg,
                         text=text,
-                        reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                            keyboards.BuildWelcomeButtonsKeyboard(
-                                welcome_buttons=welcome_buttons
-                            )
+                        reply_markup=keyboards.BuildWelcomeButtonsKeyboard(
+                            welcome_buttons=welcome_buttons
                         )
                         if welcome_buttons
                         else None,
@@ -267,11 +263,9 @@ def CbQrySettingsMenu(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQu
         cb_qry.message.edit_text(
             text=_(chat_settings.language, "settings")
             + f" {utils.PrintChat(chat=chat_settings.chat)}",
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=cb_qry.data.split(" ")[0],
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=cb_qry.data.split(" ")[0],
             ),
         )
     else:
@@ -367,11 +361,9 @@ def CbQrySettingsAreLockedChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
             ),
         )
     else:
@@ -421,11 +413,9 @@ def CbQrySettingsLanguageChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
             ),
         )
     else:
@@ -473,11 +463,9 @@ def CbQrySettingsIsBotOnChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
             ),
         )
     else:
@@ -527,11 +515,9 @@ def CbQrySettingsAllowTemporaryPunishmentsChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
             ),
         )
     else:
@@ -585,11 +571,9 @@ def CbQrySettingsHasTagAlertsChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
             ),
         )
     else:
@@ -637,11 +621,9 @@ def CbQrySettingsHasPinMarkersChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
             ),
         )
     else:
@@ -709,12 +691,10 @@ def CbQrySettingsGroupNoticesChange(
             )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                    selected_setting=setting,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
+                selected_setting=setting,
             ),
         )
     else:
@@ -768,11 +748,9 @@ def CbQrySettingsIsLinkPublicChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
             ),
         )
     else:
@@ -832,12 +810,10 @@ def CbQrySettingsSelectTime(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                    selected_setting=setting,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
+                selected_setting=setting,
             ),
         )
     else:
@@ -882,12 +858,10 @@ def CbQrySettingsNightModeTimeChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                    selected_setting=setting,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
+                selected_setting=setting,
             ),
         )
     else:
@@ -954,12 +928,10 @@ def CbQrySettingsNightModePunishmentChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                    selected_setting=setting,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
+                selected_setting=setting,
             ),
         )
     else:
@@ -1004,12 +976,10 @@ def CbQrySettingsSlowModeTimeChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                    selected_setting=setting,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
+                selected_setting=setting,
             ),
         )
     else:
@@ -1077,12 +1047,10 @@ def CbQrySettingsSlowModeValueChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                    selected_setting=setting,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
+                selected_setting=setting,
             ),
         )
     else:
@@ -1130,11 +1098,9 @@ def CbQrySettingsAllowServiceMessagesChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
             ),
         )
     else:
@@ -1182,11 +1148,9 @@ def CbQrySettingsAllowMediaGroupChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
             ),
         )
     else:
@@ -1250,11 +1214,9 @@ def CbQrySettingsGenerateLinkChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
             ),
         )
     else:
@@ -1285,18 +1247,16 @@ def CbQrySettingsSet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
             show_alert=False,
         )
 
+        py_k = InlineKeyboard()
+        py_k.row(
+            pyrogram.types.InlineKeyboardButton(
+                text=_(cb_qry.from_user.settings.language, "cancel"),
+                callback_data=f"cancel {kybrd} {chat_id}",
+            )
+        )
         cb_qry.message.edit_text(
             text=_(cb_qry.from_user.settings.language, f"{variable}_help") + "\n",
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                [
-                    [
-                        pyrogram.types.InlineKeyboardButton(
-                            text=_(cb_qry.from_user.settings.language, "cancel"),
-                            callback_data=f"cancel {kybrd} {chat_id}",
-                        )
-                    ]
-                ]
-            ),
+            reply_markup=py_k,
             parse_mode="html",
         )
     else:
@@ -1348,10 +1308,8 @@ def CbQrySettingsGet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
                     cb_qry.message.reply_cached_media(
                         file_id=media_id,
                         caption=caption,
-                        reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                            keyboards.BuildWelcomeButtonsKeyboard(
-                                welcome_buttons=welcome_buttons
-                            )
+                        reply_markup=keyboards.BuildWelcomeButtonsKeyboard(
+                            welcome_buttons=welcome_buttons
                         )
                         if welcome_buttons
                         else None,
@@ -1361,10 +1319,8 @@ def CbQrySettingsGet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
                         client=client,
                         msg=cb_qry.message,
                         text=welcome,
-                        reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                            keyboards.BuildWelcomeButtonsKeyboard(
-                                welcome_buttons=welcome_buttons
-                            )
+                        reply_markup=keyboards.BuildWelcomeButtonsKeyboard(
+                            welcome_buttons=welcome_buttons
                         )
                         if welcome_buttons
                         else None,
@@ -1400,10 +1356,8 @@ def CbQrySettingsGet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
                     text=_(cb_qry.from_user.settings.language, "get_variable_X").format(
                         _(cb_qry.from_user.settings.language, "welcome_buttons")
                     ),
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildWelcomeButtonsKeyboard(
-                            welcome_buttons=welcome_buttons
-                        )
+                    reply_markup=keyboards.BuildWelcomeButtonsKeyboard(
+                        welcome_buttons=welcome_buttons
                     ),
                 )
                 methods.CallbackQueryAnswer(
@@ -1624,11 +1578,9 @@ def CbQrySettingsWelcomeMembersPlusMinus(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
             ),
         )
     else:
@@ -1678,11 +1630,9 @@ def CbQrySettingsMaxInvitesPlusMinus(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
             ),
         )
     else:
@@ -1736,11 +1686,9 @@ def CbQrySettingsMaxFloodTimePlusMinus(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
             ),
         )
     else:
@@ -1792,11 +1740,9 @@ def CbQrySettingsMaxFloodPlusMinus(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
             ),
         )
     else:
@@ -1847,11 +1793,9 @@ def CbQrySettingsMaxWarnsPlusMinus(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
             ),
         )
     else:
@@ -1955,11 +1899,9 @@ def CbQrySettingsModifyTempPunishmentTime(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
             ),
         )
     else:
@@ -1997,11 +1939,9 @@ def CbQrySettingsMaxTempPunishmentChange(
         )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
             ),
         )
     else:
@@ -2134,12 +2074,10 @@ def CbQrySettingsChange(client: pyrogram.Client, cb_qry: pyrogram.types.Callback
             )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard=kybrd,
-                    selected_setting=setting,
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard=kybrd,
+                selected_setting=setting,
             ),
         )
     else:
@@ -2167,11 +2105,9 @@ def CmdSettings(client: pyrogram.Client, msg: pyrogram.types.Message):
                 chat_id=msg.from_user.id,
                 text=_(msg.from_user.settings.language, "settings")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildGroupSettingsMenu(
-                        chat_settings=msg.chat.settings,
-                        current_keyboard="mainsettings",
-                    )
+                reply_markup=keyboards.BuildGroupSettingsMenu(
+                    chat_settings=msg.chat.settings,
+                    current_keyboard="mainsettings",
                 ),
             )
             if not msg.text.startswith("del", 1):
@@ -2189,11 +2125,9 @@ def CmdSettings(client: pyrogram.Client, msg: pyrogram.types.Message):
                 msg=msg,
                 text=_(msg.chat.settings.language, "settings")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildGroupSettingsMenu(
-                        chat_settings=msg.chat.settings,
-                        current_keyboard="mainsettings",
-                    )
+                reply_markup=keyboards.BuildGroupSettingsMenu(
+                    chat_settings=msg.chat.settings,
+                    current_keyboard="mainsettings",
                 ),
             )
 
@@ -2218,11 +2152,9 @@ def CmdSettingsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
             msg=msg,
             text=_(chat_settings.language, "settings")
             + f" {utils.PrintChat(chat=chat_settings.chat)}",
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGroupSettingsMenu(
-                    chat_settings=chat_settings,
-                    current_keyboard="mainsettings",
-                )
+            reply_markup=keyboards.BuildGroupSettingsMenu(
+                chat_settings=chat_settings,
+                current_keyboard="mainsettings",
             ),
         )
     else:
@@ -2619,13 +2551,11 @@ def CmdAdmins(client: pyrogram.Client, msg: pyrogram.types.Message):
                     client=client,
                     chat_id=user_id,
                     text=text,
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildTagKeyboard(
-                            chat=msg.chat,
-                            message_id=msg.message_id,
-                            chat_settings=msg.chat.settings,
-                            is_member=True,
-                        )
+                    reply_markup=keyboards.BuildTagKeyboard(
+                        chat=msg.chat,
+                        message_id=msg.message_id,
+                        chat_settings=msg.chat.settings,
+                        is_member=True,
                     ),
                 )
             except pyrogram.errors.FloodWait as ex:
@@ -2732,10 +2662,8 @@ def CmdWelcome(client: pyrogram.Client, msg: pyrogram.types.Message):
                 msg.reply_cached_media(
                     file_id=media_id,
                     caption=caption,
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildWelcomeButtonsKeyboard(
-                            welcome_buttons=welcome_buttons
-                        )
+                    reply_markup=keyboards.BuildWelcomeButtonsKeyboard(
+                        welcome_buttons=welcome_buttons
                     )
                     if welcome_buttons
                     else None,
@@ -2748,10 +2676,8 @@ def CmdWelcome(client: pyrogram.Client, msg: pyrogram.types.Message):
                         client=client,
                         msg=msg,
                         text=text,
-                        reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                            keyboards.BuildWelcomeButtonsKeyboard(
-                                welcome_buttons=welcome_buttons
-                            )
+                        reply_markup=keyboards.BuildWelcomeButtonsKeyboard(
+                            welcome_buttons=welcome_buttons
                         )
                         if welcome_buttons
                         else None,
@@ -3119,33 +3045,27 @@ def CbQryCensorshipsPages(
         )
         if cb_qry.data.endswith("<<"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildCensorshipsList(chat_settings=chat_settings, page=0)
+                reply_markup=keyboards.BuildCensorshipsList(
+                    chat_settings=chat_settings, page=0
                 )
             )
         elif cb_qry.data.endswith("-"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildCensorshipsList(
-                        chat_settings=chat_settings, page=page - 1
-                    )
+                reply_markup=keyboards.BuildCensorshipsList(
+                    chat_settings=chat_settings, page=page - 1
                 )
             )
         elif cb_qry.data.endswith("+"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildCensorshipsList(
-                        chat_settings=chat_settings, page=page + 1
-                    )
+                reply_markup=keyboards.BuildCensorshipsList(
+                    chat_settings=chat_settings, page=page + 1
                 )
             )
         elif cb_qry.data.endswith(">>"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildCensorshipsList(
-                        chat_settings=chat_settings,
-                        page=-1,
-                    )
+                reply_markup=keyboards.BuildCensorshipsList(
+                    chat_settings=chat_settings,
+                    page=-1,
                 )
             )
     else:
@@ -3177,10 +3097,8 @@ def CbQryCensorshipsAdd(client: pyrogram.Client, cb_qry: pyrogram.types.Callback
         if cb_qry.data == "censorships add":
             cb_qry.message.edit_text(
                 text=_(cb_qry.from_user.settings.language, "select_type_of_censorship"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildCensorshipsList(
-                        chat_settings=chat_settings, selected_setting="add"
-                    )
+                reply_markup=keyboards.BuildCensorshipsList(
+                    chat_settings=chat_settings, selected_setting="add"
                 ),
                 parse_mode="html",
             )
@@ -3194,19 +3112,14 @@ def CbQryCensorshipsAdd(client: pyrogram.Client, cb_qry: pyrogram.types.Callback
         elif cb_qry.data == "censorships add regex":
             utils.tmp_steps[cb_qry.message.chat.id] = (cb_qry, cb_qry.data)
             text = _(cb_qry.from_user.settings.language, "send_regex_censorship")
-        cb_qry.message.edit_text(
-            text=text,
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                [
-                    [
-                        pyrogram.types.InlineKeyboardButton(
-                            text=_(cb_qry.from_user.settings.language, "cancel"),
-                            callback_data=f"cancel censorships {chat_id}",
-                        )
-                    ]
-                ]
-            ),
+        py_k = InlineKeyboard()
+        py_k.row(
+            pyrogram.types.InlineKeyboardButton(
+                text=_(cb_qry.from_user.settings.language, "cancel"),
+                callback_data=f"cancel censorships {chat_id}",
+            )
         )
+        cb_qry.message.edit_text(text=text, reply_markup=py_k)
     else:
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
@@ -3251,10 +3164,8 @@ def CbQryCensorshipsRemove(
                 show_alert=False,
             )
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildCensorshipsList(
-                        chat_settings=chat_settings, page=page
-                    )
+                reply_markup=keyboards.BuildCensorshipsList(
+                    chat_settings=chat_settings, page=page
                 )
             )
         else:
@@ -3285,8 +3196,8 @@ def CbQryCensorships(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
         cb_qry.message.edit_text(
             text=_(cb_qry.message.chat.settings.language, "censorships")
             + f" {utils.PrintChat(chat=chat_settings.chat)}",
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildCensorshipsList(chat_settings=chat_settings, page=page)
+            reply_markup=keyboards.BuildCensorshipsList(
+                chat_settings=chat_settings, page=page
             ),
         )
     else:
@@ -3421,12 +3332,10 @@ def CbQryCensorshipsChangePunishment(
             )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildCensorshipsList(
-                    chat_settings=chat_settings,
-                    page=int(parameters[2]),
-                    selected_setting=setting,
-                )
+            reply_markup=keyboards.BuildCensorshipsList(
+                chat_settings=chat_settings,
+                page=int(parameters[2]),
+                selected_setting=setting,
             ),
         )
     else:
@@ -3456,10 +3365,8 @@ def CmdCensorships(client: pyrogram.Client, msg: pyrogram.types.Message):
                 chat_id=msg.from_user.id,
                 text=_(msg.chat.settings.language, "censorships")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildCensorshipsList(
-                        chat_settings=msg.chat.settings, page=0
-                    )
+                reply_markup=keyboards.BuildCensorshipsList(
+                    chat_settings=msg.chat.settings, page=0
                 ),
             )
             if not msg.text.startswith("del", 1):
@@ -3476,10 +3383,8 @@ def CmdCensorships(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "globally_banned_users"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildCensorshipsList(
-                        chat_settings=msg.chat.settings, page=0
-                    )
+                reply_markup=keyboards.BuildCensorshipsList(
+                    chat_settings=msg.chat.settings, page=0
                 ),
             )
 
@@ -3506,10 +3411,8 @@ def CmdCensorshipsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                     msg=msg,
                     text=_(chat_settings.language, "censorships")
                     + f" {utils.PrintChat(chat=chat_settings.chat)}",
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildCensorshipsList(
-                            chat_settings=chat_settings, page=0
-                        )
+                    reply_markup=keyboards.BuildCensorshipsList(
+                        chat_settings=chat_settings, page=0
                     ),
                 )
         else:
@@ -3768,35 +3671,27 @@ def CbQryWhitelistedChatsPages(
         )
         if cb_qry.data.endswith("<<"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedChatsList(
-                        chat_settings=chat_settings, page=0
-                    )
+                reply_markup=keyboards.BuildWhitelistedChatsList(
+                    chat_settings=chat_settings, page=0
                 )
             )
         elif cb_qry.data.endswith("-"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedChatsList(
-                        chat_settings=chat_settings, page=page - 1
-                    )
+                reply_markup=keyboards.BuildWhitelistedChatsList(
+                    chat_settings=chat_settings, page=page - 1
                 )
             )
         elif cb_qry.data.endswith("+"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedChatsList(
-                        chat_settings=chat_settings, page=page + 1
-                    )
+                reply_markup=keyboards.BuildWhitelistedChatsList(
+                    chat_settings=chat_settings, page=page + 1
                 )
             )
         elif cb_qry.data.endswith(">>"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedChatsList(
-                        chat_settings=chat_settings,
-                        page=-1,
-                    )
+                reply_markup=keyboards.BuildWhitelistedChatsList(
+                    chat_settings=chat_settings,
+                    page=-1,
                 )
             )
     else:
@@ -3824,18 +3719,16 @@ def CbQryWhitelistedChatsAdd(
             show_alert=False,
         )
         utils.tmp_steps[cb_qry.message.chat.id] = (cb_qry, cb_qry.data)
+        py_k = InlineKeyboard()
+        py_k.row(
+            pyrogram.types.InlineKeyboardButton(
+                text=_(cb_qry.from_user.settings.language, "cancel"),
+                callback_data=f"cancel whitelistedchats {chat_id}",
+            )
+        )
         cb_qry.message.edit_text(
             text=_(cb_qry.from_user.settings.language, "send_chat_to_whitelist"),
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                [
-                    [
-                        pyrogram.types.InlineKeyboardButton(
-                            text=_(cb_qry.from_user.settings.language, "cancel"),
-                            callback_data=f"cancel whitelistedchats {chat_id}",
-                        )
-                    ]
-                ]
-            ),
+            reply_markup=py_k,
         )
     else:
         methods.CallbackQueryAnswer(
@@ -3879,10 +3772,8 @@ def CbQryWhitelistedChatsRemove(
                 show_alert=False,
             )
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedChatsList(
-                        chat_settings=chat_settings, page=page
-                    )
+                reply_markup=keyboards.BuildWhitelistedChatsList(
+                    chat_settings=chat_settings, page=page
                 )
             )
         else:
@@ -3915,10 +3806,8 @@ def CbQryWhitelistedChats(
         cb_qry.message.edit_text(
             text=_(cb_qry.message.chat.settings.language, "whitelisted_chats")
             + f" {utils.PrintChat(chat=chat_settings.chat)}",
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildWhitelistedChatsList(
-                    chat_settings=chat_settings, page=page
-                )
+            reply_markup=keyboards.BuildWhitelistedChatsList(
+                chat_settings=chat_settings, page=page
             ),
         )
     else:
@@ -3948,10 +3837,8 @@ def CmdWhitelistedChats(client: pyrogram.Client, msg: pyrogram.types.Message):
                 chat_id=msg.from_user.id,
                 text=_(msg.chat.settings.language, "whitelisted_chats")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedChatsList(
-                        chat_settings=msg.chat.settings, page=0
-                    )
+                reply_markup=keyboards.BuildWhitelistedChatsList(
+                    chat_settings=msg.chat.settings, page=0
                 ),
             )
             if not msg.text.startswith("del", 1):
@@ -3969,10 +3856,8 @@ def CmdWhitelistedChats(client: pyrogram.Client, msg: pyrogram.types.Message):
                 msg=msg,
                 text=_(msg.chat.settings.language, "whitelisted_chats")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedChatsList(
-                        chat_settings=msg.chat.settings, page=0
-                    )
+                reply_markup=keyboards.BuildWhitelistedChatsList(
+                    chat_settings=msg.chat.settings, page=0
                 ),
             )
 
@@ -3999,10 +3884,8 @@ def CmdWhitelistedChatsChat(client: pyrogram.Client, msg: pyrogram.types.Message
                     msg=msg,
                     text=_(chat_settings.language, "whitelisted_chats")
                     + f" {utils.PrintChat(chat=chat_settings.chat)}",
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildWhitelistedChatsList(
-                            chat_settings=chat_settings, page=0
-                        )
+                    reply_markup=keyboards.BuildWhitelistedChatsList(
+                        chat_settings=chat_settings, page=0
                     ),
                 )
         else:
@@ -4059,35 +3942,27 @@ def CbQryWhitelistedGbannedPages(
         )
         if cb_qry.data.endswith("<<"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedGbannedUsersList(
-                        chat_settings=chat_settings, page=0
-                    )
+                reply_markup=keyboards.BuildWhitelistedGbannedUsersList(
+                    chat_settings=chat_settings, page=0
                 )
             )
         elif cb_qry.data.endswith("-"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedGbannedUsersList(
-                        chat_settings=chat_settings, page=page - 1
-                    )
+                reply_markup=keyboards.BuildWhitelistedGbannedUsersList(
+                    chat_settings=chat_settings, page=page - 1
                 )
             )
         elif cb_qry.data.endswith("+"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedGbannedUsersList(
-                        chat_settings=chat_settings, page=page + 1
-                    )
+                reply_markup=keyboards.BuildWhitelistedGbannedUsersList(
+                    chat_settings=chat_settings, page=page + 1
                 )
             )
         elif cb_qry.data.endswith(">>"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedGbannedUsersList(
-                        chat_settings=chat_settings,
-                        page=-1,
-                    )
+                reply_markup=keyboards.BuildWhitelistedGbannedUsersList(
+                    chat_settings=chat_settings,
+                    page=-1,
                 )
             )
     else:
@@ -4115,18 +3990,16 @@ def CbQryWhitelistedGbannedAdd(
             show_alert=False,
         )
         utils.tmp_steps[cb_qry.message.chat.id] = (cb_qry, cb_qry.data)
+        py_k = InlineKeyboard()
+        py_k.row(
+            pyrogram.types.InlineKeyboardButton(
+                text=_(cb_qry.from_user.settings.language, "cancel"),
+                callback_data=f"cancel whitelistedgbanned {chat_id}",
+            )
+        )
         cb_qry.message.edit_text(
             text=_(cb_qry.from_user.settings.language, "send_gbanned_to_whitelist"),
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                [
-                    [
-                        pyrogram.types.InlineKeyboardButton(
-                            text=_(cb_qry.from_user.settings.language, "cancel"),
-                            callback_data=f"cancel whitelistedgbanned {chat_id}",
-                        )
-                    ]
-                ]
-            ),
+            reply_markup=py_k,
         )
     else:
         methods.CallbackQueryAnswer(
@@ -4169,10 +4042,8 @@ def CbQryWhitelistedGbannedRemove(
                 show_alert=False,
             )
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedUsersList(
-                        chat_settings=chat_settings, page=page
-                    )
+                reply_markup=keyboards.BuildWhitelistedUsersList(
+                    chat_settings=chat_settings, page=page
                 )
             )
         else:
@@ -4205,10 +4076,8 @@ def CbQryWhitelistedGbanned(
         cb_qry.message.edit_text(
             text=_(cb_qry.message.chat.settings.language, "whitelistedgbanned_users")
             + f" {utils.PrintChat(chat=chat_settings.chat)}",
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildWhitelistedGbannedUsersList(
-                    chat_settings=chat_settings, page=page
-                )
+            reply_markup=keyboards.BuildWhitelistedGbannedUsersList(
+                chat_settings=chat_settings, page=page
             ),
         )
     else:
@@ -4238,10 +4107,8 @@ def CmdWhitelistedGbanned(client: pyrogram.Client, msg: pyrogram.types.Message):
                 chat_id=msg.from_user.id,
                 text=_(msg.chat.settings.language, "whitelistedgbanned_users")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedGbannedUsersList(
-                        chat_settings=msg.chat.settings, page=0
-                    )
+                reply_markup=keyboards.BuildWhitelistedGbannedUsersList(
+                    chat_settings=msg.chat.settings, page=0
                 ),
             )
             if not msg.text.startswith("del", 1):
@@ -4259,10 +4126,8 @@ def CmdWhitelistedGbanned(client: pyrogram.Client, msg: pyrogram.types.Message):
                 msg=msg,
                 text=_(msg.chat.settings.language, "whitelistedgbanned_users")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedGbannedUsersList(
-                        chat_settings=msg.chat.settings, page=0
-                    )
+                reply_markup=keyboards.BuildWhitelistedGbannedUsersList(
+                    chat_settings=msg.chat.settings, page=0
                 ),
             )
 
@@ -4289,10 +4154,8 @@ def CmdWhitelistedGbannedChat(client: pyrogram.Client, msg: pyrogram.types.Messa
                     msg=msg,
                     text=_(chat_settings.language, "whitelistedgbanned_users")
                     + f" {utils.PrintChat(chat=chat_settings.chat)}",
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildWhitelistedGbannedUsersList(
-                            chat_settings=chat_settings, page=0
-                        )
+                    reply_markup=keyboards.BuildWhitelistedGbannedUsersList(
+                        chat_settings=chat_settings, page=0
                     ),
                 )
         else:
@@ -4345,35 +4208,27 @@ def CbQryWhitelistedPages(
         )
         if cb_qry.data.endswith("<<"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedUsersList(
-                        chat_settings=chat_settings, page=0
-                    )
+                reply_markup=keyboards.BuildWhitelistedUsersList(
+                    chat_settings=chat_settings, page=0
                 )
             )
         elif cb_qry.data.endswith("-"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedUsersList(
-                        chat_settings=chat_settings, page=page - 1
-                    )
+                reply_markup=keyboards.BuildWhitelistedUsersList(
+                    chat_settings=chat_settings, page=page - 1
                 )
             )
         elif cb_qry.data.endswith("+"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedUsersList(
-                        chat_settings=chat_settings, page=page + 1
-                    )
+                reply_markup=keyboards.BuildWhitelistedUsersList(
+                    chat_settings=chat_settings, page=page + 1
                 )
             )
         elif cb_qry.data.endswith(">>"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedUsersList(
-                        chat_settings=chat_settings,
-                        page=-1,
-                    )
+                reply_markup=keyboards.BuildWhitelistedUsersList(
+                    chat_settings=chat_settings,
+                    page=-1,
                 )
             )
     else:
@@ -4399,18 +4254,16 @@ def CbQryWhitelistedAdd(client: pyrogram.Client, cb_qry: pyrogram.types.Callback
             show_alert=False,
         )
         utils.tmp_steps[cb_qry.message.chat.id] = (cb_qry, cb_qry.data)
+        py_k = InlineKeyboard()
+        py_k.row(
+            pyrogram.types.InlineKeyboardButton(
+                text=_(cb_qry.from_user.settings.language, "cancel"),
+                callback_data=f"cancel whitelisted {chat_id}",
+            )
+        )
         cb_qry.message.edit_text(
             text=_(cb_qry.from_user.settings.language, "send_user_to_whitelist"),
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                [
-                    [
-                        pyrogram.types.InlineKeyboardButton(
-                            text=_(cb_qry.from_user.settings.language, "cancel"),
-                            callback_data=f"cancel whitelisted {chat_id}",
-                        )
-                    ]
-                ]
-            ),
+            reply_markup=py_k,
         )
     else:
         methods.CallbackQueryAnswer(
@@ -4453,10 +4306,8 @@ def CbQryWhitelistedRemove(
                 show_alert=False,
             )
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedUsersList(
-                        chat_settings=chat_settings, page=page
-                    )
+                reply_markup=keyboards.BuildWhitelistedUsersList(
+                    chat_settings=chat_settings, page=page
                 )
             )
         else:
@@ -4487,10 +4338,8 @@ def CbQryWhitelisted(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
         cb_qry.message.edit_text(
             text=_(cb_qry.message.chat.settings.language, "whitelisted_users")
             + f" {utils.PrintChat(chat=chat_settings.chat)}",
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildWhitelistedUsersList(
-                    chat_settings=chat_settings, page=page
-                )
+            reply_markup=keyboards.BuildWhitelistedUsersList(
+                chat_settings=chat_settings, page=page
             ),
         )
     else:
@@ -4520,10 +4369,8 @@ def CmdWhitelisted(client: pyrogram.Client, msg: pyrogram.types.Message):
                 chat_id=msg.from_user.id,
                 text=_(msg.chat.settings.language, "whitelisted_users")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedUsersList(
-                        chat_settings=msg.chat.settings, page=0
-                    )
+                reply_markup=keyboards.BuildWhitelistedUsersList(
+                    chat_settings=msg.chat.settings, page=0
                 ),
             )
             if not msg.text.startswith("del", 1):
@@ -4541,10 +4388,8 @@ def CmdWhitelisted(client: pyrogram.Client, msg: pyrogram.types.Message):
                 msg=msg,
                 text=_(msg.chat.settings.language, "whitelisted_users")
                 + f" {utils.PrintChat(chat=msg.chat)}",
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildWhitelistedUsersList(
-                        chat_settings=msg.chat.settings, page=0
-                    )
+                reply_markup=keyboards.BuildWhitelistedUsersList(
+                    chat_settings=msg.chat.settings, page=0
                 ),
             )
 
@@ -4571,10 +4416,8 @@ def CmdWhitelistedChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                     msg=msg,
                     text=_(chat_settings.language, "whitelisted_users")
                     + f" {utils.PrintChat(chat=chat_settings.chat)}",
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildWhitelistedUsersList(
-                            chat_settings=chat_settings, page=0
-                        )
+                    reply_markup=keyboards.BuildWhitelistedUsersList(
+                        chat_settings=chat_settings, page=0
                     ),
                 )
         else:
@@ -4730,9 +4573,7 @@ def CbQryLogsPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
         cb_qry.message.edit_text(
             text=text,
             parse_mode="html",
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildLogMenu(chat_settings=chat_settings, page=page)
-            ),
+            reply_markup=keyboards.BuildLogMenu(chat_settings=chat_settings, page=page),
         )
     else:
         methods.CallbackQueryAnswer(
@@ -4794,9 +4635,7 @@ def CmdLog(client: pyrogram.Client, msg: pyrogram.types.Message):
                 chat_id=msg.from_user.id,
                 text=text,
                 parse_mode="html",
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildLogMenu(chat_settings=msg.chat.settings)
-                ),
+                reply_markup=keyboards.BuildLogMenu(chat_settings=msg.chat.settings),
             )
             methods.ReplyText(
                 client=client,
@@ -4812,9 +4651,7 @@ def CmdLog(client: pyrogram.Client, msg: pyrogram.types.Message):
                 msg=msg,
                 text=text,
                 parse_mode="html",
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildLogMenu(chat_settings=msg.chat.settings)
-                ),
+                reply_markup=keyboards.BuildLogMenu(chat_settings=msg.chat.settings),
             )
 
 
@@ -4873,9 +4710,7 @@ def CmdLogChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                     msg=msg,
                     text=text,
                     parse_mode="html",
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildLogMenu(chat_settings=chat_settings)
-                    ),
+                    reply_markup=keyboards.BuildLogMenu(chat_settings=chat_settings),
                 )
         else:
             methods.ReplyText(

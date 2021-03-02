@@ -7,6 +7,7 @@ import typing
 import peewee
 import pyrogram
 from apscheduler.triggers.date import DateTrigger
+from pykeyboard import InlineKeyboard
 from pytz import utc
 
 import db_management
@@ -277,23 +278,21 @@ def Invite(
             if target not in utils.tmp_dicts["invitedPeople"][chat_id]:
                 utils.tmp_dicts["invitedPeople"][chat_id].add(target)
                 text = ""
+                py_k = InlineKeyboard()
+                py_k.row(
+                    pyrogram.types.InlineKeyboardButton(
+                        text=chat_settings.chat.title,
+                        url=f"t.me/{chat_settings.chat.username}"
+                        if chat_settings.chat.username
+                        else chat_settings.link,
+                    )
+                )
                 try:
                     SendMessage(
                         client=client,
                         chat_id=target,
                         text=_(chat_settings.language, "you_have_been_invited"),
-                        reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                            [
-                                [
-                                    pyrogram.types.InlineKeyboardButton(
-                                        text=chat_settings.chat.title,
-                                        url=f"t.me/{chat_settings.chat.username}"
-                                        if chat_settings.chat.username
-                                        else chat_settings.link,
-                                    )
-                                ]
-                            ]
-                        ),
+                        reply_markup=py_k,
                     )
                 except pyrogram.errors.FloodWait as ex:
                     print(ex)
@@ -1660,9 +1659,9 @@ def SendLog(
     schedule_date: int = None,
     reply_markup: typing.Union[
         "pyrogram.types.InlineKeyboardMarkup",
-        "pyrogram.ReplyKeyboardMarkup",
-        "pyrogram.ReplyKeyboardRemove",
-        "pyrogram.ForceReply",
+        "pyrogram.types.ReplyKeyboardMarkup",
+        "pyrogram.types.ReplyKeyboardRemove",
+        "pyrogram.types.ForceReply",
     ] = None,
 ) -> typing.Union[pyrogram.types.Message, None]:
     try:
@@ -1712,9 +1711,9 @@ def SendMessage(
     schedule_date: int = None,
     reply_markup: typing.Union[
         "pyrogram.types.InlineKeyboardMarkup",
-        "pyrogram.ReplyKeyboardMarkup",
-        "pyrogram.ReplyKeyboardRemove",
-        "pyrogram.ForceReply",
+        "pyrogram.types.ReplyKeyboardMarkup",
+        "pyrogram.types.ReplyKeyboardRemove",
+        "pyrogram.types.ForceReply",
     ] = None,
 ) -> typing.Union[pyrogram.types.Message, None]:
     if chat_id < 0:
@@ -1820,9 +1819,9 @@ def ReplyText(
     reply_to_message_id: int = None,
     reply_markup: typing.Union[
         "pyrogram.types.InlineKeyboardMarkup",
-        "pyrogram.ReplyKeyboardMarkup",
-        "pyrogram.ReplyKeyboardRemove",
-        "pyrogram.ForceReply",
+        "pyrogram.types.ReplyKeyboardMarkup",
+        "pyrogram.types.ReplyKeyboardRemove",
+        "pyrogram.types.ForceReply",
     ] = None,
 ) -> typing.Union[pyrogram.types.Message, None]:
 
@@ -1910,9 +1909,9 @@ def ReplyPhoto(
     reply_to_message_id: int = None,
     reply_markup: typing.Union[
         "pyrogram.types.InlineKeyboardMarkup",
-        "pyrogram.ReplyKeyboardMarkup",
-        "pyrogram.ReplyKeyboardRemove",
-        "pyrogram.ForceReply",
+        "pyrogram.types.ReplyKeyboardMarkup",
+        "pyrogram.types.ReplyKeyboardRemove",
+        "pyrogram.types.ForceReply",
     ] = None,
 ) -> typing.Union[pyrogram.types.Message, None]:
 
@@ -2001,9 +2000,9 @@ def SendDocument(
     schedule_date: int = None,
     reply_markup: typing.Union[
         "pyrogram.types.InlineKeyboardMarkup",
-        "pyrogram.ReplyKeyboardMarkup",
-        "pyrogram.ReplyKeyboardRemove",
-        "pyrogram.ForceReply",
+        "pyrogram.types.ReplyKeyboardMarkup",
+        "pyrogram.types.ReplyKeyboardRemove",
+        "pyrogram.types.ForceReply",
     ] = None,
     progress: callable = None,
     progress_args: tuple = (),
@@ -2110,9 +2109,9 @@ def ReplyDocument(
     reply_to_message_id: int = None,
     reply_markup: typing.Union[
         "pyrogram.types.InlineKeyboardMarkup",
-        "pyrogram.ReplyKeyboardMarkup",
-        "pyrogram.ReplyKeyboardRemove",
-        "pyrogram.ForceReply",
+        "pyrogram.types.ReplyKeyboardMarkup",
+        "pyrogram.types.ReplyKeyboardRemove",
+        "pyrogram.types.ForceReply",
     ] = None,
     progress: callable = None,
     progress_args: tuple = (),

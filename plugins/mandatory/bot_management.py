@@ -9,14 +9,14 @@ import traceback
 import urllib.request
 from threading import Thread
 
-import pyrogram
-from apscheduler.triggers.date import DateTrigger
-from pytz import utc
-
 import db_management
 import keyboards
 import methods
+import pyrogram
 import utils
+from apscheduler.triggers.date import DateTrigger
+from pykeyboard import InlineKeyboard
+from pytz import utc
 
 _ = utils.GetLocalizedString
 
@@ -495,10 +495,8 @@ def CbQryBotPluginsEnableDisable(
             )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildBotPluginsMenu(
-                    user_settings=cb_qry.from_user.settings, page=page
-                )
+            reply_markup=keyboards.BuildBotPluginsMenu(
+                user_settings=cb_qry.from_user.settings, page=page
             ),
         )
     else:
@@ -561,10 +559,8 @@ def CbQryBotPluginsMandatoryOptional(
             )
 
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildBotPluginsMenu(
-                    user_settings=cb_qry.from_user.settings, page=page
-                )
+            reply_markup=keyboards.BuildBotPluginsMenu(
+                user_settings=cb_qry.from_user.settings, page=page
             ),
         )
     else:
@@ -589,34 +585,26 @@ def CbQryBotPluginsPages(client: pyrogram.Client, cb_qry: pyrogram.types.Callbac
         )
         if cb_qry.data.endswith("<<"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildBotPluginsMenu(
-                        user_settings=cb_qry.from_user.settings, page=0
-                    )
+                reply_markup=keyboards.BuildBotPluginsMenu(
+                    user_settings=cb_qry.from_user.settings, page=0
                 )
             )
         elif cb_qry.data.endswith("-"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildBotPluginsMenu(
-                        user_settings=cb_qry.from_user.settings, page=page - 1
-                    )
+                reply_markup=keyboards.BuildBotPluginsMenu(
+                    user_settings=cb_qry.from_user.settings, page=page - 1
                 )
             )
         elif cb_qry.data.endswith("+"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildBotPluginsMenu(
-                        user_settings=cb_qry.from_user.settings, page=page + 1
-                    )
+                reply_markup=keyboards.BuildBotPluginsMenu(
+                    user_settings=cb_qry.from_user.settings, page=page + 1
                 )
             )
         elif cb_qry.data.endswith(">>"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildBotPluginsMenu(
-                        user_settings=cb_qry.from_user.settings, page=-1
-                    )
+                reply_markup=keyboards.BuildBotPluginsMenu(
+                    user_settings=cb_qry.from_user.settings, page=-1
                 )
             )
     else:
@@ -636,8 +624,8 @@ def CmdBotPlugins(client: pyrogram.Client, msg: pyrogram.types.Message):
         client=client,
         msg=msg,
         text=_(msg.chat.settings.language, "botplugins"),
-        reply_markup=pyrogram.types.InlineKeyboardMarkup(
-            keyboards.BuildBotPluginsMenu(user_settings=msg.from_user.settings)
+        reply_markup=keyboards.BuildBotPluginsMenu(
+            user_settings=msg.from_user.settings
         ),
     )
 
@@ -678,35 +666,27 @@ def CbQryGbannedPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQu
         )
         if cb_qry.data.endswith("<<"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildGloballyBannedUsersList(
-                        chat_settings=cb_qry.from_user.settings, page=0
-                    )
+                reply_markup=keyboards.BuildGloballyBannedUsersList(
+                    chat_settings=cb_qry.from_user.settings, page=0
                 )
             )
         elif cb_qry.data.endswith("-"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildGloballyBannedUsersList(
-                        chat_settings=cb_qry.from_user.settings, page=page - 1
-                    )
+                reply_markup=keyboards.BuildGloballyBannedUsersList(
+                    chat_settings=cb_qry.from_user.settings, page=page - 1
                 )
             )
         elif cb_qry.data.endswith("+"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildGloballyBannedUsersList(
-                        chat_settings=cb_qry.from_user.settings, page=page + 1
-                    )
+                reply_markup=keyboards.BuildGloballyBannedUsersList(
+                    chat_settings=cb_qry.from_user.settings, page=page + 1
                 )
             )
         elif cb_qry.data.endswith(">>"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildGloballyBannedUsersList(
-                        chat_settings=cb_qry.from_user.settings,
-                        page=-1,
-                    )
+                reply_markup=keyboards.BuildGloballyBannedUsersList(
+                    chat_settings=cb_qry.from_user.settings,
+                    page=-1,
                 )
             )
     else:
@@ -728,18 +708,16 @@ def CbQryGbannedAdd(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
             show_alert=False,
         )
         utils.tmp_steps[cb_qry.message.chat.id] = (cb_qry, cb_qry.data)
+        py_k = InlineKeyboard()
+        py_k.row(
+            pyrogram.types.InlineKeyboardButton(
+                text=_(cb_qry.from_user.settings.language, "cancel"),
+                callback_data="cancel gbanned",
+            )
+        )
         cb_qry.message.edit_text(
             text=_(cb_qry.from_user.settings.language, "send_user_to_gban"),
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                [
-                    [
-                        pyrogram.types.InlineKeyboardButton(
-                            text=_(cb_qry.from_user.settings.language, "cancel"),
-                            callback_data="cancel gbanned",
-                        )
-                    ]
-                ]
-            ),
+            reply_markup=py_k,
         )
     else:
         methods.CallbackQueryAnswer(
@@ -772,10 +750,8 @@ def CbQryGbannedRemove(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQ
             show_alert=False,
         )
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildGloballyBannedUsersList(
-                    chat_settings=cb_qry.from_user.settings, page=page
-                )
+            reply_markup=keyboards.BuildGloballyBannedUsersList(
+                chat_settings=cb_qry.from_user.settings, page=page
             )
         )
     else:
@@ -799,10 +775,8 @@ def CmdGbanned(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 chat_id=msg.from_user.id,
                 text=_(msg.chat.settings.language, "globally_banned_users"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildGloballyBannedUsersList(
-                        chat_settings=msg.chat.settings, page=0
-                    )
+                reply_markup=keyboards.BuildGloballyBannedUsersList(
+                    chat_settings=msg.chat.settings, page=0
                 ),
             )
             if not msg.text.startswith("del", 1):
@@ -819,10 +793,8 @@ def CmdGbanned(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "globally_banned_users"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildGloballyBannedUsersList(
-                        chat_settings=msg.chat.settings, page=0
-                    )
+                reply_markup=keyboards.BuildGloballyBannedUsersList(
+                    chat_settings=msg.chat.settings, page=0
                 ),
             )
 
@@ -863,35 +835,27 @@ def CbQryBlockedPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQu
         )
         if cb_qry.data.endswith("<<"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildBlockedUsersList(
-                        chat_settings=cb_qry.from_user.settings, page=0
-                    )
+                reply_markup=keyboards.BuildBlockedUsersList(
+                    chat_settings=cb_qry.from_user.settings, page=0
                 )
             )
         elif cb_qry.data.endswith("-"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildBlockedUsersList(
-                        chat_settings=cb_qry.from_user.settings, page=page - 1
-                    )
+                reply_markup=keyboards.BuildBlockedUsersList(
+                    chat_settings=cb_qry.from_user.settings, page=page - 1
                 )
             )
         elif cb_qry.data.endswith("+"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildBlockedUsersList(
-                        chat_settings=cb_qry.from_user.settings, page=page + 1
-                    )
+                reply_markup=keyboards.BuildBlockedUsersList(
+                    chat_settings=cb_qry.from_user.settings, page=page + 1
                 )
             )
         elif cb_qry.data.endswith(">>"):
             cb_qry.message.edit_reply_markup(
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildBlockedUsersList(
-                        chat_settings=cb_qry.from_user.settings,
-                        page=-1,
-                    )
+                reply_markup=keyboards.BuildBlockedUsersList(
+                    chat_settings=cb_qry.from_user.settings,
+                    page=-1,
                 )
             )
     else:
@@ -913,18 +877,16 @@ def CbQryBlockedAdd(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
             show_alert=False,
         )
         utils.tmp_steps[cb_qry.message.chat.id] = (cb_qry, cb_qry.data)
+        py_k = InlineKeyboard()
+        py_k.row(
+            pyrogram.types.InlineKeyboardButton(
+                text=_(cb_qry.from_user.settings.language, "cancel"),
+                callback_data="cancel blocked",
+            )
+        )
         cb_qry.message.edit_text(
             text=_(cb_qry.from_user.settings.language, "send_user_to_block"),
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                [
-                    [
-                        pyrogram.types.InlineKeyboardButton(
-                            text=_(cb_qry.from_user.settings.language, "cancel"),
-                            callback_data="cancel blocked",
-                        )
-                    ]
-                ]
-            ),
+            reply_markup=py_k,
         )
     else:
         methods.CallbackQueryAnswer(
@@ -957,10 +919,8 @@ def CbQryBlockedRemove(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQ
             show_alert=False,
         )
         cb_qry.message.edit_reply_markup(
-            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                keyboards.BuildBlockedUsersList(
-                    chat_settings=cb_qry.from_user.settings, page=page
-                )
+            reply_markup=keyboards.BuildBlockedUsersList(
+                chat_settings=cb_qry.from_user.settings, page=page
             )
         )
     else:
@@ -984,10 +944,8 @@ def CmdBlocked(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 chat_id=msg.from_user.id,
                 text=_(msg.chat.settings.language, "blocked_users"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildBlockedUsersList(
-                        chat_settings=msg.chat.settings, page=0
-                    )
+                reply_markup=keyboards.BuildBlockedUsersList(
+                    chat_settings=msg.chat.settings, page=0
                 ),
             )
             if not msg.text.startswith("del", 1):
@@ -1004,9 +962,7 @@ def CmdBlocked(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "blocked_users"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildBlockedUsersList(
-                        chat_settings=msg.chat.settings, page=0
-                    )
+                reply_markup=keyboards.BuildBlockedUsersList(
+                    chat_settings=msg.chat.settings, page=0
                 ),
             )

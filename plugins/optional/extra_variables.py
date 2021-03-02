@@ -1,13 +1,13 @@
 # getsetunset
 import re
 
-import peewee
-import pyrogram
-
 import db_management
 import keyboards
 import methods
+import peewee
+import pyrogram
 import utils
+from pykeyboard import InlineKeyboard
 
 _ = utils.GetLocalizedString
 
@@ -172,20 +172,16 @@ def CbQryExtrasReplace(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQ
                     show_alert=False,
                 )
 
+                py_k = InlineKeyboard()
+                py_k.row(
+                    pyrogram.types.InlineKeyboardButton(
+                        text=_(cb_qry.from_user.settings.language, "cancel"),
+                        callback_data=f"cancel extras {chat_id}",
+                    )
+                )
                 cb_qry.message.edit_text(
                     text=_(cb_qry.from_user.settings.language, "send_extra_value"),
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        [
-                            [
-                                pyrogram.types.InlineKeyboardButton(
-                                    text=_(
-                                        cb_qry.from_user.settings.language, "cancel"
-                                    ),
-                                    callback_data=f"cancel extras {chat_id}",
-                                )
-                            ]
-                        ]
-                    ),
+                    reply_markup=py_k,
                 )
             else:
                 methods.CallbackQueryAnswer(
@@ -325,30 +321,26 @@ def CbQryExtrasPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
             )
             if cb_qry.data.endswith("<<"):
                 cb_qry.message.edit_reply_markup(
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildExtraList(chat_settings=chat_settings, page=0)
+                    reply_markup=keyboards.BuildExtraList(
+                        chat_settings=chat_settings, page=0
                     )
                 )
             elif cb_qry.data.endswith("-"):
                 cb_qry.message.edit_reply_markup(
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildExtraList(
-                            chat_settings=chat_settings, page=page - 1
-                        )
+                    reply_markup=keyboards.BuildExtraList(
+                        chat_settings=chat_settings, page=page - 1
                     )
                 )
             elif cb_qry.data.endswith("+"):
                 cb_qry.message.edit_reply_markup(
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildExtraList(
-                            chat_settings=chat_settings, page=page + 1
-                        )
+                    reply_markup=keyboards.BuildExtraList(
+                        chat_settings=chat_settings, page=page + 1
                     )
                 )
             elif cb_qry.data.endswith(">>"):
                 cb_qry.message.edit_reply_markup(
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildExtraList(chat_settings=chat_settings, page=-1)
+                    reply_markup=keyboards.BuildExtraList(
+                        chat_settings=chat_settings, page=-1
                     )
                 )
         else:
@@ -390,10 +382,8 @@ def CbQryExtrasSet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
             if cb_qry.data == "extras set":
                 cb_qry.message.edit_text(
                     text=_(cb_qry.from_user.settings.language, "select_type_of_extra"),
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildExtraList(
-                            chat_settings=chat_settings, selected_setting="set"
-                        )
+                    reply_markup=keyboards.BuildExtraList(
+                        chat_settings=chat_settings, selected_setting="set"
                     ),
                     parse_mode="html",
                 )
@@ -402,20 +392,16 @@ def CbQryExtrasSet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
                 "extras set regex"
             ):
                 utils.tmp_steps[cb_qry.message.chat.id] = (cb_qry, cb_qry.data)
+                py_k = InlineKeyboard()
+                py_k.row(
+                    pyrogram.types.InlineKeyboardButton(
+                        text=_(cb_qry.from_user.settings.language, "cancel"),
+                        callback_data=f"cancel extras {chat_id}",
+                    )
+                )
                 cb_qry.message.edit_text(
                     text=_(cb_qry.from_user.settings.language, "send_extra_key"),
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        [
-                            [
-                                pyrogram.types.InlineKeyboardButton(
-                                    text=_(
-                                        cb_qry.from_user.settings.language, "cancel"
-                                    ),
-                                    callback_data=f"cancel extras {chat_id}",
-                                )
-                            ]
-                        ]
-                    ),
+                    reply_markup=py_k,
                 )
         else:
             methods.CallbackQueryAnswer(
@@ -470,8 +456,8 @@ def CbQryExtrasUnset(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
                     show_alert=False,
                 )
                 cb_qry.message.edit_reply_markup(
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildExtraList(chat_settings=chat_settings, page=page)
+                    reply_markup=keyboards.BuildExtraList(
+                        chat_settings=chat_settings, page=page
                     )
                 )
             else:
@@ -517,10 +503,8 @@ def CmdExtras(client: pyrogram.Client, msg: pyrogram.types.Message):
                     chat_id=msg.from_user.id,
                     text=_(msg.chat.settings.language, "extras")
                     + f" {utils.PrintChat(chat=msg.chat)}",
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildExtraList(
-                            chat_settings=msg.chat.settings, page=0
-                        )
+                    reply_markup=keyboards.BuildExtraList(
+                        chat_settings=msg.chat.settings, page=0
                     ),
                 )
                 if not msg.text.startswith("del", 1):
@@ -538,10 +522,8 @@ def CmdExtras(client: pyrogram.Client, msg: pyrogram.types.Message):
                     msg=msg,
                     text=_(msg.chat.settings.language, "extras")
                     + f" {utils.PrintChat(chat=msg.chat)}",
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildExtraList(
-                            chat_settings=msg.chat.settings, page=0
-                        )
+                    reply_markup=keyboards.BuildExtraList(
+                        chat_settings=msg.chat.settings, page=0
                     ),
                 )
 
@@ -577,10 +559,8 @@ def CmdExtrasChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                         msg=msg,
                         text=_(chat_settings.language, "extras")
                         + f" {utils.PrintChat(chat=chat_settings.chat)}",
-                        reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                            keyboards.BuildExtraList(
-                                chat_settings=chat_settings, page=0
-                            )
+                        reply_markup=keyboards.BuildExtraList(
+                            chat_settings=chat_settings, page=0
                         ),
                     )
         else:

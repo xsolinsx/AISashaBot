@@ -4,15 +4,14 @@ import secrets
 import time
 import traceback
 
-import peewee
-import pyrogram
-from apscheduler.triggers.date import DateTrigger
-from pytz import utc
-
 import db_management
 import keyboards
 import methods
+import peewee
+import pyrogram
 import utils
+from apscheduler.triggers.date import DateTrigger
+from pytz import utc
 
 _ = utils.GetLocalizedString
 
@@ -37,12 +36,10 @@ def CmdInviteReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildActionOnAddedUsersList(
-                        chat_settings=msg.chat.settings,
-                        action="invite",
-                        new_chat_members=msg.reply_to_message.new_chat_members,
-                    )
+                reply_markup=keyboards.BuildActionOnAddedUsersList(
+                    chat_settings=msg.chat.settings,
+                    action="invite",
+                    new_chat_members=msg.reply_to_message.new_chat_members,
                 ),
             )
         else:
@@ -193,12 +190,10 @@ def CmdWarnReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildActionOnAddedUsersList(
-                        chat_settings=msg.chat.settings,
-                        action="warn",
-                        new_chat_members=msg.reply_to_message.new_chat_members,
-                    )
+                reply_markup=keyboards.BuildActionOnAddedUsersList(
+                    chat_settings=msg.chat.settings,
+                    action="warn",
+                    new_chat_members=msg.reply_to_message.new_chat_members,
                 ),
             )
         else:
@@ -323,12 +318,10 @@ def CmdUnwarnReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildActionOnAddedUsersList(
-                        chat_settings=msg.chat.settings,
-                        action="unwarn",
-                        new_chat_members=msg.reply_to_message.new_chat_members,
-                    )
+                reply_markup=keyboards.BuildActionOnAddedUsersList(
+                    chat_settings=msg.chat.settings,
+                    action="unwarn",
+                    new_chat_members=msg.reply_to_message.new_chat_members,
                 ),
             )
         else:
@@ -453,12 +446,10 @@ def CmdUnwarnAllReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildActionOnAddedUsersList(
-                        chat_settings=msg.chat.settings,
-                        action="unwarnall",
-                        new_chat_members=msg.reply_to_message.new_chat_members,
-                    )
+                reply_markup=keyboards.BuildActionOnAddedUsersList(
+                    chat_settings=msg.chat.settings,
+                    action="unwarnall",
+                    new_chat_members=msg.reply_to_message.new_chat_members,
                 ),
             )
         else:
@@ -584,12 +575,10 @@ def CmdKickReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildActionOnAddedUsersList(
-                        chat_settings=msg.chat.settings,
-                        action="kick",
-                        new_chat_members=msg.reply_to_message.new_chat_members,
-                    )
+                reply_markup=keyboards.BuildActionOnAddedUsersList(
+                    chat_settings=msg.chat.settings,
+                    action="kick",
+                    new_chat_members=msg.reply_to_message.new_chat_members,
                 ),
             )
         else:
@@ -715,12 +704,10 @@ def CmdTempRestrictReplyUser(client: pyrogram.Client, msg: pyrogram.types.Messag
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildActionOnAddedUsersList(
-                        chat_settings=msg.chat.settings,
-                        action="temprestrict",
-                        new_chat_members=msg.reply_to_message.new_chat_members,
-                    )
+                reply_markup=keyboards.BuildActionOnAddedUsersList(
+                    chat_settings=msg.chat.settings,
+                    action="temprestrict",
+                    new_chat_members=msg.reply_to_message.new_chat_members,
                 ),
             )
         else:
@@ -850,12 +837,10 @@ def CmdRestrictReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildActionOnAddedUsersList(
-                        chat_settings=msg.chat.settings,
-                        action="restrict",
-                        new_chat_members=msg.reply_to_message.new_chat_members,
-                    )
+                reply_markup=keyboards.BuildActionOnAddedUsersList(
+                    chat_settings=msg.chat.settings,
+                    action="restrict",
+                    new_chat_members=msg.reply_to_message.new_chat_members,
                 ),
             )
         else:
@@ -981,12 +966,10 @@ def CmdUnrestrictReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message)
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildActionOnAddedUsersList(
-                        chat_settings=msg.chat.settings,
-                        action="unrestrict",
-                        new_chat_members=msg.reply_to_message.new_chat_members,
-                    )
+                reply_markup=keyboards.BuildActionOnAddedUsersList(
+                    chat_settings=msg.chat.settings,
+                    action="unrestrict",
+                    new_chat_members=msg.reply_to_message.new_chat_members,
                 ),
             )
         else:
@@ -1112,12 +1095,10 @@ def CmdTempBanReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildActionOnAddedUsersList(
-                        chat_settings=msg.chat.settings,
-                        action="tempban",
-                        new_chat_members=msg.reply_to_message.new_chat_members,
-                    )
+                reply_markup=keyboards.BuildActionOnAddedUsersList(
+                    chat_settings=msg.chat.settings,
+                    action="tempban",
+                    new_chat_members=msg.reply_to_message.new_chat_members,
                 ),
             )
         else:
@@ -1247,12 +1228,10 @@ def CmdBanReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildActionOnAddedUsersList(
-                        chat_settings=msg.chat.settings,
-                        action="ban",
-                        new_chat_members=msg.reply_to_message.new_chat_members,
-                    )
+                reply_markup=keyboards.BuildActionOnAddedUsersList(
+                    chat_settings=msg.chat.settings,
+                    action="ban",
+                    new_chat_members=msg.reply_to_message.new_chat_members,
                 ),
             )
         else:
@@ -1378,12 +1357,10 @@ def CmdUnbanReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildActionOnAddedUsersList(
-                        chat_settings=msg.chat.settings,
-                        action="unban",
-                        new_chat_members=msg.reply_to_message.new_chat_members,
-                    )
+                reply_markup=keyboards.BuildActionOnAddedUsersList(
+                    chat_settings=msg.chat.settings,
+                    action="unban",
+                    new_chat_members=msg.reply_to_message.new_chat_members,
                 ),
             )
         else:
@@ -1666,12 +1643,10 @@ def CmdKickInactives(client: pyrogram.Client, msg: pyrogram.types.Message):
                     text=_(msg.chat.settings.language, "inactives_confirmation").format(
                         len(query), min_date
                     ),
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildInactivesConfirmation(
-                            chat_settings=msg.chat.settings,
-                            method="kick",
-                            min_date=msg.command[1],
-                        )
+                    reply_markup=keyboards.BuildInactivesConfirmation(
+                        chat_settings=msg.chat.settings,
+                        method="kick",
+                        min_date=msg.command[1],
                     ),
                 )
 
@@ -1764,12 +1739,10 @@ def CmdKickInactivesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                             text=_(
                                 chat_settings.language, "inactives_confirmation"
                             ).format(len(query), min_date),
-                            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                                keyboards.BuildInactivesConfirmation(
-                                    chat_settings=chat_settings,
-                                    method="kick",
-                                    min_date=msg.command[2],
-                                )
+                            reply_markup=keyboards.BuildInactivesConfirmation(
+                                chat_settings=chat_settings,
+                                method="kick",
+                                min_date=msg.command[2],
                             ),
                         )
         else:
@@ -1857,12 +1830,10 @@ def CmdBanInactives(client: pyrogram.Client, msg: pyrogram.types.Message):
                     text=_(msg.chat.settings.language, "inactives_confirmation").format(
                         len(query), min_date
                     ),
-                    reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                        keyboards.BuildInactivesConfirmation(
-                            chat_settings=msg.chat.settings,
-                            method="ban",
-                            min_date=msg.command[1],
-                        )
+                    reply_markup=keyboards.BuildInactivesConfirmation(
+                        chat_settings=msg.chat.settings,
+                        method="ban",
+                        min_date=msg.command[1],
                     ),
                 )
 
@@ -1955,12 +1926,10 @@ def CmdBanInactivesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                             text=_(
                                 chat_settings.language, "inactives_confirmation"
                             ).format(len(query), min_date),
-                            reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                                keyboards.BuildInactivesConfirmation(
-                                    chat_settings=chat_settings,
-                                    method="ban",
-                                    min_date=msg.command[2],
-                                )
+                            reply_markup=keyboards.BuildInactivesConfirmation(
+                                chat_settings=chat_settings,
+                                method="ban",
+                                min_date=msg.command[2],
                             ),
                         )
         else:
@@ -2000,12 +1969,10 @@ def CmdGBanReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildActionOnAddedUsersList(
-                        chat_settings=msg.chat.settings,
-                        action="gban",
-                        new_chat_members=msg.reply_to_message.new_chat_members,
-                    )
+                reply_markup=keyboards.BuildActionOnAddedUsersList(
+                    chat_settings=msg.chat.settings,
+                    action="gban",
+                    new_chat_members=msg.reply_to_message.new_chat_members,
                 ),
             )
         else:
@@ -2092,12 +2059,10 @@ def CmdUngbanReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildActionOnAddedUsersList(
-                        chat_settings=msg.chat.settings,
-                        action="ungban",
-                        new_chat_members=msg.reply_to_message.new_chat_members,
-                    )
+                reply_markup=keyboards.BuildActionOnAddedUsersList(
+                    chat_settings=msg.chat.settings,
+                    action="ungban",
+                    new_chat_members=msg.reply_to_message.new_chat_members,
                 ),
             )
         else:
@@ -2181,12 +2146,10 @@ def CmdBlockReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildActionOnAddedUsersList(
-                        chat_settings=msg.chat.settings,
-                        action="block",
-                        new_chat_members=msg.reply_to_message.new_chat_members,
-                    )
+                reply_markup=keyboards.BuildActionOnAddedUsersList(
+                    chat_settings=msg.chat.settings,
+                    action="block",
+                    new_chat_members=msg.reply_to_message.new_chat_members,
                 ),
             )
         else:
@@ -2273,12 +2236,10 @@ def CmdUnblockReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 msg=msg,
                 text=_(msg.chat.settings.language, "select_target"),
-                reply_markup=pyrogram.types.InlineKeyboardMarkup(
-                    keyboards.BuildActionOnAddedUsersList(
-                        chat_settings=msg.chat.settings,
-                        action="unblock",
-                        new_chat_members=msg.reply_to_message.new_chat_members,
-                    )
+                reply_markup=keyboards.BuildActionOnAddedUsersList(
+                    chat_settings=msg.chat.settings,
+                    action="unblock",
+                    new_chat_members=msg.reply_to_message.new_chat_members,
                 ),
             )
         else:
