@@ -871,7 +871,7 @@ def CbQryMessagesOnlyMembers(
 
 
 @pyrogram.Client.on_callback_query(
-    pyrogram.filters.regex(pattern=r"^messages PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^messages PAGES (\d+)$", flags=re.I)
 )
 def CbQryMessagesPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
@@ -879,7 +879,7 @@ def CbQryMessagesPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQ
     )
     chat_id = int(parameters[1])
     members_only = bool(int(parameters[2]))
-    page = int(parameters[3])
+    page = int(cb_qry.data.split(" ")[2]) - 1
     chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
         chat_id=chat_id
     )
@@ -887,36 +887,11 @@ def CbQryMessagesPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQ
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry, text=_(cb_qry.from_user.settings.language, "turning_page")
         )
-        if cb_qry.data.endswith("<<"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildMessagesList(
-                    chat_settings=chat_settings, members_only=members_only, page=0
-                )
+        cb_qry.message.edit_reply_markup(
+            reply_markup=keyboards.BuildMessagesList(
+                chat_settings=chat_settings, members_only=members_only, page=page
             )
-        elif cb_qry.data.endswith("-"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildMessagesList(
-                    chat_settings=chat_settings,
-                    members_only=members_only,
-                    page=page - 1,
-                )
-            )
-        elif cb_qry.data.endswith("+"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildMessagesList(
-                    chat_settings=chat_settings,
-                    members_only=members_only,
-                    page=page + 1,
-                )
-            )
-        elif cb_qry.data.endswith(">>"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildMessagesList(
-                    chat_settings=chat_settings,
-                    members_only=members_only,
-                    page=-1,
-                )
-            )
+        )
     else:
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
@@ -1440,41 +1415,19 @@ def CmdMe(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_callback_query(
-    pyrogram.filters.regex(pattern=r"^groups PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^groups PAGES (\d+)$", flags=re.I)
     & my_filters.callback_private
 )
 def CbQryGroupsPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
-    parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
-        " "
-    )
-    page = int(parameters[1])
+    page = int(cb_qry.data.split(" ")[2]) - 1
     methods.CallbackQueryAnswer(
         cb_qry=cb_qry, text=_(cb_qry.from_user.settings.language, "turning_page")
     )
-    if cb_qry.data.endswith("<<"):
-        cb_qry.message.edit_reply_markup(
-            reply_markup=keyboards.BuildGroupsMenu(
-                chat_settings=cb_qry.from_user.settings, page=0
-            )
+    cb_qry.message.edit_reply_markup(
+        reply_markup=keyboards.BuildGroupsMenu(
+            chat_settings=cb_qry.from_user.settings, page=page
         )
-    elif cb_qry.data.endswith("-"):
-        cb_qry.message.edit_reply_markup(
-            reply_markup=keyboards.BuildGroupsMenu(
-                chat_settings=cb_qry.from_user.settings, page=page - 1
-            )
-        )
-    elif cb_qry.data.endswith("+"):
-        cb_qry.message.edit_reply_markup(
-            reply_markup=keyboards.BuildGroupsMenu(
-                chat_settings=cb_qry.from_user.settings, page=page + 1
-            )
-        )
-    elif cb_qry.data.endswith(">>"):
-        cb_qry.message.edit_reply_markup(
-            reply_markup=keyboards.BuildGroupsMenu(
-                chat_settings=cb_qry.from_user.settings, page=-1
-            )
-        )
+    )
 
 
 @pyrogram.Client.on_message(

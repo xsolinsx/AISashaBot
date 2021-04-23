@@ -572,41 +572,19 @@ def CbQryBotPluginsMandatoryOptional(
 
 
 @pyrogram.Client.on_callback_query(
-    pyrogram.filters.regex(pattern=r"^botplugins PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^botplugins PAGES (\d+)$", flags=re.I)
 )
 def CbQryBotPluginsPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
-    parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
-        " "
-    )
-    page = int(parameters[1])
+    page = int(cb_qry.data.split(" ")[2]) - 1
     if utils.IsMasterOrBot(user_id=cb_qry.from_user.id):
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry, text=_(cb_qry.from_user.settings.language, "turning_page")
         )
-        if cb_qry.data.endswith("<<"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildBotPluginsMenu(
-                    user_settings=cb_qry.from_user.settings, page=0
-                )
+        cb_qry.message.edit_reply_markup(
+            reply_markup=keyboards.BuildBotPluginsMenu(
+                user_settings=cb_qry.from_user.settings, page=page
             )
-        elif cb_qry.data.endswith("-"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildBotPluginsMenu(
-                    user_settings=cb_qry.from_user.settings, page=page - 1
-                )
-            )
-        elif cb_qry.data.endswith("+"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildBotPluginsMenu(
-                    user_settings=cb_qry.from_user.settings, page=page + 1
-                )
-            )
-        elif cb_qry.data.endswith(">>"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildBotPluginsMenu(
-                    user_settings=cb_qry.from_user.settings, page=-1
-                )
-            )
+        )
     else:
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
@@ -653,42 +631,19 @@ def CbQryGbannedInfo(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
 
 
 @pyrogram.Client.on_callback_query(
-    pyrogram.filters.regex(pattern=r"^gbanned PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^gbanned PAGES (\d+)$", flags=re.I)
 )
 def CbQryGbannedPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
-    parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
-        " "
-    )
-    page = int(parameters[1])
+    page = int(cb_qry.data.split(" ")[2]) - 1
     if utils.IsMasterOrBot(user_id=cb_qry.from_user.id):
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry, text=_(cb_qry.from_user.settings.language, "turning_page")
         )
-        if cb_qry.data.endswith("<<"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildGloballyBannedUsersList(
-                    chat_settings=cb_qry.from_user.settings, page=0
-                )
+        cb_qry.message.edit_reply_markup(
+            reply_markup=keyboards.BuildGloballyBannedUsersList(
+                chat_settings=cb_qry.from_user.settings, page=page
             )
-        elif cb_qry.data.endswith("-"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildGloballyBannedUsersList(
-                    chat_settings=cb_qry.from_user.settings, page=page - 1
-                )
-            )
-        elif cb_qry.data.endswith("+"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildGloballyBannedUsersList(
-                    chat_settings=cb_qry.from_user.settings, page=page + 1
-                )
-            )
-        elif cb_qry.data.endswith(">>"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildGloballyBannedUsersList(
-                    chat_settings=cb_qry.from_user.settings,
-                    page=-1,
-                )
-            )
+        )
     else:
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
@@ -822,42 +777,19 @@ def CbQryBlockedInfo(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
 
 
 @pyrogram.Client.on_callback_query(
-    pyrogram.filters.regex(pattern=r"^blocked PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^blocked PAGES (\d+)$", flags=re.I)
 )
 def CbQryBlockedPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
-    parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
-        " "
-    )
-    page = int(parameters[1])
+    page = int(cb_qry.data.split(" ")[2]) - 1
     if utils.IsMasterOrBot(user_id=cb_qry.from_user.id):
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry, text=_(cb_qry.from_user.settings.language, "turning_page")
         )
-        if cb_qry.data.endswith("<<"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildBlockedUsersList(
-                    chat_settings=cb_qry.from_user.settings, page=0
-                )
+        cb_qry.message.edit_reply_markup(
+            reply_markup=keyboards.BuildBlockedUsersList(
+                chat_settings=cb_qry.from_user.settings, page=page
             )
-        elif cb_qry.data.endswith("-"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildBlockedUsersList(
-                    chat_settings=cb_qry.from_user.settings, page=page - 1
-                )
-            )
-        elif cb_qry.data.endswith("+"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildBlockedUsersList(
-                    chat_settings=cb_qry.from_user.settings, page=page + 1
-                )
-            )
-        elif cb_qry.data.endswith(">>"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildBlockedUsersList(
-                    chat_settings=cb_qry.from_user.settings,
-                    page=-1,
-                )
-            )
+        )
     else:
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,

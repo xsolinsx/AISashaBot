@@ -205,7 +205,7 @@ def CbQryAlternativesGet(client: pyrogram.Client, cb_qry: pyrogram.types.Callbac
 
 
 @pyrogram.Client.on_callback_query(
-    pyrogram.filters.regex(pattern=r"^alternatives PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^alternatives PAGES (\d+)$", flags=re.I)
 )
 def CbQryAlternativesPages(
     client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
@@ -214,7 +214,7 @@ def CbQryAlternativesPages(
         " "
     )
     chat_id = int(parameters[1])
-    page = int(parameters[2])
+    page = int(cb_qry.data.split(" ")[2]) - 1
     chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
         chat_id=chat_id
     )
@@ -222,31 +222,11 @@ def CbQryAlternativesPages(
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry, text=_(cb_qry.from_user.settings.language, "turning_page")
         )
-        if cb_qry.data.endswith("<<"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildAlternativeCommandsList(
-                    chat_settings=chat_settings, page=0
-                )
+        cb_qry.message.edit_reply_markup(
+            reply_markup=keyboards.BuildAlternativeCommandsList(
+                chat_settings=chat_settings, page=page
             )
-        elif cb_qry.data.endswith("-"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildAlternativeCommandsList(
-                    chat_settings=chat_settings, page=page - 1
-                )
-            )
-        elif cb_qry.data.endswith("+"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildAlternativeCommandsList(
-                    chat_settings=chat_settings, page=page + 1
-                )
-            )
-        elif cb_qry.data.endswith(">>"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildAlternativeCommandsList(
-                    chat_settings=chat_settings,
-                    page=-1,
-                )
-            )
+        )
     else:
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,

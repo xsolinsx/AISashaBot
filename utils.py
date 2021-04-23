@@ -98,7 +98,7 @@ with open(file="config.json", encoding="utf-8") as f:
     config = json.load(fp=f)
 
 
-# temp dictionary for commands that requires more than one interaction to complete (e.g. set welcome via keyboard or)
+# temp dictionary for commands that requires more than one interaction to complete (e.g. set welcome via keyboard)
 tmp_steps = dict(
     # chat_id = generic unspecified data, usually tuple( original_cb_qry, variable )
 )

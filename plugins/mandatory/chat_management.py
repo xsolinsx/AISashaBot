@@ -3026,7 +3026,7 @@ def CbQryCensorshipsGet(client: pyrogram.Client, cb_qry: pyrogram.types.Callback
 
 
 @pyrogram.Client.on_callback_query(
-    pyrogram.filters.regex(pattern=r"^censorships PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^censorships PAGES (\d+)$", flags=re.I)
 )
 def CbQryCensorshipsPages(
     client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
@@ -3035,7 +3035,7 @@ def CbQryCensorshipsPages(
         " "
     )
     chat_id = int(parameters[1])
-    page = int(parameters[2])
+    page = int(cb_qry.data.split(" ")[2]) - 1
     chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
         chat_id=chat_id
     )
@@ -3043,31 +3043,11 @@ def CbQryCensorshipsPages(
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry, text=_(cb_qry.from_user.settings.language, "turning_page")
         )
-        if cb_qry.data.endswith("<<"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildCensorshipsList(
-                    chat_settings=chat_settings, page=0
-                )
+        cb_qry.message.edit_reply_markup(
+            reply_markup=keyboards.BuildCensorshipsList(
+                chat_settings=chat_settings, page=page
             )
-        elif cb_qry.data.endswith("-"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildCensorshipsList(
-                    chat_settings=chat_settings, page=page - 1
-                )
-            )
-        elif cb_qry.data.endswith("+"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildCensorshipsList(
-                    chat_settings=chat_settings, page=page + 1
-                )
-            )
-        elif cb_qry.data.endswith(">>"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildCensorshipsList(
-                    chat_settings=chat_settings,
-                    page=-1,
-                )
-            )
+        )
     else:
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
@@ -3652,7 +3632,7 @@ def CbQryWhitelistedChatsInfo(
 
 
 @pyrogram.Client.on_callback_query(
-    pyrogram.filters.regex(pattern=r"^whitelistedchats PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^whitelistedchats PAGES (\d+)$", flags=re.I)
 )
 def CbQryWhitelistedChatsPages(
     client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
@@ -3661,7 +3641,7 @@ def CbQryWhitelistedChatsPages(
         " "
     )
     chat_id = int(parameters[1])
-    page = int(parameters[2])
+    page = int(cb_qry.data.split(" ")[2]) - 1
     chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
         chat_id=chat_id
     )
@@ -3669,31 +3649,11 @@ def CbQryWhitelistedChatsPages(
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry, text=_(cb_qry.from_user.settings.language, "turning_page")
         )
-        if cb_qry.data.endswith("<<"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildWhitelistedChatsList(
-                    chat_settings=chat_settings, page=0
-                )
+        cb_qry.message.edit_reply_markup(
+            reply_markup=keyboards.BuildWhitelistedChatsList(
+                chat_settings=chat_settings, page=page
             )
-        elif cb_qry.data.endswith("-"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildWhitelistedChatsList(
-                    chat_settings=chat_settings, page=page - 1
-                )
-            )
-        elif cb_qry.data.endswith("+"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildWhitelistedChatsList(
-                    chat_settings=chat_settings, page=page + 1
-                )
-            )
-        elif cb_qry.data.endswith(">>"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildWhitelistedChatsList(
-                    chat_settings=chat_settings,
-                    page=-1,
-                )
-            )
+        )
     else:
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
@@ -3921,9 +3881,7 @@ def CbQryWhitelistedGbannedInfo(
 
 
 @pyrogram.Client.on_callback_query(
-    pyrogram.filters.regex(
-        pattern=r"^whitelistedgbanned PAGES[<<|\-|\+|>>]", flags=re.I
-    )
+    pyrogram.filters.regex(pattern=r"^whitelistedgbanned PAGES (\d+)$", flags=re.I)
 )
 def CbQryWhitelistedGbannedPages(
     client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
@@ -3932,7 +3890,7 @@ def CbQryWhitelistedGbannedPages(
         " "
     )
     chat_id = int(parameters[1])
-    page = int(parameters[2])
+    page = int(cb_qry.data.split(" ")[2]) - 1
     chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
         chat_id=chat_id
     )
@@ -3940,31 +3898,11 @@ def CbQryWhitelistedGbannedPages(
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry, text=_(cb_qry.from_user.settings.language, "turning_page")
         )
-        if cb_qry.data.endswith("<<"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildWhitelistedGbannedUsersList(
-                    chat_settings=chat_settings, page=0
-                )
+        cb_qry.message.edit_reply_markup(
+            reply_markup=keyboards.BuildWhitelistedGbannedUsersList(
+                chat_settings=chat_settings, page=page
             )
-        elif cb_qry.data.endswith("-"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildWhitelistedGbannedUsersList(
-                    chat_settings=chat_settings, page=page - 1
-                )
-            )
-        elif cb_qry.data.endswith("+"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildWhitelistedGbannedUsersList(
-                    chat_settings=chat_settings, page=page + 1
-                )
-            )
-        elif cb_qry.data.endswith(">>"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildWhitelistedGbannedUsersList(
-                    chat_settings=chat_settings,
-                    page=-1,
-                )
-            )
+        )
     else:
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
@@ -4189,7 +4127,7 @@ def CbQryWhitelistedInfo(client: pyrogram.Client, cb_qry: pyrogram.types.Callbac
 
 
 @pyrogram.Client.on_callback_query(
-    pyrogram.filters.regex(pattern=r"^whitelisted PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^whitelisted PAGES (\d+)$", flags=re.I)
 )
 def CbQryWhitelistedPages(
     client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
@@ -4198,7 +4136,7 @@ def CbQryWhitelistedPages(
         " "
     )
     chat_id = int(parameters[1])
-    page = int(parameters[2])
+    page = int(cb_qry.data.split(" ")[2]) - 1
     chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
         chat_id=chat_id
     )
@@ -4206,31 +4144,11 @@ def CbQryWhitelistedPages(
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry, text=_(cb_qry.from_user.settings.language, "turning_page")
         )
-        if cb_qry.data.endswith("<<"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildWhitelistedUsersList(
-                    chat_settings=chat_settings, page=0
-                )
+        cb_qry.message.edit_reply_markup(
+            reply_markup=keyboards.BuildWhitelistedUsersList(
+                chat_settings=chat_settings, page=page
             )
-        elif cb_qry.data.endswith("-"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildWhitelistedUsersList(
-                    chat_settings=chat_settings, page=page - 1
-                )
-            )
-        elif cb_qry.data.endswith("+"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildWhitelistedUsersList(
-                    chat_settings=chat_settings, page=page + 1
-                )
-            )
-        elif cb_qry.data.endswith(">>"):
-            cb_qry.message.edit_reply_markup(
-                reply_markup=keyboards.BuildWhitelistedUsersList(
-                    chat_settings=chat_settings,
-                    page=-1,
-                )
-            )
+        )
     else:
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
@@ -4513,14 +4431,14 @@ def CmdDelFrom(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_callback_query(
-    pyrogram.filters.regex(pattern=r"^logs PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^logs PAGES (\d+)$", flags=re.I)
 )
 def CbQryLogsPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
         " "
     )
     chat_id = int(parameters[1])
-    page = int(parameters[2])
+    page = int(cb_qry.data.split(" ")[2]) - 1
     chat_settings: db_management.ChatSettings = db_management.ChatSettings.get(
         chat_id=chat_id
     )
@@ -4534,14 +4452,6 @@ def CbQryLogsPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
             .order_by(db_management.Logs.timestamp.desc())
         )
 
-        if cb_qry.data.endswith("<<"):
-            page = 0
-        elif cb_qry.data.endswith("-"):
-            page -= 1
-        elif cb_qry.data.endswith("+"):
-            page += 1
-        elif cb_qry.data.endswith(">>"):
-            page = -1
         page = keyboards.AdjustPage(
             page=page,
             max_n=len(query),

@@ -108,41 +108,18 @@ def CmdStartPrivate(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_callback_query(
-    pyrogram.filters.regex(pattern=r"^mainhelp PAGES[<<|\-|\+|>>]", flags=re.I)
+    pyrogram.filters.regex(pattern=r"^mainhelp PAGES (\d+)$", flags=re.I)
 )
 def CbQryHelpPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
-    parameters = cb_qry.message.reply_markup.inline_keyboard[0][0].callback_data.split(
-        " "
-    )
-    page = int(parameters[1])
+    page = int(cb_qry.data.split(" ")[2]) - 1
     methods.CallbackQueryAnswer(
         cb_qry=cb_qry, text=_(cb_qry.from_user.settings.language, "turning_page")
     )
-    if cb_qry.data.endswith("<<"):
-        cb_qry.message.edit_reply_markup(
-            reply_markup=keyboards.BuildHelpMenu(
-                user_settings=cb_qry.from_user.settings, page=0
-            )
+    cb_qry.message.edit_reply_markup(
+        reply_markup=keyboards.BuildHelpMenu(
+            user_settings=cb_qry.from_user.settings, page=page
         )
-    elif cb_qry.data.endswith("-"):
-        cb_qry.message.edit_reply_markup(
-            reply_markup=keyboards.BuildHelpMenu(
-                user_settings=cb_qry.from_user.settings, page=page - 1
-            )
-        )
-    elif cb_qry.data.endswith("+"):
-        cb_qry.message.edit_reply_markup(
-            reply_markup=keyboards.BuildHelpMenu(
-                user_settings=cb_qry.from_user.settings, page=page + 1
-            )
-        )
-    elif cb_qry.data.endswith(">>"):
-        cb_qry.message.edit_reply_markup(
-            reply_markup=keyboards.BuildHelpMenu(
-                user_settings=cb_qry.from_user.settings,
-                page=-1,
-            )
-        )
+    )
 
 
 @pyrogram.Client.on_callback_query(

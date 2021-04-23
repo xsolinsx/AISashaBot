@@ -23,71 +23,6 @@ def AdjustPage(page: int, max_n: int, max_items_page: int):
     return page
 
 
-def BuildPager(
-    base_callback_data: str, page: int, n_items: int, max_items_keyboard: int
-) -> list:
-    """
-    Use this method to create the pager on the bottom of the keyboards.
-
-    base_callback_data (``str``): Starting callback_data that is dependent on where you call this function.
-
-    page (``int``): Current page you are on.
-
-    n_items (``int``): Number of items to put in the keyboard.
-
-    max_items_keyboard (``int``): Maximum number of items to put in the keyboard per page.
-
-
-    SUCCESS Returns ``list`` of buttons to append to a keyboard that needs it.
-    """
-    page = int(page)
-    n_items = int(n_items)
-    max_items_keyboard = int(max_items_keyboard)
-    pager = list()
-    if n_items > max_items_keyboard:
-        pager = list()
-        if page - 2 >= 0:
-            # goto first
-            pager.append(
-                pyrogram.types.InlineKeyboardButton(
-                    pyrogram.emoji.LAST_TRACK_BUTTON,
-                    callback_data=f"{base_callback_data} PAGES<<",
-                )
-            )
-        if page - 1 >= 0:
-            # previous page
-            pager.append(
-                pyrogram.types.InlineKeyboardButton(
-                    pyrogram.emoji.REVERSE_BUTTON,
-                    callback_data=f"{base_callback_data} PAGES-",
-                )
-            )
-        # select page button
-        pager.append(
-            pyrogram.types.InlineKeyboardButton(
-                f"{page + 1}/{math.ceil(n_items / max_items_keyboard)}",
-                callback_data=f"useless{base_callback_data} PAGES",
-            )
-        )
-        if page + 1 < math.ceil(n_items / max_items_keyboard):
-            # next page
-            pager.append(
-                pyrogram.types.InlineKeyboardButton(
-                    pyrogram.emoji.PLAY_BUTTON,
-                    callback_data=f"{base_callback_data} PAGES+",
-                )
-            )
-        if page + 2 < math.ceil(n_items / max_items_keyboard):
-            # goto last
-            pager.append(
-                pyrogram.types.InlineKeyboardButton(
-                    pyrogram.emoji.NEXT_TRACK_BUTTON,
-                    callback_data=f"{base_callback_data} PAGES>>",
-                )
-            )
-    return pager
-
-
 def BuildStartMenu(
     user_settings: db_management.UserSettings, bot_username: str, channel_username: str
 ) -> InlineKeyboard:
@@ -1872,7 +1807,6 @@ def BuildWelcomeButtonsKeyboard(welcome_buttons: str) -> InlineKeyboard:
     return keyboard
 
 
-# TODO PAGINATION
 def BuildCensorshipsList(
     chat_settings: db_management.ChatSettings,
     page: int = 0,
@@ -1978,14 +1912,12 @@ def BuildCensorshipsList(
                 ),
             )
 
-        keyboard.row(
-            *BuildPager(
-                base_callback_data="censorships",
-                page=page,
-                n_items=len(query),
-                max_items_keyboard=utils.config["max_items_keyboard"],
+        if len(query) > utils.config["max_items_keyboard"]:
+            keyboard.paginate(
+                count_pages=math.ceil(len(query) / utils.config["max_items_keyboard"]),
+                current_page=page + 1,
+                callback_pattern="censorships PAGES {number}",
             )
-        )
         keyboard.row(
             pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "back_to_settings_menu").format(
@@ -2012,7 +1944,6 @@ def BuildCensorshipsList(
     return keyboard
 
 
-# TODO PAGINATION
 def BuildExtraList(
     chat_settings: db_management.ChatSettings,
     page: int = 0,
@@ -2063,14 +1994,12 @@ def BuildExtraList(
                 ),
             )
 
-        keyboard.row(
-            *BuildPager(
-                base_callback_data="extras",
-                page=page,
-                n_items=len(query),
-                max_items_keyboard=utils.config["max_items_keyboard"],
+        if len(query) > utils.config["max_items_keyboard"]:
+            keyboard.paginate(
+                count_pages=math.ceil(len(query) / utils.config["max_items_keyboard"]),
+                current_page=page + 1,
+                callback_pattern="extras PAGES {number}",
             )
-        )
     elif selected_setting == "set":
         keyboard.row(
             pyrogram.types.InlineKeyboardButton(
@@ -2099,7 +2028,6 @@ def BuildExtraList(
     return keyboard
 
 
-# TODO PAGINATION
 def BuildMessagesList(
     chat_settings: db_management.ChatSettings, members_only: bool = True, page: int = 0
 ) -> InlineKeyboard:
@@ -2189,14 +2117,12 @@ def BuildMessagesList(
             ),
         )
 
-    keyboard.row(
-        *BuildPager(
-            base_callback_data="messages",
-            page=page,
-            n_items=len(query),
-            max_items_keyboard=utils.config["max_items_keyboard"],
+    if len(query) > utils.config["max_items_keyboard"]:
+        keyboard.paginate(
+            count_pages=math.ceil(len(query) / utils.config["max_items_keyboard"]),
+            current_page=page + 1,
+            callback_pattern="messages PAGES {number}",
         )
-    )
     return keyboard
 
 
@@ -2239,7 +2165,6 @@ def BuildInactivesConfirmation(
     return keyboard
 
 
-# TODO PAGINATION
 def BuildWhitelistedUsersList(
     chat_settings: db_management.ChatSettings,
     page: int = 0,
@@ -2293,14 +2218,12 @@ def BuildWhitelistedUsersList(
             ),
         )
 
-    keyboard.row(
-        *BuildPager(
-            base_callback_data="whitelisted",
-            page=page,
-            n_items=len(query),
-            max_items_keyboard=utils.config["max_items_keyboard"],
+    if len(query) > utils.config["max_items_keyboard"]:
+        keyboard.paginate(
+            count_pages=math.ceil(len(query) / utils.config["max_items_keyboard"]),
+            current_page=page + 1,
+            callback_pattern="whitelisted PAGES {number}",
         )
-    )
     keyboard.row(
         pyrogram.types.InlineKeyboardButton(
             text=_(chat_settings.language, "back_to_settings_menu").format(
@@ -2312,7 +2235,6 @@ def BuildWhitelistedUsersList(
     return keyboard
 
 
-# TODO PAGINATION
 def BuildWhitelistedGbannedUsersList(
     chat_settings: db_management.ChatSettings,
     page: int = 0,
@@ -2366,14 +2288,12 @@ def BuildWhitelistedGbannedUsersList(
             ),
         )
 
-    keyboard.row(
-        *BuildPager(
-            base_callback_data="whitelistedgbanned",
-            page=page,
-            n_items=len(query),
-            max_items_keyboard=utils.config["max_items_keyboard"],
+    if len(query) > utils.config["max_items_keyboard"]:
+        keyboard.paginate(
+            count_pages=math.ceil(len(query) / utils.config["max_items_keyboard"]),
+            current_page=page + 1,
+            callback_pattern="whitelistedgbanned PAGES {number}",
         )
-    )
     keyboard.row(
         pyrogram.types.InlineKeyboardButton(
             text=_(chat_settings.language, "back_to_settings_menu").format(
@@ -2385,7 +2305,6 @@ def BuildWhitelistedGbannedUsersList(
     return keyboard
 
 
-# TODO PAGINATION
 def BuildWhitelistedChatsList(
     chat_settings: db_management.ChatSettings,
     page: int = 0,
@@ -2440,14 +2359,12 @@ def BuildWhitelistedChatsList(
             ),
         )
 
-    keyboard.row(
-        *BuildPager(
-            base_callback_data="whitelistedchats",
-            page=page,
-            n_items=len(query),
-            max_items_keyboard=utils.config["max_items_keyboard"],
+    if len(query) > utils.config["max_items_keyboard"]:
+        keyboard.paginate(
+            count_pages=math.ceil(len(query) / utils.config["max_items_keyboard"]),
+            current_page=page + 1,
+            callback_pattern="whitelistedchats PAGES {number}",
         )
-    )
     keyboard.row(
         pyrogram.types.InlineKeyboardButton(
             text=_(chat_settings.language, "back_to_settings_menu").format(
@@ -2459,7 +2376,6 @@ def BuildWhitelistedChatsList(
     return keyboard
 
 
-# TODO PAGINATION
 def BuildGloballyBannedUsersList(
     chat_settings: typing.Union[db_management.ChatSettings, db_management.UserSettings],
     page: int = 0,
@@ -2516,18 +2432,15 @@ def BuildGloballyBannedUsersList(
             ),
         )
 
-    keyboard.row(
-        *BuildPager(
-            base_callback_data="gbanned",
-            page=page,
-            n_items=len(query),
-            max_items_keyboard=utils.config["max_items_keyboard"],
+    if len(query) > utils.config["max_items_keyboard"]:
+        keyboard.paginate(
+            count_pages=math.ceil(len(query) / utils.config["max_items_keyboard"]),
+            current_page=page + 1,
+            callback_pattern="gbanned PAGES {number}",
         )
-    )
     return keyboard
 
 
-# TODO PAGINATION
 def BuildBlockedUsersList(
     chat_settings: typing.Union[db_management.ChatSettings, db_management.UserSettings],
     page: int = 0,
@@ -2584,18 +2497,15 @@ def BuildBlockedUsersList(
             ),
         )
 
-    keyboard.row(
-        *BuildPager(
-            base_callback_data="blocked",
-            page=page,
-            n_items=len(query),
-            max_items_keyboard=utils.config["max_items_keyboard"],
+    if len(query) > utils.config["max_items_keyboard"]:
+        keyboard.paginate(
+            count_pages=math.ceil(len(query) / utils.config["max_items_keyboard"]),
+            current_page=page + 1,
+            callback_pattern="blocked PAGES {number}",
         )
-    )
     return keyboard
 
 
-# TODO PAGINATION
 def BuildAlternativeCommandsList(
     chat_settings: db_management.ChatSettings,
     page: int = 0,
@@ -2641,14 +2551,12 @@ def BuildAlternativeCommandsList(
             ),
         )
 
-    keyboard.row(
-        *BuildPager(
-            base_callback_data="alternatives",
-            page=page,
-            n_items=len(query),
-            max_items_keyboard=utils.config["max_items_keyboard"],
+    if len(query) > utils.config["max_items_keyboard"]:
+        keyboard.paginate(
+            count_pages=math.ceil(len(query) / utils.config["max_items_keyboard"]),
+            current_page=page + 1,
+            callback_pattern="alternatives PAGES {number}",
         )
-    )
     keyboard.row(
         pyrogram.types.InlineKeyboardButton(
             text=_(chat_settings.language, "back_to_settings_menu").format(
@@ -3067,20 +2975,13 @@ def BuildTagKeyboard(
     return keyboard
 
 
-# TODO PAGINATION
 def BuildHelpMenu(
     user_settings: db_management.UserSettings,
     page: int = 0,
     selected_setting: str = None,
 ) -> InlineKeyboard:
-    keyboard = InlineKeyboard()
+    keyboard = InlineKeyboard(row_width=2)
     if not selected_setting:
-        keyboard.row(
-            pyrogram.types.InlineKeyboardButton(
-                text=_(user_settings.language, "mainhelp").upper(),
-                callback_data=f"uselessmainhelp {page}",
-            )
-        )
         rank = utils.GetRank(user_id=user_settings.user_id)
         user_viewable_plugins = [
             p.name
@@ -3093,40 +2994,44 @@ def BuildHelpMenu(
             and rank
             >= dictionaries.RANK_STRING[dictionaries.HELP_DICTIONARY[p.name][0].lower()]
         ]
-        max_columns = 2
         page = AdjustPage(
             page=page,
             max_n=len(user_viewable_plugins),
             max_items_page=utils.config["max_items_keyboard"],
         )
 
-        tmp = list()
-        for i, plugin_name in enumerate(sorted(user_viewable_plugins)):
-            if i >= page * utils.config["max_items_keyboard"]:
-                if len(tmp) >= max_columns:
-                    # max_columns buttons per line, then add another row
-                    keyboard.row(*tmp)
-                    tmp = list()
-                tmp.append(
-                    pyrogram.types.InlineKeyboardButton(
-                        text=_(user_settings.language, f"{plugin_name}"),
-                        callback_data=f"mainhelp {plugin_name}",
-                    )
-                )
-                if (
-                    sum([len(row) for row in keyboard.inline_keyboard])
-                    >= utils.config["max_items_keyboard"]
-                ):
-                    break
-
-        keyboard.row(
-            *BuildPager(
-                base_callback_data="mainhelp",
-                page=page,
-                n_items=len(user_viewable_plugins),
-                max_items_keyboard=utils.config["max_items_keyboard"],
-            )
+        user_viewable_plugins.sort()
+        begin = page * utils.config["max_items_keyboard"]
+        end = min(
+            len(user_viewable_plugins), (page + 1) * utils.config["max_items_keyboard"]
         )
+
+        tmp = [
+            pyrogram.types.InlineKeyboardButton(
+                text=f"{_(user_settings.language, user_viewable_plugins[i])}",
+                callback_data=f"mainhelp {user_viewable_plugins[i]}",
+            )
+            for i in range(begin, end)
+        ]
+        keyboard.add(*tmp)
+        keyboard.inline_keyboard.insert(
+            0,
+            [
+                pyrogram.types.InlineKeyboardButton(
+                    text=_(user_settings.language, "mainhelp").upper(),
+                    callback_data=f"uselessmainhelp {page}",
+                )
+            ],
+        )
+
+        if len(user_viewable_plugins) > utils.config["max_items_keyboard"]:
+            keyboard.paginate(
+                count_pages=math.ceil(
+                    len(user_viewable_plugins) / utils.config["max_items_keyboard"]
+                ),
+                current_page=page + 1,
+                callback_pattern="mainhelp PAGES {number}",
+            )
         keyboard.row(
             pyrogram.types.InlineKeyboardButton(
                 text=_(user_settings.language, "back_to_main_menu"),
@@ -3143,7 +3048,6 @@ def BuildHelpMenu(
     return keyboard
 
 
-# TODO PAGINATION
 def BuildBotPluginsMenu(
     user_settings: db_management.UserSettings, page: int = 0
 ) -> InlineKeyboard:
@@ -3198,18 +3102,15 @@ def BuildBotPluginsMenu(
             ),
         )
 
-    keyboard.row(
-        *BuildPager(
-            base_callback_data="botplugins",
-            page=page,
-            n_items=len(query),
-            max_items_keyboard=utils.config["max_items_keyboard"],
+    if len(query) > utils.config["max_items_keyboard"]:
+        keyboard.paginate(
+            count_pages=math.ceil(len(query) / utils.config["max_items_keyboard"]),
+            current_page=page + 1,
+            callback_pattern="botplugins PAGES {number}",
         )
-    )
     return keyboard
 
 
-# TODO PAGINATION
 def BuildChatPluginsMenu(
     chat_settings: db_management.ChatSettings, page: int = 0
 ) -> InlineKeyboard:
@@ -3267,14 +3168,12 @@ def BuildChatPluginsMenu(
                 callback_data=f"chatplugins min_rank {query[i].plugin}",
             ),
         )
-    keyboard.row(
-        *BuildPager(
-            base_callback_data="chatplugins",
-            page=page,
-            n_items=len(query),
-            max_items_keyboard=utils.config["max_items_keyboard"],
+    if len(query) > utils.config["max_items_keyboard"]:
+        keyboard.paginate(
+            count_pages=math.ceil(len(query) / utils.config["max_items_keyboard"]),
+            current_page=page + 1,
+            callback_pattern="chatplugins PAGES {number}",
         )
-    )
     keyboard.row(
         pyrogram.types.InlineKeyboardButton(
             text=_(chat_settings.language, "chat") + f" {pyrogram.emoji.INFORMATION}",
@@ -3284,7 +3183,6 @@ def BuildChatPluginsMenu(
     return keyboard
 
 
-# TODO PAGINATION
 def BuildGroupsMenu(
     chat_settings: typing.Union[db_management.ChatSettings, db_management.UserSettings],
     page: int = 0,
@@ -3327,18 +3225,15 @@ def BuildGroupsMenu(
                     else query[i].link,
                 ),
             )
-    keyboard.row(
-        *BuildPager(
-            base_callback_data="groups",
-            page=page,
-            n_items=len(query),
-            max_items_keyboard=utils.config["max_items_keyboard"],
+    if len(query) > utils.config["max_items_keyboard"]:
+        keyboard.paginate(
+            count_pages=math.ceil(len(query) / utils.config["max_items_keyboard"]),
+            current_page=page + 1,
+            callback_pattern="groups PAGES {number}",
         )
-    )
     return keyboard
 
 
-# TODO PAGINATION
 def BuildLogMenu(
     chat_settings: db_management.ChatSettings, page: int = 0
 ) -> InlineKeyboard:
@@ -3359,14 +3254,12 @@ def BuildLogMenu(
         max_n=len(query),
         max_items_page=utils.config["max_items_keyboard"],
     )
-    keyboard.row(
-        *BuildPager(
-            base_callback_data="logs",
-            page=page,
-            n_items=len(query),
-            max_items_keyboard=utils.config["max_items_keyboard"],
+    if len(query) > utils.config["max_items_keyboard"]:
+        keyboard.paginate(
+            count_pages=math.ceil(len(query) / utils.config["max_items_keyboard"]),
+            current_page=page + 1,
+            callback_pattern="logs PAGES {number}",
         )
-    )
     return keyboard
 
 
