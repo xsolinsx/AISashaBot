@@ -3,7 +3,6 @@ import hashlib
 import re
 import time
 import traceback
-import typing
 
 import db_management
 import dictionaries
@@ -446,7 +445,7 @@ def CheckGroupMessageTextCaptionName(
                     break
     # links and public usernames
     if msg.chat.settings.link_spam_punishment:
-        entities_to_use: typing.List[pyrogram.types.MessageEntity] = list()
+        entities_to_use: list[pyrogram.types.MessageEntity] = list()
         if msg.caption_entities:
             entities_to_use = msg.caption_entities
         elif msg.entities:

@@ -3266,9 +3266,7 @@ def BuildLogMenu(
 def BuildActionOnAddedUsersList(
     chat_settings: db_management.ChatSettings,
     action: str,
-    new_chat_members: typing.Union[
-        typing.List[pyrogram.types.User], peewee.ModelSelect
-    ],
+    new_chat_members: typing.Union[list[pyrogram.types.User], peewee.ModelSelect],
 ) -> InlineKeyboard:
     keyboard = InlineKeyboard()
     keyboard.row(

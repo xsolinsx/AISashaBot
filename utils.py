@@ -498,7 +498,7 @@ def CensorPhone(obj: object) -> object:
     return obj
 
 
-def ExtractMedia(msg: pyrogram.types.Message) -> typing.Tuple[object, str]:
+def ExtractMedia(msg: pyrogram.types.Message) -> tuple[object, str]:
     """Extract the media from a :obj:`Message <pyrogram.types.Message>`.
 
     msg (:obj:`Message <pyrogram.types.Message>`): Message from which you want to extract the media
@@ -1186,7 +1186,7 @@ def CompareRanks(
 
 
 def IsInNightMode(
-    chat_settings: db_management.ChatSettings, time_tup: typing.Tuple[int, int] = None
+    chat_settings: db_management.ChatSettings, time_tup: tuple[int, int] = None
 ) -> bool:
     if chat_settings.night_mode_punishment:
         if not time_tup:

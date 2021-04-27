@@ -41,9 +41,7 @@ def PreCallbackQuery(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
 
 
 # @pyrogram.Client.on_deleted_messages(group=-11)
-def PreDeletedMessages(
-    client: pyrogram.Client, msgs: typing.List[pyrogram.types.Message]
-):
+def PreDeletedMessages(client: pyrogram.Client, msgs: list[pyrogram.types.Message]):
     # as this is the first handler of this type, if the db is locked wait
     while db_management.DB.is_stopped():
         time.sleep(1)
@@ -79,10 +77,8 @@ def PreUserStatus(client: pyrogram.Client, user: pyrogram.types.User):
 def PreProcessRawUpdate(
     client: pyrogram.Client,
     update: pyrogram.raw.base.Update,
-    users: typing.Dict[int, pyrogram.raw.types.User],
-    chats: typing.Dict[
-        int, typing.Union[pyrogram.raw.types.Chat, pyrogram.raw.types.Channel]
-    ],
+    users: dict[int, pyrogram.raw.types.User],
+    chats: dict[int, typing.Union[pyrogram.raw.types.Chat, pyrogram.raw.types.Channel]],
 ):
     # as this is the first handler of this type, if the db is locked wait
     while db_management.DB.is_stopped():
