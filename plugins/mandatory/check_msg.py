@@ -463,12 +463,12 @@ def CheckGroupMessageTextCaptionName(
                         url=text_to_use[entity.offset : entity.offset + entity.length]
                     )
                 )
-                if "t.me/joinchat" not in tmp.lower():
+                if "t.me/joinchat" not in tmp.lower() and "t.me/+" not in tmp.lower():
                     # t.me/username
                     tmp = utils.CleanUsername(username=tmp).lower()
             elif entity.type == "text_link":
                 tmp = str(utils.CleanLink(url=entity.url))
-                if "t.me/joinchat" not in tmp.lower():
+                if "t.me/joinchat" not in tmp.lower() and "t.me/+" not in tmp.lower():
                     # t.me/username
                     tmp = utils.CleanUsername(username=tmp).lower()
             if utils.LINK_REGEX.findall(string=tmp):
@@ -551,7 +551,10 @@ def CheckGroupMessageTextCaptionName(
                 for button in row:
                     if hasattr(button, "url") and button.url:
                         tmp = str(utils.CleanLink(button.url))
-                        if "t.me/joinchat" not in tmp.lower():
+                        if (
+                            "t.me/joinchat" not in tmp.lower()
+                            and "t.me/+" not in tmp.lower()
+                        ):
                             # t.me/username
                             tmp = utils.CleanUsername(username=tmp).lower()
                         if utils.LINK_REGEX.findall(string=tmp):

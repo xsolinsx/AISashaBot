@@ -84,11 +84,13 @@ def GetLocalizedString(locale: str, string: str) -> str:
 _ = GetLocalizedString
 RTL_CHARACTER = "‏"
 ARABIC_REGEX = re.compile(pattern=r"[\u0621-\u064a\ufb50-\ufdff\ufe70-\ufefc]")
-ORIGINAL_LINK_REGEX_PATTERN = r"((telegram\.(me|dog)|t\.me)/joinchat/([A-Z0-9_-]+))"
+ORIGINAL_LINK_REGEX_PATTERN = (
+    r"((telegram\.(me|dog)|t\.me)/(joinchat/|\+)([A-Z0-9_-]+))"
+)
 ORIGINAL_USERNAME_REGEX_PATTERN = (
     r"((@|((telegram\.(me|dog)|t\.me)/))([A-Z]([A-Z0-9_]){3,30}[A-Z0-9]))"
 )
-LINK_REGEX = re.compile(pattern=r"(t\.me/joinchat/[A-Z0-9_-]+)", flags=re.I)
+LINK_REGEX = re.compile(pattern=r"(t\.me/(joinchat/|\+)[A-Z0-9_-]+)", flags=re.I)
 # remember to not consider t.me/joinchat
 USERNAME_REGEX = re.compile(
     pattern=r"(@|t\.me/)([A-Z]([A-Z0-9_]){3,30}[A-Z0-9])", flags=re.I
@@ -1208,13 +1210,15 @@ def ResolveInviteLink(link: str):
     """Converts Invite Link to Tuple with inviter_id, chat_id, random_hash
 
     Arguments:
-        link {str} -- Link in "t.me/joinchat/INTERESTING_PART" format.
+        link {str} -- Link in "t.me/joinchat/INTERESTING_PART" or "t.me/+INTERESTING_PART" formats.
 
     Returns:
         [tuple] -- inviter_id, chat_id, random_hash
     """
     # from: https://github.com/ColinTheShark/Pyrogram-Snippets/blob/master/Snippets/resolve_invite_link.py
     interesting_part = link.split("/")[-1]
+    if interesting_part.startswith("+"):
+        interesting_part = interesting_part[1:]
     return struct.unpack(">iiq", base64.urlsafe_b64decode(interesting_part + "=="))
 
 
