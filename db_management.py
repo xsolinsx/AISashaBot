@@ -663,13 +663,19 @@ class RUserChat(peewee.Model):
     is_member = peewee.BooleanField(
         default=False,
         null=False,
-        constraints=[peewee.Check(constraint="is_admin BETWEEN 0 AND 1")],
+        constraints=[peewee.Check(constraint="is_member BETWEEN 0 AND 1")],
     )
     # is user administrator on telegram?
     is_admin = peewee.BooleanField(
         default=False,
         null=False,
         constraints=[peewee.Check(constraint="is_admin BETWEEN 0 AND 1")],
+    )
+    # is user anonymous on telegram?
+    is_anonymous = peewee.BooleanField(
+        default=False,
+        null=False,
+        constraints=[peewee.Check(constraint="is_anonymous BETWEEN 0 AND 1")],
     )
     # TELEGRAM PERMISSIONS
     # Applicable to administrators only. True, if you are allowed to edit administrator privileges of the user.
@@ -690,7 +696,17 @@ class RUserChat(peewee.Model):
     # Applicable to default chat permissions and administrators only. True, if new users can be invited to the chat.
     can_invite_users = peewee.BooleanField(
         default=False,
-        constraints=[peewee.Check(constraint="can_invite_users  BETWEEN 0 AND 1")],
+        constraints=[peewee.Check(constraint="can_invite_users BETWEEN 0 AND 1")],
+    )
+    # Applicable to administrators only. True, if the administrator can access the chat event log, chat statistics, message statistics in channels, see channel members, see anonymous administrators in supergroups and ignore slow mode. Implied by any other administrator privilege.
+    can_manage_chat = peewee.BooleanField(
+        default=False,
+        constraints=[peewee.Check(constraint="can_manage_chat BETWEEN 0 AND 1")],
+    )
+    # Applicable to administrators only. True, if the administrator can manage voice chats (also called group calls).
+    can_manage_voice_chats = peewee.BooleanField(
+        default=False,
+        constraints=[peewee.Check(constraint="can_manage_voice_chats BETWEEN 0 AND 1")],
     )
     # Applicable to default chat permissions in private groups and administrators in public groups only. True, if messages can be pinned, supergroups only.
     can_pin_messages = peewee.BooleanField(
@@ -1185,6 +1201,8 @@ def DBChatAdmins(client: pyrogram.Client, chat_id: int, clean_up=False):
             can_change_info=False,
             can_delete_messages=False,
             can_invite_users=False,
+            can_manage_chat=False,
+            can_manage_voice_chats=False,
             can_pin_messages=False,
             can_promote_members=False,
             can_restrict_members=False,
@@ -1207,6 +1225,8 @@ def DBChatAdmins(client: pyrogram.Client, chat_id: int, clean_up=False):
                 can_change_info=creator or bool(member.can_change_info),
                 can_delete_messages=creator or bool(member.can_delete_messages),
                 can_invite_users=creator or bool(member.can_invite_users),
+                can_manage_chat=creator or bool(member.can_manage_chat),
+                can_manage_voice_chats=creator or bool(member.can_manage_voice_chats),
                 can_pin_messages=creator or bool(member.can_pin_messages),
                 can_promote_members=creator or bool(member.can_promote_members),
                 can_restrict_members=creator or bool(member.can_restrict_members),
@@ -1230,6 +1250,8 @@ def DBChatAdmins(client: pyrogram.Client, chat_id: int, clean_up=False):
                 can_change_info=creator or bool(member.can_change_info),
                 can_delete_messages=creator or bool(member.can_delete_messages),
                 can_invite_users=creator or bool(member.can_invite_users),
+                can_manage_chat=creator or bool(member.can_manage_chat),
+                can_manage_voice_chats=creator or bool(member.can_manage_voice_chats),
                 can_pin_messages=creator or bool(member.can_pin_messages),
                 can_promote_members=creator or bool(member.can_promote_members),
                 can_restrict_members=creator or bool(member.can_restrict_members),
@@ -1361,20 +1383,19 @@ def DBObject(
             elif obj.forward_from_chat:
                 DBChat(chat=obj.forward_from_chat)
 
-            if obj.service:
-                if obj.new_chat_members:
-                    for i, user in enumerate(obj.new_chat_members):
-                        DBUser(user=user)
-                        DBUserChat(user=user, chat=obj.chat)
-                        obj.new_chat_members[i].settings = UserSettings.get_or_none(
-                            user_id=user.id
-                        )
-                elif obj.left_chat_member:
-                    DBUser(user=obj.left_chat_member)
-                    DBUserChat(user=obj.left_chat_member, chat=obj.chat)
-                    obj.left_chat_member.settings = UserSettings.get_or_none(
-                        user_id=obj.left_chat_member.id
+            if obj.service == "new_chat_member":
+                for i, user in enumerate(obj.new_chat_members):
+                    DBUser(user=user)
+                    DBUserChat(user=user, chat=obj.chat)
+                    obj.new_chat_members[i].settings = UserSettings.get_or_none(
+                        user_id=user.id
                     )
+            elif obj.service == "left_chat_member":
+                DBUser(user=obj.left_chat_member)
+                DBUserChat(user=obj.left_chat_member, chat=obj.chat)
+                obj.left_chat_member.settings = UserSettings.get_or_none(
+                    user_id=obj.left_chat_member.id
+                )
 
             if obj.entities:
                 for i, entity in enumerate(obj.entities):

@@ -84,11 +84,13 @@ def GetLocalizedString(locale: str, string: str) -> str:
 _ = GetLocalizedString
 RTL_CHARACTER = "‏"
 ARABIC_REGEX = re.compile(pattern=r"[\u0621-\u064a\ufb50-\ufdff\ufe70-\ufefc]")
-ORIGINAL_LINK_REGEX_PATTERN = r"((telegram\.(me|dog)|t\.me)/joinchat/([A-Z0-9_-]+))"
+ORIGINAL_LINK_REGEX_PATTERN = (
+    r"((telegram\.(me|dog)|t\.me)/(joinchat/|\+)([A-Z0-9_-]+))"
+)
 ORIGINAL_USERNAME_REGEX_PATTERN = (
     r"((@|((telegram\.(me|dog)|t\.me)/))([A-Z]([A-Z0-9_]){3,30}[A-Z0-9]))"
 )
-LINK_REGEX = re.compile(pattern=r"(t\.me/joinchat/[A-Z0-9_-]+)", flags=re.I)
+LINK_REGEX = re.compile(pattern=r"(t\.me/(joinchat/|\+)[A-Z0-9_-]+)", flags=re.I)
 # remember to not consider t.me/joinchat
 USERNAME_REGEX = re.compile(
     pattern=r"(@|t\.me/)([A-Z]([A-Z0-9_]){3,30}[A-Z0-9])", flags=re.I
@@ -511,61 +513,58 @@ def ExtractMedia(msg: pyrogram.types.Message) -> typing.Tuple[object, str]:
     media = None
     type_ = None
     if msg and not msg.empty:
-        if msg.media:
-            if msg.animation:
-                media = msg.animation
-                type_ = "animation"
-                media.media_id = media.file_id
-            elif msg.audio:
-                media = msg.audio
-                type_ = "audio"
-                media.media_id = media.file_id
-            elif msg.contact:
-                media = msg.contact
-                type_ = "contact"
-                media.media_id = media.phone_number
-            elif msg.document:
-                media = msg.document
-                type_ = "document"
-                media.media_id = media.file_id
-            elif msg.game:
-                media = msg.game
-                type_ = "game"
-                media.media_id = media.id
-            elif msg.location:
-                media = msg.location
-                type_ = "location"
-                media.media_id = f"{media.latitude}, {media.longitude}"
-            elif msg.photo:
-                media = msg.photo
-                type_ = "photo"
-                media.media_id = media.file_id
-            elif msg.poll:
-                media = msg.poll
-                type_ = "poll"
-                media.media_id = media.id
-            elif msg.sticker:
-                media = msg.sticker
-                type_ = "sticker"
-                media.media_id = media.file_id
-            elif msg.venue:
-                media = msg.venue
-                type_ = "venue"
-                media.media_id = (
-                    f"{media.location.latitude}, {media.location.longitude}"
-                )
-            elif msg.video:
-                media = msg.video
-                type_ = "video"
-                media.media_id = media.file_id
-            elif msg.video_note:
-                media = msg.video_note
-                type_ = "video_note"
-                media.media_id = media.file_id
-            elif msg.voice:
-                media = msg.voice
-                type_ = "voice"
-                media.media_id = media.file_id
+        if msg.media == "animation":
+            media = msg.animation
+            type_ = "animation"
+            media.media_id = media.file_id
+        elif msg.media == "audio":
+            media = msg.audio
+            type_ = "audio"
+            media.media_id = media.file_id
+        elif msg.media == "contact":
+            media = msg.contact
+            type_ = "contact"
+            media.media_id = media.phone_number
+        elif msg.media == "document":
+            media = msg.document
+            type_ = "document"
+            media.media_id = media.file_id
+        elif msg.media == "game":
+            media = msg.game
+            type_ = "game"
+            media.media_id = media.id
+        elif msg.media == "location":
+            media = msg.location
+            type_ = "location"
+            media.media_id = f"{media.latitude}, {media.longitude}"
+        elif msg.media == "photo":
+            media = msg.photo
+            type_ = "photo"
+            media.media_id = media.file_id
+        elif msg.media == "poll":
+            media = msg.poll
+            type_ = "poll"
+            media.media_id = media.id
+        elif msg.media == "sticker":
+            media = msg.sticker
+            type_ = "sticker"
+            media.media_id = media.file_id
+        elif msg.media == "venue":
+            media = msg.venue
+            type_ = "venue"
+            media.media_id = f"{media.location.latitude}, {media.location.longitude}"
+        elif msg.media == "video":
+            media = msg.video
+            type_ = "video"
+            media.media_id = media.file_id
+        elif msg.media == "video_note":
+            media = msg.video_note
+            type_ = "video_note"
+            media.media_id = media.file_id
+        elif msg.media == "voice":
+            media = msg.voice
+            type_ = "voice"
+            media.media_id = media.file_id
     return media, type_
 
 
@@ -1208,13 +1207,15 @@ def ResolveInviteLink(link: str):
     """Converts Invite Link to Tuple with inviter_id, chat_id, random_hash
 
     Arguments:
-        link {str} -- Link in "t.me/joinchat/INTERESTING_PART" format.
+        link {str} -- Link in "t.me/joinchat/INTERESTING_PART" or "t.me/+INTERESTING_PART" formats.
 
     Returns:
         [tuple] -- inviter_id, chat_id, random_hash
     """
     # from: https://github.com/ColinTheShark/Pyrogram-Snippets/blob/master/Snippets/resolve_invite_link.py
     interesting_part = link.split("/")[-1]
+    if interesting_part.startswith("+"):
+        interesting_part = interesting_part[1:]
     return struct.unpack(">iiq", base64.urlsafe_b64decode(interesting_part + "=="))
 
 

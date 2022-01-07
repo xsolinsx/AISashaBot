@@ -229,7 +229,7 @@ def CmdTestReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     else:
         allowed = msg.chat.type == "private"
     if allowed:
-        if msg.reply_to_message.service and msg.reply_to_message.new_chat_members:
+        if msg.reply_to_message.service == "new_chat_members":
             if (
                 msg.reply_to_message.new_chat_members[0].id
                 != msg.reply_to_message.from_user.id

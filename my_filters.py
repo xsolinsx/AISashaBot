@@ -2,11 +2,13 @@ import typing
 
 import pyrogram
 
-"""Filter anonymous messages."""
-message_anonymous = pyrogram.filters.create(
-    lambda _, client, msg: bool(msg.sender_chat),
-    name="Anonymous",
-)
+
+async def anonymous_filter(_, __, msg: pyrogram.types.Message):
+    """Filter anonymous messages."""
+    return bool(msg.sender_chat)
+
+
+message_anonymous = pyrogram.filters.create(anonymous_filter, name="Anonymous")
 
 
 def callback_command(
@@ -29,10 +31,10 @@ def callback_command(
             Examples: when True, commands="Start" would trigger /Start but not /start.
     """
 
-    def f(fil, client, callback_query):
+    async def f(fil, _, cb_query: pyrogram.types.CallbackQuery) -> bool:
         command = None
-        if callback_query.data:
-            t = callback_query.data.split(fil.separator)
+        if cb_query.data:
+            t = cb_query.data.split(fil.separator)
             c, a = t[0], t[1:]
             c = c if fil.case_sensitive else c.lower()
             if c in fil.commands:
@@ -50,30 +52,27 @@ def callback_command(
     )
 
 
-"""Filter callback queries sent in private chats."""
-callback_private = pyrogram.filters.create(
-    lambda _, client, cb_qry: bool(
-        cb_qry.message.chat and cb_qry.message.chat.type == "private"
-    ),
-    name="Private",
-)
+async def private_callback_filter(_, __, cb_qry: pyrogram.types.CallbackQuery) -> bool:
+    """Filter callback queries sent in private chats."""
+    return bool(cb_qry.message.chat and cb_qry.message.chat.type == "private")
 
-"""Filter callback queries sent in group chats."""
-callback_group = pyrogram.filters.create(
-    lambda _, client, cb_qry: bool(
-        cb_qry.message.chat
-        and (
-            cb_qry.message.chat.type == "group"
-            or cb_qry.message.chat.type == "supergroup"
-        )
-    ),
-    name="Group",
-)
 
-"""Filter callback queries sent in channels."""
-callback_channel = pyrogram.filters.create(
-    lambda _, client, cb_qry: bool(
-        cb_qry.message.chat and cb_qry.message.chat.type == "channel"
-    ),
-    name="Channel",
-)
+callback_private = pyrogram.filters.create(private_callback_filter, name="Private")
+
+
+async def group_callback_filter(_, __, cb_qry: pyrogram.types.CallbackQuery) -> bool:
+    """Filter callback queries sent in group chats."""
+    return bool(
+        cb_qry.message.chat and (cb_qry.message.chat.type in ("group", "supergroup"))
+    )
+
+
+callback_group = pyrogram.filters.create(group_callback_filter, name="Group")
+
+
+async def channel_callback_filter(_, __, cb_qry: pyrogram.types.CallbackQuery) -> bool:
+    """Filter callback queries sent in channels."""
+    return bool(cb_qry.message.chat and cb_qry.message.chat.type == "channel")
+
+
+callback_channel = pyrogram.filters.create(channel_callback_filter, name="Channel")

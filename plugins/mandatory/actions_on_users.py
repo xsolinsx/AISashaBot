@@ -25,7 +25,7 @@ _ = utils.GetLocalizedString
     & pyrogram.filters.group
 )
 def CmdInviteReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
-    if msg.reply_to_message.service and msg.reply_to_message.new_chat_members:
+    if msg.reply_to_message.service == "new_chat_members":
         if (
             msg.reply_to_message.new_chat_members[0].id
             != msg.reply_to_message.from_user.id
@@ -179,7 +179,7 @@ def CmdWarnReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     reason = ""
     if len(msg.command) > 1:
         reason = " ".join(msg.command[1:])
-    if msg.reply_to_message.service and msg.reply_to_message.new_chat_members:
+    if msg.reply_to_message.service == "new_chat_members":
         if (
             msg.reply_to_message.new_chat_members[0].id
             != msg.reply_to_message.from_user.id
@@ -307,7 +307,7 @@ def CmdUnwarnReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     reason = ""
     if len(msg.command) > 1:
         reason = " ".join(msg.command[1:])
-    if msg.reply_to_message.service and msg.reply_to_message.new_chat_members:
+    if msg.reply_to_message.service == "new_chat_members":
         if (
             msg.reply_to_message.new_chat_members[0].id
             != msg.reply_to_message.from_user.id
@@ -435,7 +435,7 @@ def CmdUnwarnAllReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     reason = ""
     if len(msg.command) > 1:
         reason = " ".join(msg.command[1:])
-    if msg.reply_to_message.service and msg.reply_to_message.new_chat_members:
+    if msg.reply_to_message.service == "new_chat_members":
         if (
             msg.reply_to_message.new_chat_members[0].id
             != msg.reply_to_message.from_user.id
@@ -564,7 +564,7 @@ def CmdKickReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     reason = ""
     if len(msg.command) > 1:
         reason = " ".join(msg.command[1:])
-    if msg.reply_to_message.service and msg.reply_to_message.new_chat_members:
+    if msg.reply_to_message.service == "new_chat_members":
         if (
             msg.reply_to_message.new_chat_members[0].id
             != msg.reply_to_message.from_user.id
@@ -693,7 +693,7 @@ def CmdTempRestrictReplyUser(client: pyrogram.Client, msg: pyrogram.types.Messag
     reason = ""
     if len(msg.command) > 1:
         reason = " ".join(msg.command[1:])
-    if msg.reply_to_message.service and msg.reply_to_message.new_chat_members:
+    if msg.reply_to_message.service == "new_chat_members":
         if (
             msg.reply_to_message.new_chat_members[0].id
             != msg.reply_to_message.from_user.id
@@ -826,7 +826,7 @@ def CmdRestrictReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     reason = ""
     if len(msg.command) > 1:
         reason = " ".join(msg.command[1:])
-    if msg.reply_to_message.service and msg.reply_to_message.new_chat_members:
+    if msg.reply_to_message.service == "new_chat_members":
         if (
             msg.reply_to_message.new_chat_members[0].id
             != msg.reply_to_message.from_user.id
@@ -955,7 +955,7 @@ def CmdUnrestrictReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message)
     reason = ""
     if len(msg.command) > 1:
         reason = " ".join(msg.command[1:])
-    if msg.reply_to_message.service and msg.reply_to_message.new_chat_members:
+    if msg.reply_to_message.service == "new_chat_members":
         if (
             msg.reply_to_message.new_chat_members[0].id
             != msg.reply_to_message.from_user.id
@@ -1084,7 +1084,7 @@ def CmdTempBanReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     reason = ""
     if len(msg.command) > 1:
         reason = " ".join(msg.command[1:])
-    if msg.reply_to_message.service and msg.reply_to_message.new_chat_members:
+    if msg.reply_to_message.service == "new_chat_members":
         if (
             msg.reply_to_message.new_chat_members[0].id
             != msg.reply_to_message.from_user.id
@@ -1217,7 +1217,7 @@ def CmdBanReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     reason = ""
     if len(msg.command) > 1:
         reason = " ".join(msg.command[1:])
-    if msg.reply_to_message.service and msg.reply_to_message.new_chat_members:
+    if msg.reply_to_message.service == "new_chat_members":
         if (
             msg.reply_to_message.new_chat_members[0].id
             != msg.reply_to_message.from_user.id
@@ -1346,7 +1346,7 @@ def CmdUnbanReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     reason = ""
     if len(msg.command) > 1:
         reason = " ".join(msg.command[1:])
-    if msg.reply_to_message.service and msg.reply_to_message.new_chat_members:
+    if msg.reply_to_message.service == "new_chat_members":
         if (
             msg.reply_to_message.new_chat_members[0].id
             != msg.reply_to_message.from_user.id
@@ -1958,7 +1958,7 @@ def CmdGBanReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
             reason = " ".join(msg.command[2:])
         else:
             reason = " ".join(msg.command[1:])
-    if msg.reply_to_message.service and msg.reply_to_message.new_chat_members:
+    if msg.reply_to_message.service == "new_chat_members":
         if (
             msg.reply_to_message.new_chat_members[0].id
             != msg.reply_to_message.from_user.id
@@ -2048,7 +2048,7 @@ def CmdUngbanReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     reason = ""
     if len(msg.command) > 1:
         reason = " ".join(msg.command[1:])
-    if msg.reply_to_message.service and msg.reply_to_message.new_chat_members:
+    if msg.reply_to_message.service == "new_chat_members":
         if (
             msg.reply_to_message.new_chat_members[0].id
             != msg.reply_to_message.from_user.id
@@ -2135,7 +2135,7 @@ def CmdBlockReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
             reason = " ".join(msg.command[2:])
         else:
             reason = " ".join(msg.command[1:])
-    if msg.reply_to_message.service and msg.reply_to_message.new_chat_members:
+    if msg.reply_to_message.service == "new_chat_members":
         if (
             msg.reply_to_message.new_chat_members[0].id
             != msg.reply_to_message.from_user.id
@@ -2225,7 +2225,7 @@ def CmdUnblockReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     reason = ""
     if len(msg.command) > 1:
         reason = " ".join(msg.command[1:])
-    if msg.reply_to_message.service and msg.reply_to_message.new_chat_members:
+    if msg.reply_to_message.service == "new_chat_members":
         if (
             msg.reply_to_message.new_chat_members[0].id
             != msg.reply_to_message.from_user.id

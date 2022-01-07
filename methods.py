@@ -100,6 +100,7 @@ def Info(
                     or member.status == "member"
                     or (member.status == "restricted" and member.is_member),
                     is_admin=member.status == "administrator",
+                    is_anonymous=bool(member.is_anonymous),
                     can_be_edited=bool(member.can_be_edited),
                     can_change_info=member.status == "creator"
                     or bool(member.can_change_info),
@@ -107,6 +108,10 @@ def Info(
                     or bool(member.can_delete_messages),
                     can_invite_users=member.status == "creator"
                     or bool(member.can_invite_users),
+                    can_manage_chat=member.status == "creator"
+                    or bool(member.can_manage_chat),
+                    can_manage_voice_chats=member.status == "creator"
+                    or bool(member.can_manage_voice_chats),
                     can_pin_messages=member.status == "creator"
                     or bool(member.can_pin_messages),
                     can_promote_members=member.status == "creator"
@@ -603,7 +608,7 @@ def Kick(
         ):
             text = ""
             try:
-                client.kick_chat_member(
+                client.ban_chat_member(
                     chat_id=chat_id,
                     user_id=target,
                     until_date=int(time.time())
@@ -914,7 +919,7 @@ def Ban(
             ):
                 text = ""
                 try:
-                    client.kick_chat_member(
+                    client.ban_chat_member(
                         chat_id=chat_id, user_id=target, until_date=until_date
                     )
                 except pyrogram.errors.FloodWait as ex:
@@ -1397,7 +1402,7 @@ def AutoPunish(
             if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
                 # if user has not been kicked
                 try:
-                    client.kick_chat_member(
+                    client.ban_chat_member(
                         chat_id=chat_id,
                         user_id=target,
                         until_date=now + utils.config["min_temp_punishment_time"],
@@ -1518,7 +1523,7 @@ def AutoPunish(
                     else (now + chat_settings.max_temp_restrict)
                 )
                 try:
-                    client.kick_chat_member(
+                    client.ban_chat_member(
                         chat_id=chat_id, user_id=target, until_date=until_date
                     )
                     hashtags.append(
@@ -1564,7 +1569,7 @@ def AutoPunish(
             if target not in utils.tmp_dicts["kickedPeople"][chat_id]:
                 # if user has not been kicked
                 try:
-                    client.kick_chat_member(chat_id=chat_id, user_id=target)
+                    client.ban_chat_member(chat_id=chat_id, user_id=target)
                     hashtags.append("#ban")
                 except pyrogram.errors.FloodWait as ex:
                     print(ex)

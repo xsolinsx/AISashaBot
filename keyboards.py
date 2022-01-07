@@ -2630,6 +2630,18 @@ def BuildPermissionsKeyboard(
     )
     keyboard.row(
         pyrogram.types.InlineKeyboardButton(
+            text=_(chat_settings.language, "is_anonymous")
+            + " "
+            + (
+                _(chat_settings.language, "yes")
+                if r_user_chat.is_anonymous
+                else _(chat_settings.language, "no")
+            ),
+            callback_data="(i)permissions is_anonymous",
+        )
+    )
+    keyboard.row(
+        pyrogram.types.InlineKeyboardButton(
             text=_(chat_settings.language, "sync_bot2tg"),
             callback_data="permissions sync_bot2tg",
         ),

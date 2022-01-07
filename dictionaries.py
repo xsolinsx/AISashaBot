@@ -208,11 +208,13 @@ RANK_STRING = {
 
 PERMISSIONS = {
     "can_change_info": "can_change_info",
+    "can_manage_chat": "can_manage_chat",
     "can_delete_messages": "can_delete_messages",
     "can_invite_users": "can_invite_users",
     "can_restrict_members": "can_restrict_members",
-    "can_pin_messages": "can_pin_messages",
     "can_promote_members": "can_promote_members",
+    "can_pin_messages": "can_pin_messages",
+    "can_manage_voice_chats": "can_manage_voice_chats",
 }
 
 

@@ -16,18 +16,12 @@ import utils
 _ = utils.GetLocalizedString
 
 
-@pyrogram.Client.on_message(
-    my_filters.message_anonymous,
-    group=-9,
-)  # TODO implement pyrogram filter as soon as it is available
+@pyrogram.Client.on_message(my_filters.message_anonymous, group=-9)
 def MessageFromAnonymousAdmin(client: pyrogram.Client, msg: pyrogram.types.Message):
     msg.stop_propagation()
 
 
-@pyrogram.Client.on_message(
-    pyrogram.filters.linked_channel,
-    group=-9,
-)
+@pyrogram.Client.on_message(pyrogram.filters.linked_channel, group=-9)
 def MessageFromConnectedChannel(client: pyrogram.Client, msg: pyrogram.types.Message):
     msg.stop_propagation()
 
@@ -303,7 +297,11 @@ def InitGroupMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
 @pyrogram.Client.on_message(pyrogram.filters.group & pyrogram.filters.bot, group=-9)
 def CheckGroupMessageFromBot(client: pyrogram.Client, msg: pyrogram.types.Message):
     # is bot?
-    if msg.chat.settings.bot_punishment and msg.from_user.is_bot:
+    if (
+        msg.chat.settings.bot_punishment
+        and msg.from_user.is_bot
+        and msg.from_user.id != client.ME.id
+    ):
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
             id_=msg.message_id,
@@ -463,12 +461,12 @@ def CheckGroupMessageTextCaptionName(
                         url=text_to_use[entity.offset : entity.offset + entity.length]
                     )
                 )
-                if "t.me/joinchat" not in tmp.lower():
+                if "t.me/joinchat" not in tmp.lower() and "t.me/+" not in tmp.lower():
                     # t.me/username
                     tmp = utils.CleanUsername(username=tmp).lower()
             elif entity.type == "text_link":
                 tmp = str(utils.CleanLink(url=entity.url))
-                if "t.me/joinchat" not in tmp.lower():
+                if "t.me/joinchat" not in tmp.lower() and "t.me/+" not in tmp.lower():
                     # t.me/username
                     tmp = utils.CleanUsername(username=tmp).lower()
             if utils.LINK_REGEX.findall(string=tmp):
@@ -551,7 +549,10 @@ def CheckGroupMessageTextCaptionName(
                 for button in row:
                     if hasattr(button, "url") and button.url:
                         tmp = str(utils.CleanLink(button.url))
-                        if "t.me/joinchat" not in tmp.lower():
+                        if (
+                            "t.me/joinchat" not in tmp.lower()
+                            and "t.me/+" not in tmp.lower()
+                        ):
                             # t.me/username
                             tmp = utils.CleanUsername(username=tmp).lower()
                         if utils.LINK_REGEX.findall(string=tmp):
