@@ -19,6 +19,14 @@ _ = utils.GetLocalizedString
         prefixes=["/", "!", "#", "."],
     )
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(
+            commands=["ud", "urban", "urbandictionary"], del_=True
+        ),
+        prefixes=["/", "!", "#", "."],
+    )
+)
 def CmdUrbanDictionary(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
@@ -32,7 +40,7 @@ def CmdUrbanDictionary(client: pyrogram.Client, msg: pyrogram.types.Message):
             and r_chat_plugin.is_enabled_on_chat
         )
     else:
-        allowed = msg.chat.type == "private"
+        allowed = msg.chat.type == pyrogram.enums.chat_type.ChatType.PRIVATE
     if allowed:
         try:
             r = requests.get(
@@ -64,4 +72,9 @@ def CmdUrbanDictionary(client: pyrogram.Client, msg: pyrogram.types.Message):
 
                 text = text.replace("[", "")
                 text = text.replace("]", "")
-                methods.ReplyText(client=client, msg=msg, text=text, parse_mode="html")
+                methods.ReplyText(
+                    client=client,
+                    msg=msg,
+                    text=text,
+                    parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
+                )

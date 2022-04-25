@@ -6,6 +6,7 @@
         "api_hash": "hash"
     },
     "masters": [
+        bot_id,
         123456789
     ],
     "available_languages": [

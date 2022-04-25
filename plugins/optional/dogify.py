@@ -14,6 +14,12 @@ _ = utils.GetLocalizedString
         prefixes=["/", "!", "#", "."],
     )
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["doge", "dogify"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+)
 def CmdDogify(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
@@ -25,7 +31,7 @@ def CmdDogify(client: pyrogram.Client, msg: pyrogram.types.Message):
             and r_chat_plugin.is_enabled_on_chat
         )
     else:
-        allowed = msg.chat.type == "private"
+        allowed = msg.chat.type == pyrogram.enums.chat_type.ChatType.PRIVATE
     if allowed:
         tmp = msg.text[len(msg.command[0]) + 2 :].split("/")
         doge_query = list(map(lambda x: urllib.parse.quote_plus(x), tmp))

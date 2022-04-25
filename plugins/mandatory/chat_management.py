@@ -13,11 +13,13 @@ import peewee
 import pyrogram
 import utils
 from pykeyboard import InlineKeyboard
+from pyrogram import errors as pyrogram_errors
 
 _ = utils.GetLocalizedString
 
 
 @pyrogram.Client.on_message(pyrogram.filters.new_chat_members, group=-5)
+@pyrogram.Client.on_edited_message(pyrogram.filters.new_chat_members, group=-5)
 def SendWelcome(client: pyrogram.Client, msg: pyrogram.types.Message):
     welcome = (
         msg.chat.settings.extras.where(
@@ -60,9 +62,9 @@ def SendWelcome(client: pyrogram.Client, msg: pyrogram.types.Message):
                 try:
                     client.send_chat_action(
                         chat_id=msg.chat.id,
-                        action="upload_document",
+                        action=pyrogram.enums.chat_action.ChatAction.UPLOAD_DOCUMENT,
                     )
-                except pyrogram.errors.ChatWriteForbidden as ex:
+                except pyrogram_errors.ChatWriteForbidden as ex:
                     print(ex)
                     traceback.print_exc()
                     msg.chat.settings.forbidden_writing_counter += 1
@@ -77,7 +79,7 @@ def SendWelcome(client: pyrogram.Client, msg: pyrogram.types.Message):
                         chat_id=utils.config["log_chat"],
                         text=_("en", "tg_error_X").format(ex),
                     )
-                except pyrogram.errors.RPCError as ex:
+                except pyrogram_errors.RPCError as ex:
                     print(ex)
                     traceback.print_exc()
                     methods.ReplyText(
@@ -95,12 +97,12 @@ def SendWelcome(client: pyrogram.Client, msg: pyrogram.types.Message):
                             )
                             if welcome_buttons
                             else None,
-                            parse_mode="html",
+                            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                         )
-                    except pyrogram.errors.FloodWait as ex:
+                    except pyrogram_errors.FloodWait as ex:
                         print(ex)
                         traceback.print_exc()
-                    except pyrogram.errors.RPCError as ex:
+                    except pyrogram_errors.RPCError as ex:
                         print(ex)
                         traceback.print_exc()
                         methods.ReplyText(
@@ -120,7 +122,7 @@ def SendWelcome(client: pyrogram.Client, msg: pyrogram.types.Message):
                         )
                         if welcome_buttons
                         else None,
-                        parse_mode="html",
+                        parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                     )
             if tmp:
                 if utils.tmp_dicts["greetings"][msg.chat.id]["last_welcome"]:
@@ -131,13 +133,12 @@ def SendWelcome(client: pyrogram.Client, msg: pyrogram.types.Message):
                         ],
                     )
                 utils.tmp_dicts["greetings"][msg.chat.id]["counter"] = 0
-                utils.tmp_dicts["greetings"][msg.chat.id][
-                    "last_welcome"
-                ] = tmp.message_id
+                utils.tmp_dicts["greetings"][msg.chat.id]["last_welcome"] = tmp.id
     msg.continue_propagation()
 
 
 @pyrogram.Client.on_message(pyrogram.filters.left_chat_member, group=-5)
+@pyrogram.Client.on_edited_message(pyrogram.filters.left_chat_member, group=-5)
 def SendGoodbye(client: pyrogram.Client, msg: pyrogram.types.Message):
     goodbye = (
         msg.chat.settings.extras.where(
@@ -161,9 +162,9 @@ def SendGoodbye(client: pyrogram.Client, msg: pyrogram.types.Message):
                 try:
                     client.send_chat_action(
                         chat_id=msg.chat.id,
-                        action="typing",
+                        action=pyrogram.enums.chat_action.ChatAction.TYPING,
                     )
-                except pyrogram.errors.ChatWriteForbidden as ex:
+                except pyrogram_errors.ChatWriteForbidden as ex:
                     print(ex)
                     traceback.print_exc()
                     msg.chat.settings.forbidden_writing_counter += 1
@@ -178,7 +179,7 @@ def SendGoodbye(client: pyrogram.Client, msg: pyrogram.types.Message):
                         chat_id=utils.config["log_chat"],
                         text=_("en", "tg_error_X").format(ex),
                     )
-                except pyrogram.errors.RPCError as ex:
+                except pyrogram_errors.RPCError as ex:
                     print(ex)
                     traceback.print_exc()
                     methods.ReplyText(
@@ -191,12 +192,12 @@ def SendGoodbye(client: pyrogram.Client, msg: pyrogram.types.Message):
                         tmp: pyrogram.types.Message = msg.reply_cached_media(
                             file_id=media_id,
                             caption=caption,
-                            parse_mode="html",
+                            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                         )
-                    except pyrogram.errors.FloodWait as ex:
+                    except pyrogram_errors.FloodWait as ex:
                         print(ex)
                         traceback.print_exc()
-                    except pyrogram.errors.RPCError as ex:
+                    except pyrogram_errors.RPCError as ex:
                         print(ex)
                         traceback.print_exc()
                         methods.ReplyText(
@@ -210,7 +211,7 @@ def SendGoodbye(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 msg=msg,
                 text=utils.AdjustMarkers(value=goodbye, msg=msg),
-                parse_mode="html",
+                parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
             )
         if tmp:
             if utils.tmp_dicts["greetings"][msg.chat.id]["last_goodbye"]:
@@ -220,7 +221,7 @@ def SendGoodbye(client: pyrogram.Client, msg: pyrogram.types.Message):
                         "last_goodbye"
                     ],
                 )
-            utils.tmp_dicts["greetings"][msg.chat.id]["last_goodbye"] = tmp.message_id
+            utils.tmp_dicts["greetings"][msg.chat.id]["last_goodbye"] = tmp.id
     msg.continue_propagation()
 
 
@@ -1179,17 +1180,17 @@ def CbQrySettingsGenerateLinkChange(
         link = None
         try:
             link = client.export_chat_invite_link(chat_id=chat_id)
-        except pyrogram.errors.FloodWait as ex:
+        except pyrogram_errors.FloodWait as ex:
             print(ex)
             traceback.print_exc()
             methods.CallbackQueryAnswer(
                 cb_qry=cb_qry,
                 text=_(cb_qry.from_user.settings.language, "tg_flood_wait_X").format(
-                    ex.x
+                    ex.value
                 ),
                 show_alert=True,
             )
-        except pyrogram.errors.RPCError as ex:
+        except pyrogram_errors.RPCError as ex:
             print(ex)
             traceback.print_exc()
             methods.CallbackQueryAnswer(
@@ -1257,7 +1258,7 @@ def CbQrySettingsSet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
         cb_qry.message.edit_text(
             text=_(cb_qry.from_user.settings.language, f"{variable}_help") + "\n",
             reply_markup=py_k,
-            parse_mode="html",
+            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
         )
     else:
         methods.CallbackQueryAnswer(
@@ -2095,6 +2096,13 @@ def CbQrySettingsChange(client: pyrogram.Client, cb_qry: pyrogram.types.Callback
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["settings"], del_=True, pvt=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdSettings(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -2117,7 +2125,7 @@ def CmdSettings(client: pyrogram.Client, msg: pyrogram.types.Message):
                     text=_(msg.from_user.settings.language, "sent_to_pvt").format(
                         client.ME.id
                     ),
-                    parse_mode="html",
+                    parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                 )
         else:
             methods.ReplyText(
@@ -2133,6 +2141,13 @@ def CmdSettings(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=["settings"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=["settings"],
         prefixes=["/", "!", "#", "."],
@@ -2166,6 +2181,13 @@ def CmdSettingsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["getstaff", "staff"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["getstaff", "staff"], del_=True),
         prefixes=["/", "!", "#", "."],
@@ -2252,10 +2274,22 @@ def CmdStaff(client: pyrogram.Client, msg: pyrogram.types.Message):
                 + "</b>"
             )
 
-    methods.ReplyText(client=client, msg=msg, text=text, parse_mode="html")
+    methods.ReplyText(
+        client=client,
+        msg=msg,
+        text=text,
+        parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
+    )
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=["getstaff", "staff"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=["getstaff", "staff"],
         prefixes=["/", "!", "#", "."],
@@ -2352,7 +2386,12 @@ def CmdStaffChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                         + "</b>"
                     )
 
-            methods.ReplyText(client=client, msg=msg, text=text, parse_mode="html")
+            methods.ReplyText(
+                client=client,
+                msg=msg,
+                text=text,
+                parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
+            )
         else:
             methods.ReplyText(
                 client=client,
@@ -2362,6 +2401,13 @@ def CmdStaffChat(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["syncadmins"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["syncadmins"], del_=True),
         prefixes=["/", "!", "#", "."],
@@ -2378,15 +2424,17 @@ def CmdSyncAdmins(client: pyrogram.Client, msg: pyrogram.types.Message):
                 db_management.DBChatAdmins(
                     client=client, chat_id=msg.chat.id, clean_up=True
                 )
-            except pyrogram.errors.FloodWait as ex:
+            except pyrogram_errors.FloodWait as ex:
                 print(ex)
                 traceback.print_exc()
                 methods.ReplyText(
                     client=client,
                     msg=msg,
-                    text=_(msg.chat.settings.language, "tg_flood_wait_X").format(ex.x),
+                    text=_(msg.chat.settings.language, "tg_flood_wait_X").format(
+                        ex.value
+                    ),
                 )
-            except pyrogram.errors.RPCError as ex:
+            except pyrogram_errors.RPCError as ex:
                 print(ex)
                 traceback.print_exc()
                 methods.ReplyText(
@@ -2422,6 +2470,13 @@ def CmdSyncAdmins(client: pyrogram.Client, msg: pyrogram.types.Message):
     )
     & pyrogram.filters.private
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=["syncadmins"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
 def CmdSyncAdminsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     chat_id = utils.ResolveCommandToId(client=client, value=msg.command[1], msg=msg)
     if isinstance(chat_id, str):
@@ -2438,17 +2493,17 @@ def CmdSyncAdminsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                         db_management.DBChatAdmins(
                             client=client, chat_id=chat_id, clean_up=True
                         )
-                    except pyrogram.errors.FloodWait as ex:
+                    except pyrogram_errors.FloodWait as ex:
                         print(ex)
                         traceback.print_exc()
                         methods.ReplyText(
                             client=client,
                             msg=msg,
                             text=_(chat_settings.language, "tg_flood_wait_X").format(
-                                ex.x
+                                ex.value
                             ),
                         )
-                    except pyrogram.errors.RPCError as ex:
+                    except pyrogram_errors.RPCError as ex:
                         print(ex)
                         traceback.print_exc()
                         methods.ReplyText(
@@ -2490,6 +2545,13 @@ def CmdSyncAdminsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=["admins", "admin"],
+        prefixes=["@", "/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdAdmins(client: pyrogram.Client, msg: pyrogram.types.Message):
     if msg.chat.id not in utils.tmp_dicts["staffContacted"]:
         utils.tmp_dicts["staffContacted"].add(msg.chat.id)
@@ -2517,7 +2579,7 @@ def CmdAdmins(client: pyrogram.Client, msg: pyrogram.types.Message):
                 msg.text if msg.text else (msg.caption if msg.caption else "/")
             )
             + _(msg.chat.settings.language, "hashtags")
-            + f": #admins{abs(msg.chat.id)} #messageid{msg.message_id}"
+            + f": #admins{abs(msg.chat.id)} #messageid{msg.id}"
         )
 
         # owner
@@ -2553,21 +2615,23 @@ def CmdAdmins(client: pyrogram.Client, msg: pyrogram.types.Message):
                     text=text,
                     reply_markup=keyboards.BuildTagKeyboard(
                         chat=msg.chat,
-                        message_id=msg.message_id,
+                        message_id=msg.id,
                         chat_settings=msg.chat.settings,
                         is_member=True,
                     ),
                 )
-            except pyrogram.errors.FloodWait as ex:
+            except pyrogram_errors.FloodWait as ex:
                 print(ex)
                 traceback.print_exc()
                 cant_contact.append(
                     (
                         user_id,
-                        _(msg.chat.settings.language, "tg_flood_wait_X").format(ex.x),
+                        _(msg.chat.settings.language, "tg_flood_wait_X").format(
+                            ex.value
+                        ),
                     )
                 )
-            except pyrogram.errors.RPCError as ex:
+            except pyrogram_errors.RPCError as ex:
                 print(ex)
                 traceback.print_exc()
                 cant_contact.append(
@@ -2578,7 +2642,7 @@ def CmdAdmins(client: pyrogram.Client, msg: pyrogram.types.Message):
         methods.ReplyText(
             client=client,
             msg=msg,
-            text=f"#admins{abs(msg.chat.id)} #messageid{msg.message_id}\n"
+            text=f"#admins{abs(msg.chat.id)} #messageid{msg.id}\n"
             + (
                 (
                     _(msg.chat.settings.language, "cant_contact")
@@ -2605,6 +2669,13 @@ def CmdAdmins(client: pyrogram.Client, msg: pyrogram.types.Message):
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["rules", "getrules"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdRules(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -2622,6 +2693,15 @@ def CmdRules(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(
+            commands=["welcome", "getwelcome"], del_=True
+        ),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(
             commands=["welcome", "getwelcome"], del_=True
@@ -2667,7 +2747,7 @@ def CmdWelcome(client: pyrogram.Client, msg: pyrogram.types.Message):
                     )
                     if welcome_buttons
                     else None,
-                    parse_mode="html",
+                    parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                 )
             else:
                 text = utils.AdjustMarkers(value=welcome, msg=msg, welcome=True)
@@ -2681,7 +2761,7 @@ def CmdWelcome(client: pyrogram.Client, msg: pyrogram.types.Message):
                         )
                         if welcome_buttons
                         else None,
-                        parse_mode="html",
+                        parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                     )
         else:
             methods.ReplyText(
@@ -2696,21 +2776,28 @@ def CmdWelcome(client: pyrogram.Client, msg: pyrogram.types.Message):
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["newlink"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdNewLink(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsSeniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
         try:
             msg.chat.settings.link = client.export_chat_invite_link(chat_id=msg.chat.id)
-        except pyrogram.errors.FloodWait as ex:
+        except pyrogram_errors.FloodWait as ex:
             print(ex)
             traceback.print_exc()
             methods.ReplyText(
                 client=client,
                 msg=msg,
-                text=_(msg.chat.settings.language, "tg_flood_wait_X").format(ex.x),
+                text=_(msg.chat.settings.language, "tg_flood_wait_X").format(ex.value),
             )
-        except pyrogram.errors.RPCError as ex:
+        except pyrogram_errors.RPCError as ex:
             print(ex)
             traceback.print_exc()
             methods.ReplyText(
@@ -2742,6 +2829,13 @@ def CmdNewLink(client: pyrogram.Client, msg: pyrogram.types.Message):
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["link"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdLink(client: pyrogram.Client, msg: pyrogram.types.Message):
     if (
         utils.IsJuniorModOrHigher(
@@ -2759,7 +2853,7 @@ def CmdLink(client: pyrogram.Client, msg: pyrogram.types.Message):
                 ).format(
                     msg.chat.settings.link, html.escape(msg.chat.settings.chat.title)
                 ),
-                parse_mode="html",
+                parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
             )
             methods.ReplyText(
                 client=client,
@@ -2767,7 +2861,7 @@ def CmdLink(client: pyrogram.Client, msg: pyrogram.types.Message):
                 text=_(msg.from_user.settings.language, "sent_to_pvt").format(
                     client.ME.id
                 ),
-                parse_mode="html",
+                parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
             )
         else:
             methods.ReplyText(
@@ -2779,7 +2873,7 @@ def CmdLink(client: pyrogram.Client, msg: pyrogram.types.Message):
                 ).format(
                     msg.chat.settings.link, html.escape(msg.chat.settings.chat.title)
                 ),
-                parse_mode="html",
+                parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
             )
         utils.Log(
             client=client,
@@ -2791,6 +2885,13 @@ def CmdLink(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=["link"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=["link"],
         prefixes=["/", "!", "#", "."],
@@ -2813,18 +2914,25 @@ def CmdLinkChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                     member = client.get_chat_member(
                         chat_id=chat_id, user_id=msg.from_user.id
                     )
-                except pyrogram.errors.FloodWait as ex:
+                except pyrogram_errors.FloodWait as ex:
                     print(ex)
                     traceback.print_exc()
-                except pyrogram.errors.RPCError as ex:
+                except pyrogram_errors.RPCError as ex:
                     print(ex)
                     traceback.print_exc()
                 else:
                     if (
-                        member.status == "creator"
-                        or member.status == "administrator"
-                        or member.status == "member"
-                        or (member.status == "restricted" and member.is_member)
+                        member.status
+                        == pyrogram.enums.chat_member_status.ChatMemberStatus.OWNER
+                        or member.status
+                        == pyrogram.enums.chat_member_status.ChatMemberStatus.ADMINISTRATOR
+                        or member.status
+                        == pyrogram.enums.chat_member_status.ChatMemberStatus.MEMBER
+                        or (
+                            member.status
+                            == pyrogram.enums.chat_member_status.ChatMemberStatus.RESTRICTED
+                            and member.is_member
+                        )
                     ):
                         methods.ReplyText(
                             client=client,
@@ -2836,7 +2944,7 @@ def CmdLinkChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                                 chat_settings.link,
                                 html.escape(chat_settings.chat.title),
                             ),
-                            parse_mode="html",
+                            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                         )
                         utils.Log(
                             client=client,
@@ -2856,7 +2964,7 @@ def CmdLinkChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                         chat_settings.language,
                         "chat_link" if chat_settings.link else "no_chat_link",
                     ).format(chat_settings.link, html.escape(chat_settings.chat.title)),
-                    parse_mode="html",
+                    parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                 )
                 utils.Log(
                     client=client,
@@ -2926,9 +3034,9 @@ def CbQryCensorshipsGet(client: pyrogram.Client, cb_qry: pyrogram.types.Callback
                 try:
                     client.send_chat_action(
                         chat_id=cb_qry.message.chat.id,
-                        action="upload_document",
+                        action=pyrogram.enums.chat_action.ChatAction.UPLOAD_DOCUMENT,
                     )
-                except pyrogram.errors.ChatWriteForbidden as ex:
+                except pyrogram_errors.ChatWriteForbidden as ex:
                     print(ex)
                     traceback.print_exc()
                     chat_settings.forbidden_writing_counter += 1
@@ -2943,7 +3051,7 @@ def CbQryCensorshipsGet(client: pyrogram.Client, cb_qry: pyrogram.types.Callback
                         chat_id=utils.config["log_chat"],
                         text=_("en", "tg_error_X").format(ex),
                     )
-                except pyrogram.errors.RPCError as ex:
+                except pyrogram_errors.RPCError as ex:
                     print(ex)
                     traceback.print_exc()
                     methods.ReplyText(
@@ -2956,7 +3064,7 @@ def CbQryCensorshipsGet(client: pyrogram.Client, cb_qry: pyrogram.types.Callback
                 else:
                     try:
                         cb_qry.message.reply_cached_media(file_id=element.value)
-                    except pyrogram.errors.FilerefUpgradeNeeded:
+                    except pyrogram_errors.FilerefUpgradeNeeded:
                         try:
                             original_media_message: pyrogram.types.Message = (
                                 client.get_messages(
@@ -2979,10 +3087,10 @@ def CbQryCensorshipsGet(client: pyrogram.Client, cb_qry: pyrogram.types.Callback
                                         "original_censorship_deleted",
                                     ),
                                 )
-                        except pyrogram.errors.FloodWait as ex:
+                        except pyrogram_errors.FloodWait as ex:
                             print(ex)
                             traceback.print_exc()
-                        except pyrogram.errors.RPCError as ex:
+                        except pyrogram_errors.RPCError as ex:
                             print(ex)
                             traceback.print_exc()
                             methods.ReplyText(
@@ -2993,10 +3101,10 @@ def CbQryCensorshipsGet(client: pyrogram.Client, cb_qry: pyrogram.types.Callback
                                     "tg_error_X",
                                 ).format(ex),
                             )
-                    except pyrogram.errors.FloodWait as ex:
+                    except pyrogram_errors.FloodWait as ex:
                         print(ex)
                         traceback.print_exc()
-                    except pyrogram.errors.RPCError as ex:
+                    except pyrogram_errors.RPCError as ex:
                         print(ex)
                         traceback.print_exc()
                         methods.ReplyText(
@@ -3080,7 +3188,7 @@ def CbQryCensorshipsAdd(client: pyrogram.Client, cb_qry: pyrogram.types.Callback
                 reply_markup=keyboards.BuildCensorshipsList(
                     chat_settings=chat_settings, selected_setting="add"
                 ),
-                parse_mode="html",
+                parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
             )
             return
         elif cb_qry.data == "censorships add text":
@@ -3335,6 +3443,15 @@ def CbQryCensorshipsChangePunishment(
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(
+            commands=["censorships"], del_=True, pvt=True
+        ),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdCensorships(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -3356,7 +3473,7 @@ def CmdCensorships(client: pyrogram.Client, msg: pyrogram.types.Message):
                     text=_(msg.from_user.settings.language, "sent_to_pvt").format(
                         client.ME.id
                     ),
-                    parse_mode="html",
+                    parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                 )
         else:
             methods.ReplyText(
@@ -3370,6 +3487,13 @@ def CmdCensorships(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=["censorships"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=["censorships"],
         prefixes=["/", "!", "#", "."],
@@ -3411,21 +3535,31 @@ def CmdCensorshipsChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     & pyrogram.filters.reply
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["pin"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.reply
+    & pyrogram.filters.group
+)
 def CmdPin(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
         try:
             msg.reply_to_message.pin(disable_notification=False)
-        except pyrogram.errors.FloodWait as ex:
+        except pyrogram_errors.FloodWait as ex:
             print(ex)
             traceback.print_exc()
             methods.ReplyText(
                 client=client,
                 msg=msg,
-                text=_(msg.from_user.settings.language, "tg_flood_wait_X").format(ex.x),
+                text=_(msg.from_user.settings.language, "tg_flood_wait_X").format(
+                    ex.value
+                ),
             )
-        except pyrogram.errors.RPCError as ex:
+        except pyrogram_errors.RPCError as ex:
             print(ex)
             traceback.print_exc()
             methods.ReplyText(
@@ -3457,21 +3591,31 @@ def CmdPin(client: pyrogram.Client, msg: pyrogram.types.Message):
     & pyrogram.filters.reply
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["silentpin"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.reply
+    & pyrogram.filters.group
+)
 def CmdSilentPin(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
         try:
             msg.reply_to_message.pin(disable_notification=True)
-        except pyrogram.errors.FloodWait as ex:
+        except pyrogram_errors.FloodWait as ex:
             print(ex)
             traceback.print_exc()
             methods.ReplyText(
                 client=client,
                 msg=msg,
-                text=_(msg.from_user.settings.language, "tg_flood_wait_X").format(ex.x),
+                text=_(msg.from_user.settings.language, "tg_flood_wait_X").format(
+                    ex.value
+                ),
             )
-        except pyrogram.errors.RPCError as ex:
+        except pyrogram_errors.RPCError as ex:
             print(ex)
             traceback.print_exc()
             methods.ReplyText(
@@ -3502,21 +3646,30 @@ def CmdSilentPin(client: pyrogram.Client, msg: pyrogram.types.Message):
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["unpin"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdUnpin(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
     ):
         try:
             client.unpin_chat_message(chat_id=msg.chat.id)
-        except pyrogram.errors.FloodWait as ex:
+        except pyrogram_errors.FloodWait as ex:
             print(ex)
             traceback.print_exc()
             methods.ReplyText(
                 client=client,
                 msg=msg,
-                text=_(msg.from_user.settings.language, "tg_flood_wait_X").format(ex.x),
+                text=_(msg.from_user.settings.language, "tg_flood_wait_X").format(
+                    ex.value
+                ),
             )
-        except pyrogram.errors.RPCError as ex:
+        except pyrogram_errors.RPCError as ex:
             print(ex)
             traceback.print_exc()
             methods.ReplyText(
@@ -3542,6 +3695,14 @@ def CmdUnpin(client: pyrogram.Client, msg: pyrogram.types.Message):
     & pyrogram.filters.group
     & pyrogram.filters.forwarded
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=["setlog"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+    & pyrogram.filters.forwarded
+)
 def CmdSetlog(client: pyrogram.Client, msg: pyrogram.types.Message):
     if msg.forward_from_chat:
         if utils.IsSeniorModOrHigher(
@@ -3555,7 +3716,7 @@ def CmdSetlog(client: pyrogram.Client, msg: pyrogram.types.Message):
                         msg.chat.title, msg.chat.id
                     ),
                 )
-            except pyrogram.errors.RPCError as ex:
+            except pyrogram_errors.RPCError as ex:
                 print(ex)
                 traceback.print_exc()
                 methods.ReplyText(
@@ -3590,6 +3751,14 @@ def CmdSetlog(client: pyrogram.Client, msg: pyrogram.types.Message):
     & pyrogram.filters.group
     & ~pyrogram.filters.forwarded
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=["setlog"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+    & ~pyrogram.filters.forwarded
+)
 def CmdSetlogHelp(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsSeniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -3598,7 +3767,7 @@ def CmdSetlogHelp(client: pyrogram.Client, msg: pyrogram.types.Message):
             client=client,
             msg=msg,
             text=_(msg.chat.settings.language, "log_channel_help"),
-            parse_mode="html",
+            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
         )
 
 
@@ -3787,6 +3956,15 @@ def CbQryWhitelistedChats(
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(
+            commands=["whitelistedchats", "chatswhitelist"], del_=True, pvt=True
+        ),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdWhitelistedChats(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -3808,7 +3986,7 @@ def CmdWhitelistedChats(client: pyrogram.Client, msg: pyrogram.types.Message):
                     text=_(msg.from_user.settings.language, "sent_to_pvt").format(
                         client.ME.id
                     ),
-                    parse_mode="html",
+                    parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                 )
         else:
             methods.ReplyText(
@@ -3823,6 +4001,13 @@ def CmdWhitelistedChats(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=["whitelistedchats", "chatswhitelist"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=["whitelistedchats", "chatswhitelist"],
         prefixes=["/", "!", "#", "."],
@@ -4035,6 +4220,15 @@ def CbQryWhitelistedGbanned(
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(
+            commands=["whitelistedgbanned", "whitelistedgban"], del_=True, pvt=True
+        ),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdWhitelistedGbanned(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -4056,7 +4250,7 @@ def CmdWhitelistedGbanned(client: pyrogram.Client, msg: pyrogram.types.Message):
                     text=_(msg.from_user.settings.language, "sent_to_pvt").format(
                         client.ME.id
                     ),
-                    parse_mode="html",
+                    parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                 )
         else:
             methods.ReplyText(
@@ -4071,6 +4265,13 @@ def CmdWhitelistedGbanned(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=["whitelistedgbanned", "whitelistedgban"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=["whitelistedgbanned", "whitelistedgban"],
         prefixes=["/", "!", "#", "."],
@@ -4277,6 +4478,15 @@ def CbQryWhitelisted(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(
+            commands=["whitelisted"], del_=True, pvt=True
+        ),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdWhitelisted(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -4298,7 +4508,7 @@ def CmdWhitelisted(client: pyrogram.Client, msg: pyrogram.types.Message):
                     text=_(msg.from_user.settings.language, "sent_to_pvt").format(
                         client.ME.id
                     ),
-                    parse_mode="html",
+                    parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                 )
         else:
             methods.ReplyText(
@@ -4313,6 +4523,13 @@ def CmdWhitelisted(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=["whitelisted"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=["whitelisted"],
         prefixes=["/", "!", "#", "."],
@@ -4354,6 +4571,14 @@ def CmdWhitelistedChat(client: pyrogram.Client, msg: pyrogram.types.Message):
     & pyrogram.filters.reply
     & pyrogram.filters.group,
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=["del", "delete"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.reply
+    & pyrogram.filters.group,
+)
 def CmdDel(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -4361,14 +4586,14 @@ def CmdDel(client: pyrogram.Client, msg: pyrogram.types.Message):
         if msg.reply_to_message.from_user.id == client.ME.id:
             try:
                 msg.reply_to_message.delete()
-            except pyrogram.errors.MessageDeleteForbidden as ex:
+            except pyrogram_errors.MessageDeleteForbidden as ex:
                 print(ex)
                 traceback.print_exc()
                 msg.reply_to_message.edit_text(text=".")
         else:
             try:
                 msg.reply_to_message.delete()
-            except pyrogram.errors.MessageDeleteForbidden as ex:
+            except pyrogram_errors.MessageDeleteForbidden as ex:
                 print(ex)
                 traceback.print_exc()
                 methods.ReplyText(
@@ -4382,6 +4607,10 @@ def CmdDel(client: pyrogram.Client, msg: pyrogram.types.Message):
     pyrogram.filters.command(commands=["leave"], prefixes=["/", "!", "#", "."])
     & pyrogram.filters.group,
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(commands=["leave"], prefixes=["/", "!", "#", "."])
+    & pyrogram.filters.group,
+)
 def CmdLeave(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsSeniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -4390,6 +4619,10 @@ def CmdLeave(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(commands=["leave"], prefixes=["/", "!", "#", "."])
+    & pyrogram.filters.private,
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(commands=["leave"], prefixes=["/", "!", "#", "."])
     & pyrogram.filters.private,
 )
@@ -4418,6 +4651,14 @@ def CmdLeaveChat(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=["delfrom", "deletefrom"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.reply
+    & pyrogram.filters.group,
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=["delfrom", "deletefrom"],
         prefixes=["/", "!", "#", "."],
@@ -4482,7 +4723,7 @@ def CbQryLogsPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
             )
         cb_qry.message.edit_text(
             text=text,
-            parse_mode="html",
+            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
             reply_markup=keyboards.BuildLogMenu(chat_settings=chat_settings, page=page),
         )
     else:
@@ -4494,6 +4735,15 @@ def CbQryLogsPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(
+            commands=["logs", "log"], del_=True, pvt=True
+        ),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group,
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(
             commands=["logs", "log"], del_=True, pvt=True
@@ -4544,7 +4794,7 @@ def CmdLog(client: pyrogram.Client, msg: pyrogram.types.Message):
                 client=client,
                 chat_id=msg.from_user.id,
                 text=text,
-                parse_mode="html",
+                parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                 reply_markup=keyboards.BuildLogMenu(chat_settings=msg.chat.settings),
             )
             methods.ReplyText(
@@ -4553,19 +4803,26 @@ def CmdLog(client: pyrogram.Client, msg: pyrogram.types.Message):
                 text=_(msg.from_user.settings.language, "sent_to_pvt").format(
                     client.ME.id
                 ),
-                parse_mode="html",
+                parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
             )
         else:
             methods.ReplyText(
                 client=client,
                 msg=msg,
                 text=text,
-                parse_mode="html",
+                parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                 reply_markup=keyboards.BuildLogMenu(chat_settings=msg.chat.settings),
             )
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=["logs", "log"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private,
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=["logs", "log"],
         prefixes=["/", "!", "#", "."],
@@ -4619,7 +4876,7 @@ def CmdLogChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                     client=client,
                     msg=msg,
                     text=text,
-                    parse_mode="html",
+                    parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                     reply_markup=keyboards.BuildLogMenu(chat_settings=chat_settings),
                 )
         else:
@@ -4631,6 +4888,15 @@ def CmdLogChat(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(
+            commands=["sendlogs", "sendlog"], del_=True, pvt=True
+        ),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group,
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(
             commands=["sendlogs", "sendlog"], del_=True, pvt=True
@@ -4711,13 +4977,20 @@ def CmdSendLog(client: pyrogram.Client, msg: pyrogram.types.Message):
                 text=_(msg.from_user.settings.language, "sent_to_pvt").format(
                     client.ME.id
                 ),
-                parse_mode="html",
+                parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
             )
         else:
             methods.ReplyDocument(client=client, msg=msg, document=file_name)
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=["sendlogs", "sendlog"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private,
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=["sendlogs", "sendlog"],
         prefixes=["/", "!", "#", "."],

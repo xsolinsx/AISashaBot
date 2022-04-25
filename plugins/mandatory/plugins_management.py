@@ -239,6 +239,15 @@ def CbQryChatPlugins(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(
+            commands=["chatplugins", "plugins"], del_=True, pvt=True
+        ),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdChatPlugins(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -260,7 +269,7 @@ def CmdChatPlugins(client: pyrogram.Client, msg: pyrogram.types.Message):
                 text=_(msg.from_user.settings.language, "sent_to_pvt").format(
                     client.ME.id
                 ),
-                parse_mode="html",
+                parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
             )
         else:
             methods.ReplyText(
@@ -275,6 +284,13 @@ def CmdChatPlugins(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=["chatplugins", "plugins"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=["chatplugins", "plugins"],
         prefixes=["/", "!", "#", "."],

@@ -9,6 +9,9 @@ _ = utils.GetLocalizedString
 @pyrogram.Client.on_message(
     pyrogram.filters.command(commands=["convertseconds"], prefixes=["/", "!", "#", "."])
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(commands=["convertseconds"], prefixes=["/", "!", "#", "."])
+)
 def CmdConvertSeconds(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
@@ -20,7 +23,7 @@ def CmdConvertSeconds(client: pyrogram.Client, msg: pyrogram.types.Message):
             and r_chat_plugin.is_enabled_on_chat
         )
     else:
-        allowed = msg.chat.type == "private"
+        allowed = msg.chat.type == pyrogram.enums.chat_type.ChatType.PRIVATE
     if allowed:
         duration = utils.ConvertUnixToDuration(int(msg.command[1]))
         methods.ReplyText(
@@ -59,6 +62,11 @@ def CmdConvertSeconds(client: pyrogram.Client, msg: pyrogram.types.Message):
         commands=["convertduration"], prefixes=["/", "!", "#", "."]
     )
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=["convertduration"], prefixes=["/", "!", "#", "."]
+    )
+)
 def CmdConvertDuration(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
@@ -70,7 +78,7 @@ def CmdConvertDuration(client: pyrogram.Client, msg: pyrogram.types.Message):
             and r_chat_plugin.is_enabled_on_chat
         )
     else:
-        allowed = msg.chat.type == "private"
+        allowed = msg.chat.type == pyrogram.enums.chat_type.ChatType.PRIVATE
     if allowed:
         duration = [0] * 5
         duration[: len(msg.command[1:])] = msg.command[1:]

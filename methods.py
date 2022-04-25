@@ -8,6 +8,7 @@ import peewee
 import pyrogram
 from apscheduler.triggers.date import DateTrigger
 from pykeyboard import InlineKeyboard
+from pyrogram import errors as pyrogram_errors
 from pytz import utc
 
 import db_management
@@ -86,43 +87,61 @@ def Info(
                 member: pyrogram.types.ChatMember = client.get_chat_member(
                     chat_id=chat_id, user_id=target
                 )
-            except pyrogram.errors.FloodWait as ex:
+            except pyrogram_errors.FloodWait as ex:
                 print(ex)
                 traceback.print_exc()
-            except pyrogram.errors.RPCError as ex:
+            except pyrogram_errors.RPCError as ex:
                 print(ex)
                 traceback.print_exc()
             else:
                 # update telegram data saved on db
                 db_management.RUserChat.update(
-                    is_member=member.status == "creator"
-                    or member.status == "administrator"
-                    or member.status == "member"
-                    or (member.status == "restricted" and member.is_member),
-                    is_admin=member.status == "administrator",
-                    is_anonymous=bool(member.is_anonymous),
+                    is_member=member.status
+                    == pyrogram.enums.chat_member_status.ChatMemberStatus.OWNER
+                    or member.status
+                    == pyrogram.enums.chat_member_status.ChatMemberStatus.ADMINISTRATOR
+                    or member.status
+                    == pyrogram.enums.chat_member_status.ChatMemberStatus.MEMBER
+                    or (
+                        member.status
+                        == pyrogram.enums.chat_member_status.ChatMemberStatus.RESTRICTED
+                        and member.is_member
+                    ),
+                    is_admin=member.status
+                    == pyrogram.enums.chat_member_status.ChatMemberStatus.ADMINISTRATOR,
+                    is_anonymous=bool(member.privileges.is_anonymous),
                     can_be_edited=bool(member.can_be_edited),
-                    can_change_info=member.status == "creator"
-                    or bool(member.can_change_info),
-                    can_delete_messages=member.status == "creator"
-                    or bool(member.can_delete_messages),
-                    can_invite_users=member.status == "creator"
-                    or bool(member.can_invite_users),
-                    can_manage_chat=member.status == "creator"
-                    or bool(member.can_manage_chat),
-                    can_manage_voice_chats=member.status == "creator"
-                    or bool(member.can_manage_voice_chats),
-                    can_pin_messages=member.status == "creator"
-                    or bool(member.can_pin_messages),
-                    can_promote_members=member.status == "creator"
-                    or bool(member.can_promote_members),
-                    can_restrict_members=member.status == "creator"
-                    or bool(member.can_restrict_members),
+                    can_change_info=member.status
+                    == pyrogram.enums.chat_member_status.ChatMemberStatus.OWNER
+                    or bool(member.privileges.can_change_info),
+                    can_delete_messages=member.status
+                    == pyrogram.enums.chat_member_status.ChatMemberStatus.OWNER
+                    or bool(member.privileges.can_delete_messages),
+                    can_invite_users=member.status
+                    == pyrogram.enums.chat_member_status.ChatMemberStatus.OWNER
+                    or bool(member.privileges.can_invite_users),
+                    can_manage_chat=member.status
+                    == pyrogram.enums.chat_member_status.ChatMemberStatus.OWNER
+                    or bool(member.privileges.can_manage_chat),
+                    can_manage_video_chats=member.status
+                    == pyrogram.enums.chat_member_status.ChatMemberStatus.OWNER
+                    or bool(member.privileges.can_manage_video_chats),
+                    can_pin_messages=member.status
+                    == pyrogram.enums.chat_member_status.ChatMemberStatus.OWNER
+                    or bool(member.privileges.can_pin_messages),
+                    can_promote_members=member.status
+                    == pyrogram.enums.chat_member_status.ChatMemberStatus.OWNER
+                    or bool(member.privileges.can_promote_members),
+                    can_restrict_members=member.status
+                    == pyrogram.enums.chat_member_status.ChatMemberStatus.OWNER
+                    or bool(member.privileges.can_restrict_members),
                 ).where(
                     (db_management.RUserChat.user_id == target)
                     & (db_management.RUserChat.chat_id == chat_id)
                 ).execute()
-                other_info.append(_(chat_settings.language, member.status).upper())
+                other_info.append(
+                    _(chat_settings.language, member.status.value).upper()
+                )
 
             user_info += _(chat_settings.language, "info_other") + (
                 ", ".join(other_info) if other_info else "/"
@@ -179,7 +198,7 @@ def GetObjInfo(
                 tmp = client.get_chat(chat_id=value)
                 tmp = db_management.DBObject(obj=tmp, client=client)
                 value = tmp.id
-            except pyrogram.errors.RPCError as ex:
+            except pyrogram_errors.RPCError as ex:
                 print(ex)
                 traceback.print_exc()
                 value = None
@@ -299,11 +318,11 @@ def Invite(
                         text=_(chat_settings.language, "you_have_been_invited"),
                         reply_markup=py_k,
                     )
-                except pyrogram.errors.FloodWait as ex:
+                except pyrogram_errors.FloodWait as ex:
                     print(ex)
                     traceback.print_exc()
                     run_date = datetime.datetime.utcnow() + datetime.timedelta(
-                        seconds=ex.x
+                        seconds=ex.value
                     )
                     utils.scheduler.add_job(
                         func=Invite,
@@ -320,8 +339,8 @@ def Invite(
                     )
                     text = _(
                         chat_settings.language, "tg_flood_wait_X_scheduled_Y"
-                    ).format(ex.x, run_date)
-                except pyrogram.errors.RPCError as ex:
+                    ).format(ex.value, run_date)
+                except pyrogram_errors.RPCError as ex:
                     print(ex)
                     traceback.print_exc()
                     text = _(chat_settings.language, "tg_error_X").format(ex)
@@ -398,7 +417,10 @@ def Warn(
                             executer=executer,
                             target=target,
                             chat_id=chat_id,
-                            until_date=chat_settings.max_temp_restrict,
+                            until_date=datetime.datetime.utcnow()
+                            + datetime.timedelta(
+                                seconds=chat_settings.max_temp_restrict
+                            ),
                             reasons=f"{reasons}\n"
                             + _(chat_settings.language, "reason_max_warns_reached"),
                             r_executer_chat=r_executer_chat,
@@ -429,7 +451,8 @@ def Warn(
                             executer=executer,
                             target=target,
                             chat_id=chat_id,
-                            until_date=chat_settings.max_temp_ban,
+                            until_date=datetime.datetime.utcnow()
+                            + datetime.timedelta(seconds=chat_settings.max_temp_ban),
                             reasons=f"{reasons}\n"
                             + _(chat_settings.language, "reason_max_warns_reached"),
                             r_executer_chat=r_executer_chat,
@@ -611,13 +634,17 @@ def Kick(
                 client.ban_chat_member(
                     chat_id=chat_id,
                     user_id=target,
-                    until_date=int(time.time())
-                    + utils.config["min_temp_punishment_time"],
+                    until_date=datetime.datetime.utcnow()
+                    + datetime.timedelta(
+                        seconds=utils.config["min_temp_punishment_time"]
+                    ),
                 )
-            except pyrogram.errors.FloodWait as ex:
+            except pyrogram_errors.FloodWait as ex:
                 print(ex)
                 traceback.print_exc()
-                run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=ex.x)
+                run_date = datetime.datetime.utcnow() + datetime.timedelta(
+                    seconds=ex.value
+                )
                 utils.scheduler.add_job(
                     func=Kick,
                     trigger=DateTrigger(run_date=run_date, timezone=utc),
@@ -633,9 +660,9 @@ def Kick(
                     ),
                 )
                 text = _(chat_settings.language, "tg_flood_wait_X_scheduled_Y").format(
-                    ex.x, run_date
+                    ex.value, run_date
                 )
-            except pyrogram.errors.RPCError as ex:
+            except pyrogram_errors.RPCError as ex:
                 print(ex)
                 traceback.print_exc()
                 text = _(chat_settings.language, "tg_error_X").format(ex)
@@ -667,7 +694,7 @@ def Restrict(
     executer: typing.Union[int, str],
     target: typing.Union[int, str],
     chat_id: typing.Union[int, str],
-    until_date: int = 0,
+    until_date: datetime.datetime = datetime.datetime.utcnow(),
     reasons: str = "",
     r_executer_chat: db_management.RUserChat = None,
     r_target_chat: db_management.RUserChat = None,
@@ -705,11 +732,11 @@ def Restrict(
                         permissions=pyrogram.types.ChatPermissions(),
                         until_date=until_date,
                     )
-                except pyrogram.errors.FloodWait as ex:
+                except pyrogram_errors.FloodWait as ex:
                     print(ex)
                     traceback.print_exc()
                     run_date = datetime.datetime.utcnow() + datetime.timedelta(
-                        seconds=ex.x
+                        seconds=ex.value
                     )
                     utils.scheduler.add_job(
                         func=Restrict,
@@ -728,8 +755,8 @@ def Restrict(
                     )
                     text = _(
                         chat_settings.language, "tg_flood_wait_X_scheduled_Y"
-                    ).format(ex.x, run_date)
-                except pyrogram.errors.RPCError as ex:
+                    ).format(ex.value, run_date)
+                except pyrogram_errors.RPCError as ex:
                     print(ex)
                     traceback.print_exc()
                     text = _(chat_settings.language, "tg_error_X").format(ex)
@@ -738,7 +765,7 @@ def Restrict(
                         (
                             "#temprestrict "
                             + _(chat_settings.language, "until")
-                            + f" UTC {datetime.datetime.utcfromtimestamp(until_date)}"
+                            + f" UTC {until_date}"
                         )
                         if until_date
                         else "#restrict",
@@ -842,10 +869,12 @@ def Unrestrict(
                         can_pin_messages=True,
                     ),
                 )
-            except pyrogram.errors.FloodWait as ex:
+            except pyrogram_errors.FloodWait as ex:
                 print(ex)
                 traceback.print_exc()
-                run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=ex.x)
+                run_date = datetime.datetime.utcnow() + datetime.timedelta(
+                    seconds=ex.value
+                )
                 utils.scheduler.add_job(
                     func=Unrestrict,
                     trigger=DateTrigger(run_date=run_date, timezone=utc),
@@ -861,9 +890,9 @@ def Unrestrict(
                     ),
                 )
                 text = _(chat_settings.language, "tg_flood_wait_X_scheduled_Y").format(
-                    ex.x, run_date
+                    ex.value, run_date
                 )
-            except pyrogram.errors.RPCError as ex:
+            except pyrogram_errors.RPCError as ex:
                 print(ex)
                 traceback.print_exc()
                 text = _(chat_settings.language, "tg_error_X").format(ex)
@@ -887,7 +916,7 @@ def Ban(
     executer: typing.Union[int, str],
     target: typing.Union[int, str],
     chat_id: typing.Union[int, str],
-    until_date: int = 0,
+    until_date: datetime.datetime = datetime.datetime.utcnow(),
     reasons: str = "",
     r_executer_chat: db_management.RUserChat = None,
     r_target_chat: db_management.RUserChat = None,
@@ -922,11 +951,11 @@ def Ban(
                     client.ban_chat_member(
                         chat_id=chat_id, user_id=target, until_date=until_date
                     )
-                except pyrogram.errors.FloodWait as ex:
+                except pyrogram_errors.FloodWait as ex:
                     print(ex)
                     traceback.print_exc()
                     run_date = datetime.datetime.utcnow() + datetime.timedelta(
-                        seconds=ex.x
+                        seconds=ex.value
                     )
                     utils.scheduler.add_job(
                         func=Ban,
@@ -945,8 +974,8 @@ def Ban(
                     )
                     text = _(
                         chat_settings.language, "tg_flood_wait_X_scheduled_Y"
-                    ).format(ex.x, run_date)
-                except pyrogram.errors.RPCError as ex:
+                    ).format(ex.value, run_date)
+                except pyrogram_errors.RPCError as ex:
                     print(ex)
                     traceback.print_exc()
                     text = _(chat_settings.language, "tg_error_X").format(ex)
@@ -955,7 +984,7 @@ def Ban(
                         (
                             "#tempban "
                             + _(chat_settings.language, "until")
-                            + f" UTC {datetime.datetime.utcfromtimestamp(until_date)}"
+                            + f" UTC {until_date}"
                         )
                         if until_date
                         else "#ban",
@@ -1046,10 +1075,12 @@ def Unban(
             text = ""
             try:
                 client.unban_chat_member(chat_id=chat_id, user_id=target)
-            except pyrogram.errors.FloodWait as ex:
+            except pyrogram_errors.FloodWait as ex:
                 print(ex)
                 traceback.print_exc()
-                run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=ex.x)
+                run_date = datetime.datetime.utcnow() + datetime.timedelta(
+                    seconds=ex.value
+                )
                 utils.scheduler.add_job(
                     func=Unban,
                     trigger=DateTrigger(run_date=run_date, timezone=utc),
@@ -1065,9 +1096,9 @@ def Unban(
                     ),
                 )
                 text = _(chat_settings.language, "tg_flood_wait_X_scheduled_Y").format(
-                    ex.x, run_date
+                    ex.value, run_date
                 )
-            except pyrogram.errors.RPCError as ex:
+            except pyrogram_errors.RPCError as ex:
                 print(ex)
                 traceback.print_exc()
                 text = _(chat_settings.language, "tg_error_X").format(ex)
@@ -1320,7 +1351,7 @@ def AutoPunish(
     punishment: int,
     reasons: typing.Union[typing.List[str], str] = None,
     message_ids: typing.Union[typing.List[int], int] = None,
-    until_date: int = None,
+    until_date: datetime.datetime = None,
     r_target_chat: db_management.RUserChat = None,
     chat_settings: db_management.ChatSettings = None,
     auto_group_notice: bool = False,
@@ -1345,7 +1376,7 @@ def AutoPunish(
             chat_settings or db_management.ChatSettings.get_or_none(chat_id=chat_id)
         )
 
-        now = int(time.time())
+        now = datetime.datetime.utcnow()
         hashtags = list()
 
         if punishment > dictionaries.PUNISHMENT_STRING["nothing"] and message_ids:
@@ -1356,17 +1387,19 @@ def AutoPunish(
             try:
                 client.delete_messages(chat_id=chat_id, message_ids=message_ids)
                 hashtags.append("#delete")
-            except pyrogram.errors.FloodWait as ex:
+            except pyrogram_errors.FloodWait as ex:
                 print(ex)
                 traceback.print_exc()
-                run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=ex.x)
+                run_date = datetime.datetime.utcnow() + datetime.timedelta(
+                    seconds=ex.value
+                )
                 utils.scheduler.add_job(
                     func=client.delete_messages,
                     trigger=DateTrigger(run_date=run_date, timezone=utc),
                     kwargs=dict(chat_id=chat_id, message_ids=message_ids),
                 )
                 hashtags.append(f"#scheduleddelete UTC {run_date}")
-            except pyrogram.errors.RPCError as ex:
+            except pyrogram_errors.RPCError as ex:
                 print(ex)
                 traceback.print_exc()
                 return _(chat_settings.language, "tg_error_X").format(ex)
@@ -1405,14 +1438,17 @@ def AutoPunish(
                     client.ban_chat_member(
                         chat_id=chat_id,
                         user_id=target,
-                        until_date=now + utils.config["min_temp_punishment_time"],
+                        until_date=now
+                        + datetime.timedelta(
+                            seconds=utils.config["min_temp_punishment_time"]
+                        ),
                     )
                     hashtags.append("#kick")
-                except pyrogram.errors.FloodWait as ex:
+                except pyrogram_errors.FloodWait as ex:
                     print(ex)
                     traceback.print_exc()
                     run_date = datetime.datetime.utcnow() + datetime.timedelta(
-                        seconds=ex.x
+                        seconds=ex.value
                     )
                     utils.scheduler.add_job(
                         func=Kick,
@@ -1428,7 +1464,7 @@ def AutoPunish(
                         ),
                     )
                     hashtags.append(f"#scheduledkick UTC {run_date}")
-                except pyrogram.errors.RPCError as ex:
+                except pyrogram_errors.RPCError as ex:
                     print(ex)
                     traceback.print_exc()
                     return _(chat_settings.language, "tg_error_X").format(ex)
@@ -1442,7 +1478,10 @@ def AutoPunish(
                 until_date = (
                     until_date
                     if until_date is not None
-                    else (now + chat_settings.max_temp_restrict)
+                    else (
+                        now
+                        + datetime.timedelta(seconds=chat_settings.max_temp_restrict)
+                    )
                 )
                 try:
                     client.restrict_chat_member(
@@ -1454,15 +1493,15 @@ def AutoPunish(
                     hashtags.append(
                         "#temprestrict "
                         + _(chat_settings.language, "until")
-                        + f" UTC {datetime.datetime.utcfromtimestamp(until_date)}"
+                        + f" UTC {until_date}"
                     )
-                except pyrogram.errors.FloodWait as ex:
+                except pyrogram_errors.FloodWait as ex:
                     print(ex)
                     traceback.print_exc()
                     run_date = datetime.datetime.utcnow() + datetime.timedelta(
-                        seconds=ex.x
+                        seconds=ex.value
                     )
-                    until_date += ex.x
+                    until_date += datetime.timedelta(seconds=ex.value)
                     utils.scheduler.add_job(
                         func=client.restrict_chat_member,
                         trigger=DateTrigger(run_date=run_date, timezone=utc),
@@ -1476,9 +1515,9 @@ def AutoPunish(
                     hashtags.append(
                         f"#scheduledtemprestrict UTC {run_date} "
                         + _(chat_settings.language, "until")
-                        + f" UTC {datetime.datetime.utcfromtimestamp(until_date)}"
+                        + f" UTC {until_date}"
                     )
-                except pyrogram.errors.RPCError as ex:
+                except pyrogram_errors.RPCError as ex:
                     print(ex)
                     traceback.print_exc()
                     return _(chat_settings.language, "tg_error_X").format(ex)
@@ -1493,11 +1532,11 @@ def AutoPunish(
                         permissions=pyrogram.types.ChatPermissions(),
                     )
                     hashtags.append("#restrict")
-                except pyrogram.errors.FloodWait as ex:
+                except pyrogram_errors.FloodWait as ex:
                     print(ex)
                     traceback.print_exc()
                     run_date = datetime.datetime.utcnow() + datetime.timedelta(
-                        seconds=ex.x
+                        seconds=ex.value
                     )
                     utils.scheduler.add_job(
                         func=client.restrict_chat_member,
@@ -1509,7 +1548,7 @@ def AutoPunish(
                         ),
                     )
                     hashtags.append(f"#scheduledrestrict UTC {run_date}")
-                except pyrogram.errors.RPCError as ex:
+                except pyrogram_errors.RPCError as ex:
                     print(ex)
                     traceback.print_exc()
                     return _(chat_settings.language, "tg_error_X").format(ex)
@@ -1520,7 +1559,10 @@ def AutoPunish(
                 until_date = (
                     until_date
                     if until_date is not None
-                    else (now + chat_settings.max_temp_restrict)
+                    else (
+                        now
+                        + datetime.timedelta(seconds=chat_settings.max_temp_restrict)
+                    )
                 )
                 try:
                     client.ban_chat_member(
@@ -1529,15 +1571,15 @@ def AutoPunish(
                     hashtags.append(
                         "#tempban "
                         + _(chat_settings.language, "until")
-                        + f" UTC {datetime.datetime.utcfromtimestamp(until_date)}"
+                        + f" UTC {until_date}"
                     )
-                except pyrogram.errors.FloodWait as ex:
+                except pyrogram_errors.FloodWait as ex:
                     print(ex)
                     traceback.print_exc()
                     run_date = datetime.datetime.utcnow() + datetime.timedelta(
-                        seconds=ex.x
+                        seconds=ex.value
                     )
-                    until_date += ex.x
+                    until_date += datetime.timedelta(seconds=ex.value)
                     utils.scheduler.add_job(
                         func=Ban,
                         trigger=DateTrigger(run_date=run_date, timezone=utc),
@@ -1555,9 +1597,9 @@ def AutoPunish(
                     hashtags.append(
                         f"#scheduledtempban UTC {run_date} "
                         + _(chat_settings.language, "until")
-                        + f" UTC {datetime.datetime.utcfromtimestamp(until_date)}"
+                        + f" UTC {until_date}"
                     )
-                except pyrogram.errors.RPCError as ex:
+                except pyrogram_errors.RPCError as ex:
                     print(ex)
                     traceback.print_exc()
                     return _(chat_settings.language, "tg_error_X").format(ex)
@@ -1571,11 +1613,11 @@ def AutoPunish(
                 try:
                     client.ban_chat_member(chat_id=chat_id, user_id=target)
                     hashtags.append("#ban")
-                except pyrogram.errors.FloodWait as ex:
+                except pyrogram_errors.FloodWait as ex:
                     print(ex)
                     traceback.print_exc()
                     run_date = datetime.datetime.utcnow() + datetime.timedelta(
-                        seconds=ex.x
+                        seconds=ex.value
                     )
                     utils.scheduler.add_job(
                         func=Ban,
@@ -1591,7 +1633,7 @@ def AutoPunish(
                         ),
                     )
                     hashtags.append(f"#scheduledban UTC {run_date}")
-                except pyrogram.errors.RPCError as ex:
+                except pyrogram_errors.RPCError as ex:
                     print(ex)
                     traceback.print_exc()
                     return _(chat_settings.language, "tg_error_X").format(ex)
@@ -1647,7 +1689,7 @@ def CallbackQueryAnswer(
             url=url,
             cache_time=cache_time,
         )
-    except pyrogram.errors.RPCError as ex:
+    except pyrogram_errors.RPCError as ex:
         print(ex)
         traceback.print_exc()
         return False
@@ -1657,7 +1699,7 @@ def CallbackQueryAnswer(
 def SendLog(
     client: pyrogram.Client,
     text: str,
-    parse_mode: typing.Union[str, None] = object,
+    parse_mode: pyrogram.enums.parse_mode.ParseMode = pyrogram.enums.parse_mode.ParseMode.DISABLED,
     disable_web_page_preview: bool = None,
     disable_notification: bool = None,
     reply_to_message_id: int = None,
@@ -1680,10 +1722,10 @@ def SendLog(
             schedule_date=schedule_date,
             reply_markup=reply_markup,
         )
-    except pyrogram.errors.FloodWait as ex:
+    except pyrogram_errors.FloodWait as ex:
         print(ex)
         traceback.print_exc()
-        run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=ex.x)
+        run_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=ex.value)
         utils.scheduler.add_job(
             func=SendLog,
             trigger=DateTrigger(run_date=run_date, timezone=utc),
@@ -1698,7 +1740,7 @@ def SendLog(
                 reply_markup=reply_markup,
             ),
         )
-    except pyrogram.errors.RPCError as ex:
+    except pyrogram_errors.RPCError as ex:
         print(ex)
         traceback.print_exc()
 
@@ -1709,7 +1751,7 @@ def SendMessage(
     client: pyrogram.Client,
     chat_id: str,
     text: str,
-    parse_mode: typing.Union[str, None] = object,
+    parse_mode: pyrogram.enums.parse_mode.ParseMode = pyrogram.enums.parse_mode.ParseMode.DISABLED,
     disable_web_page_preview: bool = None,
     disable_notification: bool = None,
     reply_to_message_id: int = None,
@@ -1730,9 +1772,9 @@ def SendMessage(
     try:
         client.send_chat_action(
             chat_id=chat_id,
-            action="typing",
+            action=pyrogram.enums.chat_action.ChatAction.TYPING,
         )
-    except pyrogram.errors.ChatWriteForbidden as ex:
+    except pyrogram_errors.ChatWriteForbidden as ex:
         print(ex)
         traceback.print_exc()
         chat_settings.forbidden_writing_counter += 1
@@ -1746,12 +1788,12 @@ def SendMessage(
             chat_id=utils.config["log_chat"],
             text=_("en", "tg_error_X").format(ex),
         )
-    except pyrogram.errors.UserIsBlocked as ex:
+    except pyrogram_errors.UserIsBlocked as ex:
         print(ex)
         traceback.print_exc()
         chat_settings.has_blocked_bot = True
         chat_settings.save()
-    except pyrogram.errors.RPCError as ex:
+    except pyrogram_errors.RPCError as ex:
         print(ex)
         traceback.print_exc()
         utils.Log(
@@ -1775,14 +1817,14 @@ def SendMessage(
                 schedule_date=schedule_date,
                 reply_markup=reply_markup,
             )
-        except pyrogram.errors.FloodWait as ex:
+        except pyrogram_errors.FloodWait as ex:
             print(ex)
             traceback.print_exc()
             utils.scheduler.add_job(
                 func=SendMessage,
                 trigger=DateTrigger(
                     run_date=datetime.datetime.utcnow()
-                    + datetime.timedelta(seconds=ex.x),
+                    + datetime.timedelta(seconds=ex.value),
                     timezone=utc,
                 ),
                 kwargs=dict(
@@ -1797,7 +1839,7 @@ def SendMessage(
                     reply_markup=reply_markup,
                 ),
             )
-        except pyrogram.errors.RPCError as ex:
+        except pyrogram_errors.RPCError as ex:
             print(ex)
             traceback.print_exc()
             utils.Log(
@@ -1818,7 +1860,7 @@ def ReplyText(
     client: pyrogram.Client,
     msg: pyrogram.types.Message,
     text: str,
-    parse_mode: typing.Union[str, None] = object,
+    parse_mode: pyrogram.enums.parse_mode.ParseMode = pyrogram.enums.parse_mode.ParseMode.DISABLED,
     disable_web_page_preview: bool = None,
     disable_notification: bool = None,
     reply_to_message_id: int = None,
@@ -1833,9 +1875,9 @@ def ReplyText(
     try:
         client.send_chat_action(
             chat_id=msg.chat.id,
-            action="typing",
+            action=pyrogram.enums.chat_action.ChatAction.TYPING,
         )
-    except pyrogram.errors.ChatWriteForbidden as ex:
+    except pyrogram_errors.ChatWriteForbidden as ex:
         print(ex)
         traceback.print_exc()
         msg.chat.settings.forbidden_writing_counter += 1
@@ -1849,7 +1891,7 @@ def ReplyText(
             chat_id=utils.config["log_chat"],
             text=_("en", "tg_error_X").format(ex),
         )
-    except pyrogram.errors.RPCError as ex:
+    except pyrogram_errors.RPCError as ex:
         print(ex)
         traceback.print_exc()
         utils.Log(
@@ -1869,14 +1911,14 @@ def ReplyText(
                 reply_to_message_id=reply_to_message_id,
                 reply_markup=reply_markup,
             )
-        except pyrogram.errors.FloodWait as ex:
+        except pyrogram_errors.FloodWait as ex:
             print(ex)
             traceback.print_exc()
             utils.scheduler.add_job(
                 func=ReplyText,
                 trigger=DateTrigger(
                     run_date=datetime.datetime.utcnow()
-                    + datetime.timedelta(seconds=ex.x),
+                    + datetime.timedelta(seconds=ex.value),
                     timezone=utc,
                 ),
                 kwargs=dict(
@@ -1890,7 +1932,7 @@ def ReplyText(
                     reply_markup=reply_markup,
                 ),
             )
-        except pyrogram.errors.RPCError as ex:
+        except pyrogram_errors.RPCError as ex:
             print(ex)
             traceback.print_exc()
             utils.Log(
@@ -1909,7 +1951,7 @@ def ReplyPhoto(
     msg: pyrogram.types.Message,
     photo: str,
     caption: str = "",
-    parse_mode: typing.Union[str, None] = object,
+    parse_mode: pyrogram.enums.parse_mode.ParseMode = pyrogram.enums.parse_mode.ParseMode.DISABLED,
     disable_notification: bool = None,
     reply_to_message_id: int = None,
     reply_markup: typing.Union[
@@ -1923,9 +1965,9 @@ def ReplyPhoto(
     try:
         client.send_chat_action(
             chat_id=msg.chat.id,
-            action="upload_photo",
+            action=pyrogram.enums.chat_action.ChatAction.UPLOAD_PHOTO,
         )
-    except pyrogram.errors.ChatWriteForbidden as ex:
+    except pyrogram_errors.ChatWriteForbidden as ex:
         print(ex)
         traceback.print_exc()
         msg.chat.settings.forbidden_writing_counter += 1
@@ -1939,7 +1981,7 @@ def ReplyPhoto(
             chat_id=utils.config["log_chat"],
             text=_("en", "tg_error_X").format(ex),
         )
-    except pyrogram.errors.RPCError as ex:
+    except pyrogram_errors.RPCError as ex:
         print(ex)
         traceback.print_exc()
         utils.Log(
@@ -1959,14 +2001,14 @@ def ReplyPhoto(
                 reply_to_message_id=reply_to_message_id,
                 reply_markup=reply_markup,
             )
-        except pyrogram.errors.FloodWait as ex:
+        except pyrogram_errors.FloodWait as ex:
             print(ex)
             traceback.print_exc()
             utils.scheduler.add_job(
                 func=ReplyPhoto,
                 trigger=DateTrigger(
                     run_date=datetime.datetime.utcnow()
-                    + datetime.timedelta(seconds=ex.x),
+                    + datetime.timedelta(seconds=ex.value),
                     timezone=utc,
                 ),
                 kwargs=dict(
@@ -1980,7 +2022,7 @@ def ReplyPhoto(
                     reply_markup=reply_markup,
                 ),
             )
-        except pyrogram.errors.RPCError as ex:
+        except pyrogram_errors.RPCError as ex:
             print(ex)
             traceback.print_exc()
             utils.Log(
@@ -1999,7 +2041,7 @@ def SendDocument(
     chat_id: str,
     document: str,
     caption: str = "",
-    parse_mode: typing.Union[str, None] = object,
+    parse_mode: pyrogram.enums.parse_mode.ParseMode = pyrogram.enums.parse_mode.ParseMode.DISABLED,
     disable_notification: bool = None,
     reply_to_message_id: int = None,
     schedule_date: int = None,
@@ -2021,9 +2063,9 @@ def SendDocument(
     try:
         client.send_chat_action(
             chat_id=chat_id,
-            action="upload_document",
+            action=pyrogram.enums.chat_action.ChatAction.UPLOAD_DOCUMENT,
         )
-    except pyrogram.errors.ChatWriteForbidden as ex:
+    except pyrogram_errors.ChatWriteForbidden as ex:
         print(ex)
         traceback.print_exc()
         chat_settings.forbidden_writing_counter += 1
@@ -2037,7 +2079,7 @@ def SendDocument(
             chat_id=utils.config["log_chat"],
             text=_("en", "tg_error_X").format(ex),
         )
-    except pyrogram.errors.RPCError as ex:
+    except pyrogram_errors.RPCError as ex:
         print(ex)
         traceback.print_exc()
         utils.Log(
@@ -2063,14 +2105,14 @@ def SendDocument(
                 progress=progress,
                 progress_args=progress_args,
             )
-        except pyrogram.errors.FloodWait as ex:
+        except pyrogram_errors.FloodWait as ex:
             print(ex)
             traceback.print_exc()
             utils.scheduler.add_job(
                 func=SendDocument,
                 trigger=DateTrigger(
                     run_date=datetime.datetime.utcnow()
-                    + datetime.timedelta(seconds=ex.x),
+                    + datetime.timedelta(seconds=ex.value),
                     timezone=utc,
                 ),
                 kwargs=dict(
@@ -2087,7 +2129,7 @@ def SendDocument(
                     progress_args=progress_args,
                 ),
             )
-        except pyrogram.errors.RPCError as ex:
+        except pyrogram_errors.RPCError as ex:
             print(ex)
             traceback.print_exc()
             utils.Log(
@@ -2109,7 +2151,7 @@ def ReplyDocument(
     msg: pyrogram.types.Message,
     document: str,
     caption: str = "",
-    parse_mode: typing.Union[str, None] = object,
+    parse_mode: pyrogram.enums.parse_mode.ParseMode = pyrogram.enums.parse_mode.ParseMode.DISABLED,
     disable_notification: bool = None,
     reply_to_message_id: int = None,
     reply_markup: typing.Union[
@@ -2125,9 +2167,9 @@ def ReplyDocument(
     try:
         client.send_chat_action(
             chat_id=msg.chat.id,
-            action="upload_document",
+            action=pyrogram.enums.chat_action.ChatAction.UPLOAD_DOCUMENT,
         )
-    except pyrogram.errors.ChatWriteForbidden as ex:
+    except pyrogram_errors.ChatWriteForbidden as ex:
         print(ex)
         traceback.print_exc()
         msg.chat.settings.forbidden_writing_counter += 1
@@ -2141,7 +2183,7 @@ def ReplyDocument(
             chat_id=utils.config["log_chat"],
             text=_("en", "tg_error_X").format(ex),
         )
-    except pyrogram.errors.RPCError as ex:
+    except pyrogram_errors.RPCError as ex:
         print(ex)
         traceback.print_exc()
         utils.Log(
@@ -2163,14 +2205,14 @@ def ReplyDocument(
                 progress=progress,
                 progress_args=progress_args,
             )
-        except pyrogram.errors.FloodWait as ex:
+        except pyrogram_errors.FloodWait as ex:
             print(ex)
             traceback.print_exc()
             utils.scheduler.add_job(
                 func=ReplyDocument,
                 trigger=DateTrigger(
                     run_date=datetime.datetime.utcnow()
-                    + datetime.timedelta(seconds=ex.x),
+                    + datetime.timedelta(seconds=ex.value),
                     timezone=utc,
                 ),
                 kwargs=dict(
@@ -2186,7 +2228,7 @@ def ReplyDocument(
                     progress_args=progress_args,
                 ),
             )
-        except pyrogram.errors.RPCError as ex:
+        except pyrogram_errors.RPCError as ex:
             print(ex)
             traceback.print_exc()
             utils.Log(
@@ -2202,12 +2244,12 @@ def ReplyDocument(
 
 def SendBackup(client: pyrogram.Client):
     tmp_msgs = dict()
-    for id_ in utils.config["masters"]:
+    for id_ in utils.config["masters"][1:]:
         try:
             tmp_msgs[id_] = client.send_message(
                 chat_id=id_, text=_("en", "automatic_backup"), disable_notification=True
             )
-        except pyrogram.errors.RPCError as ex:
+        except pyrogram_errors.RPCError as ex:
             print(ex)
             traceback.print_exc()
 

@@ -1,6 +1,6 @@
 apscheduler
 peewee
 pykeyboard
-pyrogram==1.3
+pyrogram==2.0
 requests
 tgcrypto

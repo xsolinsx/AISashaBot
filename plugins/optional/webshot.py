@@ -12,6 +12,12 @@ _ = utils.GetLocalizedString
         prefixes=["/", "!", "#", "."],
     )
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["webshot"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+)
 def CmdWebshot(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
@@ -23,7 +29,7 @@ def CmdWebshot(client: pyrogram.Client, msg: pyrogram.types.Message):
             and r_chat_plugin.is_enabled_on_chat
         )
     else:
-        allowed = msg.chat.type == "private"
+        allowed = msg.chat.type == pyrogram.enums.chat_type.ChatType.PRIVATE
     if allowed:
         methods.ReplyText(
             client=client, msg=msg, text=f"http://webshot.deam.io/{msg.command[1]}"

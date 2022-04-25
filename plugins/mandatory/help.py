@@ -23,6 +23,15 @@ _ = utils.GetLocalizedString
     ),
     group=-10,
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.group
+    & (
+        pyrogram.filters.regex(pattern="[/!#.]start@(\\w+) new_group", flags=re.I)
+        | pyrogram.filters.group_chat_created
+        | pyrogram.filters.new_chat_members
+    ),
+    group=-10,
+)
 def AddGroup(client: pyrogram.Client, msg: pyrogram.types.Message):
     added_to_group = False
     if msg.new_chat_members:
@@ -48,10 +57,8 @@ def AddGroup(client: pyrogram.Client, msg: pyrogram.types.Message):
         msg.stop_propagation()
 
 
-@pyrogram.Client.on_message(
-    pyrogram.filters.left_chat_member,
-    group=-10,
-)
+@pyrogram.Client.on_message(pyrogram.filters.left_chat_member, group=-10)
+@pyrogram.Client.on_edited_message(pyrogram.filters.left_chat_member, group=-10)
 def DeleteGroup(client: pyrogram.Client, msg: pyrogram.types.Message):
     if client.ME.id == msg.left_chat_member.id:
         msg.chat.settings.chat.delete_instance()
@@ -86,11 +93,15 @@ def CbQryStart(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
             bot_username=client.ME.username,
             channel_username=utils.config["channel"]["username"],
         ),
-        parse_mode="html",
+        parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
     )
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(commands=["start"], prefixes=["/", "!", "#", "."])
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(commands=["start"], prefixes=["/", "!", "#", "."])
     & pyrogram.filters.private
 )
@@ -170,7 +181,7 @@ def CbQryHelpPlugin(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
             user_settings=cb_qry.from_user.settings,
             selected_setting=cb_qry.data.replace("mainhelp ", ""),
         ),
-        parse_mode="html",
+        parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
     )
 
 
@@ -204,11 +215,14 @@ def CbQryHelp(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     cb_qry.message.edit_text(
         text=text,
         reply_markup=keyboards.BuildHelpMenu(user_settings=cb_qry.from_user.settings),
-        parse_mode="html",
+        parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
     )
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(commands=["help"], prefixes=["/", "!", "#", "."])
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(commands=["help"], prefixes=["/", "!", "#", "."])
 )
 def CmdHelp(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -240,7 +254,7 @@ def CmdHelp(client: pyrogram.Client, msg: pyrogram.types.Message):
             chat_id=msg.from_user.id,
             text=text,
             reply_markup=keyboards.BuildHelpMenu(user_settings=msg.from_user.settings),
-            parse_mode="html",
+            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
         )
     else:
         plugin = "_".join(msg.command[1:])
@@ -283,11 +297,14 @@ def CmdHelp(client: pyrogram.Client, msg: pyrogram.types.Message):
             reply_markup=keyboards.BuildHelpMenu(
                 user_settings=msg.from_user.settings, selected_setting=plugin
             ),
-            parse_mode="html",
+            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
         )
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(commands=["helpall"], prefixes=["/", "!", "#", "."])
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(commands=["helpall"], prefixes=["/", "!", "#", "."])
 )
 def CmdHelpAll(client: pyrogram.Client, msg: pyrogram.types.Message):
@@ -373,5 +390,5 @@ def CbQryAbout(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery):
     cb_qry.message.edit_text(
         text=_(cb_qry.from_user.settings.language, "about_message"),
         reply_markup=py_k,
-        parse_mode="html",
+        parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
     )

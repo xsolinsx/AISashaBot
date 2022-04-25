@@ -14,6 +14,12 @@ _ = utils.GetLocalizedString
         prefixes=["/", "!", "#", "."],
     )
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["shout"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+)
 def CmdShout(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
@@ -25,7 +31,7 @@ def CmdShout(client: pyrogram.Client, msg: pyrogram.types.Message):
             and r_chat_plugin.is_enabled_on_chat
         )
     else:
-        allowed = msg.chat.type == "private"
+        allowed = msg.chat.type == pyrogram.enums.chat_type.ChatType.PRIVATE
     if allowed:
         # 30 chars maximum
         to_shout = msg.text[len(msg.command[0]) + 2 : len(msg.command[0]) + 31].upper()
@@ -37,4 +43,9 @@ def CmdShout(client: pyrogram.Client, msg: pyrogram.types.Message):
             spacing = "  " * i
             text += f"<code>{html.escape(character)} {spacing}{html.escape(character)}</code>\n"
 
-        methods.ReplyText(client=client, msg=msg, text=text, parse_mode="html")
+        methods.ReplyText(
+            client=client,
+            msg=msg,
+            text=text,
+            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
+        )

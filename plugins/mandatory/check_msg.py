@@ -12,21 +12,25 @@ import my_filters
 import peewee
 import pyrogram
 import utils
+from pyrogram import errors as pyrogram_errors
 
 _ = utils.GetLocalizedString
 
 
 @pyrogram.Client.on_message(my_filters.message_anonymous, group=-9)
+@pyrogram.Client.on_edited_message(my_filters.message_anonymous, group=-9)
 def MessageFromAnonymousAdmin(client: pyrogram.Client, msg: pyrogram.types.Message):
     msg.stop_propagation()
 
 
 @pyrogram.Client.on_message(pyrogram.filters.linked_channel, group=-9)
+@pyrogram.Client.on_edited_message(pyrogram.filters.linked_channel, group=-9)
 def MessageFromConnectedChannel(client: pyrogram.Client, msg: pyrogram.types.Message):
     msg.stop_propagation()
 
 
 @pyrogram.Client.on_message(pyrogram.filters.channel, group=-9)
+@pyrogram.Client.on_edited_message(pyrogram.filters.channel, group=-9)
 def MessageFromChannel(client: pyrogram.Client, msg: pyrogram.types.Message):
     msg.stop_propagation()
 
@@ -39,6 +43,10 @@ def CallbackQueryFromChannel(
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.text | pyrogram.filters.caption,
+    group=-9,
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.text | pyrogram.filters.caption,
     group=-9,
 )
@@ -59,12 +67,14 @@ def CheckMessageStartingWithBotUsername(
 
 
 @pyrogram.Client.on_message(pyrogram.filters.migrate_from_chat_id, group=-9)
+@pyrogram.Client.on_edited_message(pyrogram.filters.migrate_from_chat_id, group=-9)
 def MigrationFromGroup(client: pyrogram.Client, msg: pyrogram.types.Message):
     # managing migration to supergroup so ignore
     msg.stop_propagation()
 
 
 @pyrogram.Client.on_message(pyrogram.filters.migrate_to_chat_id, group=-9)
+@pyrogram.Client.on_edited_message(pyrogram.filters.migrate_to_chat_id, group=-9)
 def MigrationToSupergroup(client: pyrogram.Client, msg: pyrogram.types.Message):
     utils.Log(
         client=client,
@@ -91,19 +101,21 @@ def MigrationToSupergroup(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(pyrogram.filters.private, group=-9)
+@pyrogram.Client.on_edited_message(pyrogram.filters.private, group=-9)
+@pyrogram.Client.on_edited_message(pyrogram.filters.private, group=-9)
 def CheckPrivateMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
-    utils.InstantiatePunishmentDictionary(chat_id=msg.chat.id, id_=msg.message_id)
+    utils.InstantiatePunishmentDictionary(chat_id=msg.chat.id, id_=msg.id)
 
     # if user is blocked don't process
     if msg.chat.settings.block_expiration > datetime.datetime.utcnow():
         print(f"BLOCKED USER {msg.chat.id}")
-        if msg.message_id in utils.tmp_dicts["punishments"][msg.chat.id]:
-            utils.tmp_dicts["punishments"][msg.chat.id].pop(msg.message_id)
+        if msg.id in utils.tmp_dicts["punishments"][msg.chat.id]:
+            utils.tmp_dicts["punishments"][msg.chat.id].pop(msg.id)
         msg.stop_propagation()
     # if user is master skip checks
     if utils.IsMasterOrBot(user_id=msg.from_user.id):
-        if msg.message_id in utils.tmp_dicts["punishments"][msg.chat.id]:
-            utils.tmp_dicts["punishments"][msg.chat.id].pop(msg.message_id)
+        if msg.id in utils.tmp_dicts["punishments"][msg.chat.id]:
+            utils.tmp_dicts["punishments"][msg.chat.id].pop(msg.id)
         return
 
     # flood
@@ -120,7 +132,8 @@ def CheckPrivateMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
             for x in utils.tmp_dicts["flood"][msg.chat.id][msg.from_user.id][
                 "msgs_times"
             ]
-            if msg.date - x <= utils.config["private_flood_time_window"]
+            if msg.date - datetime.timedelta(seconds=x)
+            <= utils.config["private_flood_time_window"]
         ]
 
         # check if X+ messages in less than Y seconds from the current message
@@ -133,13 +146,9 @@ def CheckPrivateMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
             msg.from_user.settings.save()
             flood_wait = 120
             # is the user flooding inside X seconds window after the previous expiry date?
-            if (
-                msg.date
-                <= msg.from_user.settings.block_expiration.replace(
-                    tzinfo=datetime.timezone.utc
-                ).timestamp()
-                + utils.config["flood_surveillance_window"]
-            ):
+            if msg.date <= msg.from_user.settings.block_expiration.replace(
+                tzinfo=datetime.timezone.utc
+            ) + datetime.timedelta(seconds=utils.config["flood_surveillance_window"]):
                 # double previous flood wait time because it's a repeat flooder
                 print("REPEAT FLOODER")
                 flood_wait = (
@@ -158,20 +167,24 @@ def CheckPrivateMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
             if text:
                 methods.ReplyText(client=client, msg=msg, text=text)
             # do not process messages for flooders
-            if msg.message_id in utils.tmp_dicts["punishments"][msg.chat.id]:
-                utils.tmp_dicts["punishments"][msg.chat.id].pop(msg.message_id)
+            if msg.id in utils.tmp_dicts["punishments"][msg.chat.id]:
+                utils.tmp_dicts["punishments"][msg.chat.id].pop(msg.id)
             msg.stop_propagation()
     # if the message has been edited more than 8 seconds ago stop
-    if msg.edit_date and msg.edit_date - msg.date > 8:
+    if msg.edit_date and (msg.edit_date - msg.date).total_seconds() > 8:
         msg.stop_propagation()
     # if the message is not edited and has been sent more than 15 seconds ago stop
-    if not msg.edit_date and time.time() - msg.date > 15:
+    if (
+        not msg.edit_date
+        and (datetime.datetime.utcnow() - msg.date).total_seconds() > 15
+    ):
         msg.stop_propagation()
 
 
 @pyrogram.Client.on_message(pyrogram.filters.group, group=-9)
+@pyrogram.Client.on_edited_message(pyrogram.filters.group, group=-9)
 def InitGroupMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
-    utils.InstantiatePunishmentDictionary(chat_id=msg.chat.id, id_=msg.message_id)
+    utils.InstantiatePunishmentDictionary(chat_id=msg.chat.id, id_=msg.id)
     utils.InstantiateKickedPeopleDictionary(chat_id=msg.chat.id)
 
     if msg.new_chat_members:
@@ -182,8 +195,8 @@ def InitGroupMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
 
     # if chat is banned don't process
     if msg.chat.settings.is_banned:
-        if msg.message_id in utils.tmp_dicts["punishments"][msg.chat.id]:
-            utils.tmp_dicts["punishments"][msg.chat.id].pop(msg.message_id)
+        if msg.id in utils.tmp_dicts["punishments"][msg.chat.id]:
+            utils.tmp_dicts["punishments"][msg.chat.id].pop(msg.id)
         msg.stop_propagation()
     # if bot not enabled and user is not owner^ don't process
     if not (
@@ -192,8 +205,8 @@ def InitGroupMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
             user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
         )
     ):
-        if msg.message_id in utils.tmp_dicts["punishments"][msg.chat.id]:
-            utils.tmp_dicts["punishments"][msg.chat.id].pop(msg.message_id)
+        if msg.id in utils.tmp_dicts["punishments"][msg.chat.id]:
+            utils.tmp_dicts["punishments"][msg.chat.id].pop(msg.id)
         msg.stop_propagation()
 
     # if user is juniormod^ or whitelisted skip checks
@@ -203,8 +216,8 @@ def InitGroupMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
         )
         or msg.r_user_chat.is_whitelisted
     ):
-        if msg.message_id in utils.tmp_dicts["punishments"][msg.chat.id]:
-            utils.tmp_dicts["punishments"][msg.chat.id].pop(msg.message_id)
+        if msg.id in utils.tmp_dicts["punishments"][msg.chat.id]:
+            utils.tmp_dicts["punishments"][msg.chat.id].pop(msg.id)
         return
 
     # pre action
@@ -227,8 +240,8 @@ def InitGroupMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
             reasons="pre_action",
             auto_group_notice=True,
         )
-        if msg.message_id in utils.tmp_dicts["punishments"][msg.chat.id]:
-            utils.tmp_dicts["punishments"][msg.chat.id].pop(msg.message_id)
+        if msg.id in utils.tmp_dicts["punishments"][msg.chat.id]:
+            utils.tmp_dicts["punishments"][msg.chat.id].pop(msg.id)
         if success:
             pre_action.delete_instance()
         msg.stop_propagation()
@@ -252,7 +265,7 @@ def InitGroupMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
                 for x in utils.tmp_dicts["flood"][msg.chat.id][msg.from_user.id][
                     "msgs_times"
                 ]
-                if msg.date - x <= msg.chat.settings.max_flood_time
+                if (msg.date - x).total_seconds() <= msg.chat.settings.max_flood_time
             ]
 
             # check if X+ messages in less than Y seconds
@@ -267,7 +280,7 @@ def InitGroupMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
                 print(f"MESSAGES FLOODER {msg.from_user.id} IN {msg.chat.id}")
                 utils.ChangePunishmentAddReason(
                     chat_id=msg.chat.id,
-                    id_=msg.message_id,
+                    id_=msg.id,
                     punishment=msg.chat.settings.flood_punishment,
                     reason="flood",
                 )
@@ -279,7 +292,7 @@ def InitGroupMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
     ):
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.globally_banned_punishment,
             reason="globally_banned",
         )
@@ -287,7 +300,7 @@ def InitGroupMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
     if msg.chat.settings.anti_everything:
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.anti_everything,
             reason="everything",
         )
@@ -295,6 +308,9 @@ def InitGroupMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(pyrogram.filters.group & pyrogram.filters.bot, group=-9)
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.group & pyrogram.filters.bot, group=-9
+)
 def CheckGroupMessageFromBot(client: pyrogram.Client, msg: pyrogram.types.Message):
     # is bot?
     if (
@@ -304,7 +320,7 @@ def CheckGroupMessageFromBot(client: pyrogram.Client, msg: pyrogram.types.Messag
     ):
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.bot_punishment,
             reason="bot",
         )
@@ -312,6 +328,10 @@ def CheckGroupMessageFromBot(client: pyrogram.Client, msg: pyrogram.types.Messag
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.group & pyrogram.filters.forwarded,
+    group=-9,
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.group & pyrogram.filters.forwarded,
     group=-9,
 )
@@ -325,7 +345,7 @@ def CheckGroupMessageForwardFromChat(
         ):
             utils.ChangePunishmentAddReason(
                 chat_id=msg.chat.id,
-                id_=msg.message_id,
+                id_=msg.id,
                 punishment=msg.chat.settings.forward_punishment,
                 reason="forward_from_channel",
             )
@@ -333,6 +353,10 @@ def CheckGroupMessageForwardFromChat(
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.group,
+    group=-9,
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.group,
     group=-9,
 )
@@ -358,7 +382,7 @@ def CheckGroupMessageTextCaptionName(
         utils.tmp_dicts["msgsHashes"][msg.chat.id][msg_hash] = [
             x
             for x in utils.tmp_dicts["msgsHashes"][msg.chat.id][msg_hash]
-            if msg.date - x <= utils.config["shitstorm_time_window"]
+            if (msg.date - x).total_seconds() <= utils.config["shitstorm_time_window"]
         ]
         if (
             len(utils.tmp_dicts["msgsHashes"][msg.chat.id][msg_hash])
@@ -366,7 +390,7 @@ def CheckGroupMessageTextCaptionName(
         ):
             utils.ChangePunishmentAddReason(
                 chat_id=msg.chat.id,
-                id_=msg.message_id,
+                id_=msg.id,
                 punishment=msg.chat.settings.shitstorm_punishment,
                 reason="text_shitstorm",
             )
@@ -437,7 +461,7 @@ def CheckGroupMessageTextCaptionName(
                 if found:
                     utils.ChangePunishmentAddReason(
                         chat_id=msg.chat.id,
-                        id_=msg.message_id,
+                        id_=msg.id,
                         punishment=msg.chat.settings.censorships_punishment,
                         reason="censored_text",
                     )
@@ -452,10 +476,15 @@ def CheckGroupMessageTextCaptionName(
         # entities (text)
         for entity in entities_to_use:
             tmp = ""
-            if entity.type == "mention":
+            if (
+                entity.type
+                == pyrogram.enums.message_entity_type.MessageEntityType.MENTION
+            ):
                 # @username
                 tmp = text_to_use[entity.offset : entity.offset + entity.length]
-            elif entity.type == "url":
+            elif (
+                entity.type == pyrogram.enums.message_entity_type.MessageEntityType.URL
+            ):
                 tmp = str(
                     utils.CleanLink(
                         url=text_to_use[entity.offset : entity.offset + entity.length]
@@ -464,7 +493,10 @@ def CheckGroupMessageTextCaptionName(
                 if "t.me/joinchat" not in tmp.lower() and "t.me/+" not in tmp.lower():
                     # t.me/username
                     tmp = utils.CleanUsername(username=tmp).lower()
-            elif entity.type == "text_link":
+            elif (
+                entity.type
+                == pyrogram.enums.message_entity_type.MessageEntityType.TEXT_LINK
+            ):
                 tmp = str(utils.CleanLink(url=entity.url))
                 if "t.me/joinchat" not in tmp.lower() and "t.me/+" not in tmp.lower():
                     # t.me/username
@@ -491,7 +523,7 @@ def CheckGroupMessageTextCaptionName(
                 if not whitelisted_link:
                     utils.ChangePunishmentAddReason(
                         chat_id=msg.chat.id,
-                        id_=msg.message_id,
+                        id_=msg.id,
                         punishment=msg.chat.settings.link_spam_punishment,
                         reason="link_spam",
                     )
@@ -535,7 +567,7 @@ def CheckGroupMessageTextCaptionName(
                     if not whitelisted_username:
                         utils.ChangePunishmentAddReason(
                             chat_id=msg.chat.id,
-                            id_=msg.message_id,
+                            id_=msg.id,
                             punishment=msg.chat.settings.link_spam_punishment,
                             reason="public_chat_username",
                         )
@@ -579,7 +611,7 @@ def CheckGroupMessageTextCaptionName(
                             if not whitelisted_link:
                                 utils.ChangePunishmentAddReason(
                                     chat_id=msg.chat.id,
-                                    id_=msg.message_id,
+                                    id_=msg.id,
                                     punishment=msg.chat.settings.link_spam_punishment,
                                     reason="link_spam",
                                 )
@@ -630,7 +662,7 @@ def CheckGroupMessageTextCaptionName(
                                 if not whitelisted_username:
                                     utils.ChangePunishmentAddReason(
                                         chat_id=msg.chat.id,
-                                        id_=msg.message_id,
+                                        id_=msg.id,
                                         punishment=msg.chat.settings.link_spam_punishment,
                                         reason="public_chat_username",
                                     )
@@ -638,7 +670,7 @@ def CheckGroupMessageTextCaptionName(
     if msg.chat.settings.anti_text and (msg.text or msg.caption):
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.anti_text,
             reason="text",
         )
@@ -651,7 +683,7 @@ def CheckGroupMessageTextCaptionName(
     ):
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.rtl_punishment,
             reason="rtl_character",
         )
@@ -661,7 +693,7 @@ def CheckGroupMessageTextCaptionName(
     ):
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.text_spam_punishment,
             reason="spam_long_text",
         )
@@ -676,7 +708,7 @@ def CheckGroupMessageTextCaptionName(
     ):
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.arabic_punishment,
             reason="arabic",
         )
@@ -684,6 +716,10 @@ def CheckGroupMessageTextCaptionName(
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.group & pyrogram.filters.media,
+    group=-9,
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.group & pyrogram.filters.media,
     group=-9,
 )
@@ -701,7 +737,7 @@ def InitCheckGroupMessageMedia(client: pyrogram.Client, msg: pyrogram.types.Mess
         utils.tmp_dicts["msgsHashes"][msg.chat.id][media.media_id] = [
             x
             for x in utils.tmp_dicts["msgsHashes"][msg.chat.id][media.media_id]
-            if msg.date - x <= utils.config["shitstorm_time_window"]
+            if (msg.date - x).total_seconds <= utils.config["shitstorm_time_window"]
         ]
         if (
             len(utils.tmp_dicts["msgsHashes"][msg.chat.id][media.media_id])
@@ -709,7 +745,7 @@ def InitCheckGroupMessageMedia(client: pyrogram.Client, msg: pyrogram.types.Mess
         ):
             utils.ChangePunishmentAddReason(
                 chat_id=msg.chat.id,
-                id_=msg.message_id,
+                id_=msg.id,
                 punishment=msg.chat.settings.shitstorm_punishment,
                 reason="media_shitstorm",
             )
@@ -742,7 +778,7 @@ def InitCheckGroupMessageMedia(client: pyrogram.Client, msg: pyrogram.types.Mess
                 if media and media.media_id.lower() == element.value.lower():
                     utils.ChangePunishmentAddReason(
                         chat_id=msg.chat.id,
-                        id_=msg.message_id,
+                        id_=msg.id,
                         punishment=msg.chat.settings.censorships_punishment,
                         reason="censored_media",
                     )
@@ -754,6 +790,10 @@ def InitCheckGroupMessageMedia(client: pyrogram.Client, msg: pyrogram.types.Mess
     pyrogram.filters.group & pyrogram.filters.animation,
     group=-9,
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.group & pyrogram.filters.animation,
+    group=-9,
+)
 def CheckGroupAnimation(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti animation
     if msg.chat.settings.anti_animation or utils.IsInNightMode(
@@ -761,7 +801,7 @@ def CheckGroupAnimation(client: pyrogram.Client, msg: pyrogram.types.Message):
     ):
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.anti_animation
             if not utils.IsInNightMode(chat_settings=msg.chat.settings)
             else max(
@@ -779,12 +819,16 @@ def CheckGroupAnimation(client: pyrogram.Client, msg: pyrogram.types.Message):
     pyrogram.filters.group & pyrogram.filters.audio,
     group=-9,
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.group & pyrogram.filters.audio,
+    group=-9,
+)
 def CheckGroupAudio(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti audio
     if msg.chat.settings.anti_audio:
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.anti_audio,
             reason="audio",
         )
@@ -795,12 +839,16 @@ def CheckGroupAudio(client: pyrogram.Client, msg: pyrogram.types.Message):
     pyrogram.filters.group & pyrogram.filters.contact,
     group=-9,
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.group & pyrogram.filters.contact,
+    group=-9,
+)
 def CheckGroupContact(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti contact
     if msg.chat.settings.anti_contact:
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.anti_contact,
             reason="contact",
         )
@@ -811,12 +859,16 @@ def CheckGroupContact(client: pyrogram.Client, msg: pyrogram.types.Message):
     pyrogram.filters.group & pyrogram.filters.document,
     group=-9,
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.group & pyrogram.filters.document,
+    group=-9,
+)
 def CheckGroupDocument(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti document
     if msg.chat.settings.anti_document:
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.anti_document,
             reason="document",
         )
@@ -827,12 +879,16 @@ def CheckGroupDocument(client: pyrogram.Client, msg: pyrogram.types.Message):
     pyrogram.filters.group & (pyrogram.filters.game | pyrogram.filters.game_high_score),
     group=-9,
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.group & (pyrogram.filters.game | pyrogram.filters.game_high_score),
+    group=-9,
+)
 def CheckGroupGame(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti game
     if msg.chat.settings.anti_game:
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.anti_game,
             reason="game",
         )
@@ -843,12 +899,16 @@ def CheckGroupGame(client: pyrogram.Client, msg: pyrogram.types.Message):
     pyrogram.filters.group & pyrogram.filters.location,
     group=-9,
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.group & pyrogram.filters.location,
+    group=-9,
+)
 def CheckGroupLocation(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti location
     if msg.chat.settings.anti_location:
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.anti_location,
             reason="location",
         )
@@ -859,6 +919,10 @@ def CheckGroupLocation(client: pyrogram.Client, msg: pyrogram.types.Message):
     pyrogram.filters.group & pyrogram.filters.photo,
     group=-9,
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.group & pyrogram.filters.photo,
+    group=-9,
+)
 def CheckGroupPhoto(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti photo
     if msg.chat.settings.anti_photo or utils.IsInNightMode(
@@ -866,7 +930,7 @@ def CheckGroupPhoto(client: pyrogram.Client, msg: pyrogram.types.Message):
     ):
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.anti_photo
             if not utils.IsInNightMode(chat_settings=msg.chat.settings)
             else max(
@@ -881,12 +945,15 @@ def CheckGroupPhoto(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(pyrogram.filters.group & pyrogram.filters.poll, group=-9)
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.group & pyrogram.filters.poll, group=-9
+)
 def CheckGroupPoll(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti poll
     if msg.chat.settings.anti_poll:
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.anti_poll,
             reason="poll",
         )
@@ -897,6 +964,10 @@ def CheckGroupPoll(client: pyrogram.Client, msg: pyrogram.types.Message):
     pyrogram.filters.group & pyrogram.filters.sticker,
     group=-9,
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.group & pyrogram.filters.sticker,
+    group=-9,
+)
 def CheckGroupSticker(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti sticker
     if msg.chat.settings.anti_sticker or utils.IsInNightMode(
@@ -904,7 +975,7 @@ def CheckGroupSticker(client: pyrogram.Client, msg: pyrogram.types.Message):
     ):
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.anti_sticker
             if not utils.IsInNightMode(chat_settings=msg.chat.settings)
             else max(
@@ -922,12 +993,16 @@ def CheckGroupSticker(client: pyrogram.Client, msg: pyrogram.types.Message):
     pyrogram.filters.group & pyrogram.filters.venue,
     group=-9,
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.group & pyrogram.filters.venue,
+    group=-9,
+)
 def CheckGroupVenue(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti location
     if msg.chat.settings.anti_venue:
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.anti_venue,
             reason="venue",
         )
@@ -938,6 +1013,10 @@ def CheckGroupVenue(client: pyrogram.Client, msg: pyrogram.types.Message):
     pyrogram.filters.group & pyrogram.filters.video,
     group=-9,
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.group & pyrogram.filters.video,
+    group=-9,
+)
 def CheckGroupVideo(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti video
     if msg.chat.settings.anti_video or utils.IsInNightMode(
@@ -945,7 +1024,7 @@ def CheckGroupVideo(client: pyrogram.Client, msg: pyrogram.types.Message):
     ):
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.anti_video
             if not utils.IsInNightMode(chat_settings=msg.chat.settings)
             else max(
@@ -963,12 +1042,16 @@ def CheckGroupVideo(client: pyrogram.Client, msg: pyrogram.types.Message):
     pyrogram.filters.group & pyrogram.filters.video_note,
     group=-9,
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.group & pyrogram.filters.video_note,
+    group=-9,
+)
 def CheckGroupVideoNote(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti video_note
     if msg.chat.settings.anti_video_note:
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.anti_video_note,
             reason="video_note",
         )
@@ -979,12 +1062,16 @@ def CheckGroupVideoNote(client: pyrogram.Client, msg: pyrogram.types.Message):
     pyrogram.filters.group & pyrogram.filters.voice,
     group=-9,
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.group & pyrogram.filters.voice,
+    group=-9,
+)
 def CheckGroupVoice(client: pyrogram.Client, msg: pyrogram.types.Message):
     # anti voice
     if msg.chat.settings.anti_voice:
         utils.ChangePunishmentAddReason(
             chat_id=msg.chat.id,
-            id_=msg.message_id,
+            id_=msg.id,
             punishment=msg.chat.settings.anti_voice,
             reason="voice",
         )
@@ -992,6 +1079,10 @@ def CheckGroupVoice(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.group & pyrogram.filters.new_chat_members,
+    group=-9,
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.group & pyrogram.filters.new_chat_members,
     group=-9,
 )
@@ -1004,7 +1095,7 @@ def CheckGroupMessageAdder(client: pyrogram.Client, msg: pyrogram.types.Message)
         ):
             utils.ChangePunishmentAddReason(
                 chat_id=msg.chat.id,
-                id_=msg.message_id,
+                id_=msg.id,
                 punishment=msg.chat.settings.add_punishment
                 if not utils.IsInNightMode(chat_settings=msg.chat.settings)
                 else max(
@@ -1024,7 +1115,7 @@ def CheckGroupMessageAdder(client: pyrogram.Client, msg: pyrogram.types.Message)
         if len(msg.new_chat_members) > max_invites:
             utils.ChangePunishmentAddReason(
                 chat_id=msg.chat.id,
-                id_=msg.message_id,
+                id_=msg.id,
                 punishment=dictionaries.PUNISHMENT_STRING["ban"],
                 reason="invitation_flood"
                 if not utils.IsInNightMode(chat_settings=msg.chat.settings)
@@ -1035,7 +1126,7 @@ def CheckGroupMessageAdder(client: pyrogram.Client, msg: pyrogram.types.Message)
         if msg.chat.settings.join_punishment:
             utils.ChangePunishmentAddReason(
                 chat_id=msg.chat.id,
-                id_=msg.message_id,
+                id_=msg.id,
                 punishment=msg.chat.settings.join_punishment,
                 reason="join",
             )
@@ -1043,13 +1134,11 @@ def CheckGroupMessageAdder(client: pyrogram.Client, msg: pyrogram.types.Message)
 
 
 @pyrogram.Client.on_message(pyrogram.filters.group, group=-9)
+@pyrogram.Client.on_edited_message(pyrogram.filters.group, group=-9)
 def CheckGroupMessagePunish(client: pyrogram.Client, msg: pyrogram.types.Message):
-    if utils.tmp_dicts["punishments"][msg.chat.id][msg.message_id]["punishment"]:
+    if utils.tmp_dicts["punishments"][msg.chat.id][msg.id]["punishment"]:
         # punish user
-        if (
-            utils.tmp_dicts["punishments"][msg.chat.id][msg.message_id]["punishment"]
-            > 1
-        ):
+        if utils.tmp_dicts["punishments"][msg.chat.id][msg.id]["punishment"] > 1:
             # if user will be punished with warn^ forecast new warns value and check if (s)he will reach max_warns
             if (
                 msg.chat.settings.max_warns_punishment
@@ -1058,7 +1147,7 @@ def CheckGroupMessagePunish(client: pyrogram.Client, msg: pyrogram.types.Message
                 # add max_warns to punishments
                 utils.ChangePunishmentAddReason(
                     chat_id=msg.chat.id,
-                    id_=msg.message_id,
+                    id_=msg.id,
                     punishment=msg.chat.settings.max_warns_punishment,
                     reason="max_warns_reached",
                 )
@@ -1066,13 +1155,11 @@ def CheckGroupMessagePunish(client: pyrogram.Client, msg: pyrogram.types.Message
             client=client,
             target=msg.from_user.id,
             chat_id=msg.chat.id,
-            punishment=utils.tmp_dicts["punishments"][msg.chat.id][msg.message_id][
+            punishment=utils.tmp_dicts["punishments"][msg.chat.id][msg.id][
                 "punishment"
             ],
-            reasons=utils.tmp_dicts["punishments"][msg.chat.id][msg.message_id][
-                "reasons"
-            ],
-            message_ids=msg.message_id,
+            reasons=utils.tmp_dicts["punishments"][msg.chat.id][msg.id]["reasons"],
+            message_ids=msg.id,
             auto_group_notice=True,
         )
     else:
@@ -1094,6 +1181,10 @@ def CheckGroupMessagePunish(client: pyrogram.Client, msg: pyrogram.types.Message
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.group & pyrogram.filters.new_chat_members,
+    group=-9,
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.group & pyrogram.filters.new_chat_members,
     group=-9,
 )
@@ -1317,27 +1408,30 @@ def CheckGroupMessageAdded(client: pyrogram.Client, msg: pyrogram.types.Message)
 
 
 @pyrogram.Client.on_message(pyrogram.filters.group, group=-8)
+@pyrogram.Client.on_edited_message(pyrogram.filters.group, group=-8)
 def CheckGroupMessageTime(client: pyrogram.Client, msg: pyrogram.types.Message):
     # if someone has already been punished don't process
-    if msg.message_id in utils.tmp_dicts["punishments"][msg.chat.id]:
-        if utils.tmp_dicts["punishments"][msg.chat.id][msg.message_id]["punishment"]:
-            if msg.message_id in utils.tmp_dicts["punishments"][msg.chat.id]:
-                utils.tmp_dicts["punishments"][msg.chat.id].pop(msg.message_id)
+    if msg.id in utils.tmp_dicts["punishments"][msg.chat.id]:
+        if utils.tmp_dicts["punishments"][msg.chat.id][msg.id]["punishment"]:
+            if msg.id in utils.tmp_dicts["punishments"][msg.chat.id]:
+                utils.tmp_dicts["punishments"][msg.chat.id].pop(msg.id)
             msg.stop_propagation()
 
-        if msg.message_id in utils.tmp_dicts["punishments"][msg.chat.id]:
-            utils.tmp_dicts["punishments"][msg.chat.id].pop(msg.message_id)
+        if msg.id in utils.tmp_dicts["punishments"][msg.chat.id]:
+            utils.tmp_dicts["punishments"][msg.chat.id].pop(msg.id)
     # if the message has been edited more than X seconds ago stop
     if (
         msg.edit_date
-        and msg.edit_date - msg.date > utils.config["edited_message_expiration"]
+        and (msg.edit_date - msg.date).total_seconds()
+        > utils.config["edited_message_expiration"]
     ):
         print("OLD EDITED MESSAGE")
         msg.stop_propagation()
     # if the message is not edited and has been sent more than Y seconds ago stop
     if (
         not msg.edit_date
-        and time.time() - msg.date > utils.config["message_expiration"]
+        and (datetime.datetime.utcnow() - msg.date).total_seconds()
+        > utils.config["message_expiration"]
     ):
         print("OLD MESSAGE")
         msg.stop_propagation()
@@ -1597,7 +1691,7 @@ def CheckFloodCallbackQuery(
         # check if X+ callback_queries in less than Y seconds from the current message
         maximum = (
             utils.config["max_flood_cb_qrs_user"]
-            if cb_qry.message.chat.type == "private"
+            if cb_qry.message.chat.type == pyrogram.enums.chat_type.ChatType.PRIVATE
             else utils.config["max_flood_cb_qrs_chat"]
         )
         if (
@@ -1668,6 +1762,9 @@ def CheckFloodCallbackQuery(
 @pyrogram.Client.on_message(
     pyrogram.filters.pinned_message & pyrogram.filters.group, group=-1
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.pinned_message & pyrogram.filters.group, group=-1
+)
 def CheckPinnedMessages(client: pyrogram.Client, msg: pyrogram.types.Message):
     if msg.chat.settings.has_pin_markers:
         methods.ReplyText(client=client, msg=msg, text=f"#pin{abs(msg.chat.id)}")
@@ -1679,11 +1776,16 @@ def CheckPinnedMessages(client: pyrogram.Client, msg: pyrogram.types.Message):
     & (pyrogram.filters.left_chat_member | pyrogram.filters.new_chat_members),
     group=-1,
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.group
+    & (pyrogram.filters.left_chat_member | pyrogram.filters.new_chat_members),
+    group=-1,
+)
 def CheckGroupMessageService(client: pyrogram.Client, msg: pyrogram.types.Message):
     if not msg.chat.settings.allow_service_messages:
         try:
             msg.delete()
-        except pyrogram.errors.MessageDeleteForbidden as ex:
+        except pyrogram_errors.MessageDeleteForbidden as ex:
             print(ex)
             traceback.print_exc()
     msg.continue_propagation()

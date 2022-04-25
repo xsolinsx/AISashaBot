@@ -38,6 +38,13 @@ def MultipleFunctionExecution(
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multipleinvite"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdMultipleInviteUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsSeniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -76,6 +83,13 @@ def CmdMultipleInviteUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multipleinvite"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["multipleinvite"], del_=True),
         prefixes=["/", "!", "#", "."],
@@ -147,6 +161,13 @@ def CmdMultipleInviteChatUser(client: pyrogram.Client, msg: pyrogram.types.Messa
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multiplewarn"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdMultipleWarnUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsSeniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -185,6 +206,13 @@ def CmdMultipleWarnUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multiplewarn"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["multiplewarn"], del_=True),
         prefixes=["/", "!", "#", "."],
@@ -256,6 +284,13 @@ def CmdMultipleWarnChatUser(client: pyrogram.Client, msg: pyrogram.types.Message
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multipleunwarn"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdMultipleUnwarnUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsSeniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -294,6 +329,13 @@ def CmdMultipleUnwarnUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multipleunwarn"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["multipleunwarn"], del_=True),
         prefixes=["/", "!", "#", "."],
@@ -365,6 +407,13 @@ def CmdMultipleUnwarnChatUser(client: pyrogram.Client, msg: pyrogram.types.Messa
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multipleunwarnall"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdMultipleUnwarnAllUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsSeniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -403,6 +452,13 @@ def CmdMultipleUnwarnAllUser(client: pyrogram.Client, msg: pyrogram.types.Messag
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multipleunwarnall"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["multipleunwarnall"], del_=True),
         prefixes=["/", "!", "#", "."],
@@ -474,6 +530,13 @@ def CmdMultipleUnwarnAllChatUser(client: pyrogram.Client, msg: pyrogram.types.Me
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multiplekick"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdMultipleKickUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsSeniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -512,6 +575,13 @@ def CmdMultipleKickUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multiplekick"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["multiplekick"], del_=True),
         prefixes=["/", "!", "#", "."],
@@ -585,6 +655,15 @@ def CmdMultipleKickChatUser(client: pyrogram.Client, msg: pyrogram.types.Message
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(
+            commands=["multipletemprestrict"], del_=True
+        ),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdMultipleTempRestrictUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsSeniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -606,8 +685,10 @@ def CmdMultipleTempRestrictUser(client: pyrogram.Client, msg: pyrogram.types.Mes
                         client=client,
                         executer=msg.from_user.id,
                         chat_id=msg.chat.id,
-                        until_date=int(run_date.timestamp())
-                        + msg.chat.settings.max_temp_restrict,
+                        until_date=run_date
+                        + datetime.timedelta(
+                            seconds=msg.chat.settings.max_temp_restrict
+                        ),
                         r_executer_chat=msg.r_user_chat,
                         chat_settings=msg.chat.settings,
                     ),
@@ -625,6 +706,15 @@ def CmdMultipleTempRestrictUser(client: pyrogram.Client, msg: pyrogram.types.Mes
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(
+            commands=["multipletemprestrict"], del_=True
+        ),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(
             commands=["multipletemprestrict"], del_=True
@@ -671,8 +761,10 @@ def CmdMultipleTempRestrictChatUser(
                                 client=client,
                                 executer=msg.from_user.id,
                                 chat_id=chat_id,
-                                until_date=int(run_date.timestamp())
-                                + chat_settings.max_temp_restrict,
+                                until_date=run_date
+                                + datetime.timedelta(
+                                    seconds=chat_settings.max_temp_restrict
+                                ),
                                 r_executer_chat=r_executer_chat,
                                 chat_settings=chat_settings,
                             ),
@@ -696,6 +788,13 @@ def CmdMultipleTempRestrictChatUser(
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multiplerestrict"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["multiplerestrict"], del_=True),
         prefixes=["/", "!", "#", "."],
@@ -740,6 +839,13 @@ def CmdMultipleRestrictUser(client: pyrogram.Client, msg: pyrogram.types.Message
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multiplerestrict"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["multiplerestrict"], del_=True),
         prefixes=["/", "!", "#", "."],
@@ -811,6 +917,13 @@ def CmdMultipleRestrictChatUser(client: pyrogram.Client, msg: pyrogram.types.Mes
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multipleunrestrict"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdMultipleUnrestrictUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsSeniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -849,6 +962,13 @@ def CmdMultipleUnrestrictUser(client: pyrogram.Client, msg: pyrogram.types.Messa
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multipleunrestrict"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["multipleunrestrict"], del_=True),
         prefixes=["/", "!", "#", "."],
@@ -920,6 +1040,13 @@ def CmdMultipleUnrestrictChatUser(client: pyrogram.Client, msg: pyrogram.types.M
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multipletempban"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdMultipleTempBanUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsSeniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -941,8 +1068,8 @@ def CmdMultipleTempBanUser(client: pyrogram.Client, msg: pyrogram.types.Message)
                         client=client,
                         executer=msg.from_user.id,
                         chat_id=msg.chat.id,
-                        until_date=int(run_date.timestamp())
-                        + msg.chat.settings.max_temp_ban,
+                        until_date=run_date
+                        + datetime.timedelta(seconds=msg.chat.settings.max_temp_ban),
                         r_executer_chat=msg.r_user_chat,
                         chat_settings=msg.chat.settings,
                     ),
@@ -960,6 +1087,13 @@ def CmdMultipleTempBanUser(client: pyrogram.Client, msg: pyrogram.types.Message)
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multipletempban"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["multipletempban"], del_=True),
         prefixes=["/", "!", "#", "."],
@@ -1002,8 +1136,10 @@ def CmdMultipleTempBanChatUser(client: pyrogram.Client, msg: pyrogram.types.Mess
                                 client=client,
                                 executer=msg.from_user.id,
                                 chat_id=chat_id,
-                                until_date=int(run_date.timestamp())
-                                + chat_settings.max_temp_ban,
+                                until_date=run_date
+                                + datetime.timedelta(
+                                    seconds=chat_settings.max_temp_ban
+                                ),
                                 r_executer_chat=r_executer_chat,
                                 chat_settings=chat_settings,
                             ),
@@ -1027,6 +1163,13 @@ def CmdMultipleTempBanChatUser(client: pyrogram.Client, msg: pyrogram.types.Mess
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multipleban"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["multipleban"], del_=True),
         prefixes=["/", "!", "#", "."],
@@ -1071,6 +1214,13 @@ def CmdMultipleBanUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multipleban"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["multipleban"], del_=True),
         prefixes=["/", "!", "#", "."],
@@ -1142,6 +1292,13 @@ def CmdMultipleBanChatUser(client: pyrogram.Client, msg: pyrogram.types.Message)
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multipleunban"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdMultipleUnbanUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsSeniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -1180,6 +1337,13 @@ def CmdMultipleUnbanUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multipleunban"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["multipleunban"], del_=True),
         prefixes=["/", "!", "#", "."],
@@ -1251,6 +1415,13 @@ def CmdMultipleUnbanChatUser(client: pyrogram.Client, msg: pyrogram.types.Messag
         prefixes=["/", "!", "#", "."],
     )
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multiplegban"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+)
 def CmdMultipleGBanUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     seconds = int(msg.command[2])
     run_date = None
@@ -1284,6 +1455,13 @@ def CmdMultipleGBanUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multipleungban"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.user(utils.config["masters"])
     & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["multipleungban"], del_=True),
@@ -1327,6 +1505,13 @@ def CmdMultipleUngbanUser(client: pyrogram.Client, msg: pyrogram.types.Message):
         prefixes=["/", "!", "#", "."],
     )
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multipleblock"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+)
 def CmdMultipleBlockUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     seconds = int(msg.command[2])
     run_date = None
@@ -1360,6 +1545,13 @@ def CmdMultipleBlockUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["multipleunblock"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.user(utils.config["masters"])
     & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["multipleunblock"], del_=True),

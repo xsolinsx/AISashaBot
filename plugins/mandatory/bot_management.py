@@ -25,15 +25,23 @@ _ = utils.GetLocalizedString
     pyrogram.filters.user(utils.config["masters"])
     & pyrogram.filters.command(commands=["oldping"], prefixes=["/", "!", "#", "."])
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(commands=["oldping"], prefixes=["/", "!", "#", "."])
+)
 def CmdOldPing(client: pyrogram.Client, msg: pyrogram.types.Message):
     methods.ReplyText(
         client=client,
         msg=msg,
-        text=f"oldpong!\n{utils.TimeFormatter((abs(datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(msg.date))).total_seconds() * 1000)}",
+        text=f"oldpong!\n{utils.TimeFormatter(abs((datetime.datetime.utcnow() - msg.date).total_seconds()) * 1000)}",
     )
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(commands=["ping"], prefixes=["/", "!", "#", "."])
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.user(utils.config["masters"])
     & pyrogram.filters.command(commands=["ping"], prefixes=["/", "!", "#", "."])
 )
@@ -53,6 +61,10 @@ def CmdPing(client: pyrogram.Client, msg: pyrogram.types.Message):
     pyrogram.filters.user(utils.config["masters"])
     & pyrogram.filters.command(commands=["uptime"], prefixes=["/", "!", "#", "."])
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(commands=["uptime"], prefixes=["/", "!", "#", "."])
+)
 def CmdUptime(client: pyrogram.Client, msg: pyrogram.types.Message):
     methods.ReplyText(
         client=client, msg=msg, text=f"{datetime.datetime.utcnow() - utils.start_date}"
@@ -60,6 +72,10 @@ def CmdUptime(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(commands=["pm"], prefixes=["/", "!", "#", "."])
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.user(utils.config["masters"])
     & pyrogram.filters.command(commands=["pm"], prefixes=["/", "!", "#", "."])
 )
@@ -82,6 +98,13 @@ def CmdPm(client: pyrogram.Client, msg: pyrogram.types.Message):
         prefixes=["/", "!", "#", "."],
     )
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["todo"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+)
 def CmdTodo(client: pyrogram.Client, msg: pyrogram.types.Message):
     text = f"#{msg.text[1:]}"
     fwd = None
@@ -91,11 +114,18 @@ def CmdTodo(client: pyrogram.Client, msg: pyrogram.types.Message):
         client=client,
         chat_id=utils.config["log_chat"],
         text=text,
-        reply_to_message_id=fwd.message_id if fwd else None,
+        reply_to_message_id=fwd.id if fwd else None,
     )
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["getip"], del_=True, pvt=True),
+        prefixes=["/", "!", "#", "."],
+    )
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.user(utils.config["masters"])
     & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["getip"], del_=True, pvt=True),
@@ -114,6 +144,13 @@ def CmdGetIP(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
+        commands=["broadcast"],
+        prefixes=["/", "!", "#", "."],
+    )
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.user(utils.config["masters"])
     & pyrogram.filters.command(
         commands=["broadcast"],
@@ -152,6 +189,10 @@ def CmdBroadcast(client: pyrogram.Client, msg: pyrogram.types.Message):
     pyrogram.filters.user(utils.config["masters"])
     & pyrogram.filters.command(commands=["backup"], prefixes=["/", "!", "#", "."])
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(commands=["backup"], prefixes=["/", "!", "#", "."])
+)
 def CmdBackup(client: pyrogram.Client, msg: pyrogram.types.Message):
     utils.Log(
         client=client,
@@ -163,6 +204,13 @@ def CmdBackup(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["exec"], del_=True, pvt=True),
+        prefixes=["/", "!", "#", "."],
+    )
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.user(utils.config["masters"])
     & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["exec"], del_=True, pvt=True),
@@ -201,7 +249,7 @@ def CmdExec(client: pyrogram.Client, msg: pyrogram.types.Message):
                             text=_(
                                 msg.from_user.settings.language, "sent_to_pvt"
                             ).format(client.ME.id),
-                            parse_mode="html",
+                            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                         )
                 else:
                     if not msg.text.startswith("del", 1):
@@ -220,7 +268,7 @@ def CmdExec(client: pyrogram.Client, msg: pyrogram.types.Message):
                             text=_(
                                 msg.from_user.settings.language, "sent_to_pvt"
                             ).format(client.ME.id),
-                            parse_mode="html",
+                            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                         )
                 else:
                     if not msg.text.startswith("del", 1):
@@ -228,6 +276,13 @@ def CmdExec(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["eval"], del_=True, pvt=True),
+        prefixes=["/", "!", "#", "."],
+    )
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.user(utils.config["masters"])
     & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["eval"], del_=True, pvt=True),
@@ -265,7 +320,7 @@ def CmdEval(client: pyrogram.Client, msg: pyrogram.types.Message):
                             text=_(
                                 msg.from_user.settings.language, "sent_to_pvt"
                             ).format(client.ME.id),
-                            parse_mode="html",
+                            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                         )
                 else:
                     if not msg.text.startswith("del", 1):
@@ -284,7 +339,7 @@ def CmdEval(client: pyrogram.Client, msg: pyrogram.types.Message):
                             text=_(
                                 msg.from_user.settings.language, "sent_to_pvt"
                             ).format(client.ME.id),
-                            parse_mode="html",
+                            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                         )
                 else:
                     if not msg.text.startswith("del", 1):
@@ -292,6 +347,13 @@ def CmdEval(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["vardump"], del_=True, pvt=True),
+        prefixes=["/", "!", "#", "."],
+    )
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.user(utils.config["masters"])
     & pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["vardump"], del_=True, pvt=True),
@@ -324,7 +386,7 @@ def CmdVardump(client: pyrogram.Client, msg: pyrogram.types.Message):
                         text=_(msg.from_user.settings.language, "sent_to_pvt").format(
                             client.ME.id
                         ),
-                        parse_mode="html",
+                        parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                     )
             else:
                 if not msg.text.startswith("del", 1):
@@ -341,7 +403,7 @@ def CmdVardump(client: pyrogram.Client, msg: pyrogram.types.Message):
                         text=_(msg.from_user.settings.language, "sent_to_pvt").format(
                             client.ME.id
                         ),
-                        parse_mode="html",
+                        parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                     )
             else:
                 if not msg.text.startswith("del", 1):
@@ -349,6 +411,10 @@ def CmdVardump(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(commands=["setstring"], prefixes=["/", "!", "#", "."])
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.user(utils.config["masters"])
     & pyrogram.filters.command(commands=["setstring"], prefixes=["/", "!", "#", "."])
 )
@@ -385,6 +451,13 @@ def CmdSetString(client: pyrogram.Client, msg: pyrogram.types.Message):
         prefixes=["/", "!", "#", "."],
     )
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["getstring"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+)
 def CmdGetString(client: pyrogram.Client, msg: pyrogram.types.Message):
     if len(msg.command) == 3:
         methods.ReplyText(
@@ -402,6 +475,10 @@ def CmdGetString(client: pyrogram.Client, msg: pyrogram.types.Message):
     pyrogram.filters.user(utils.config["masters"])
     & pyrogram.filters.command(commands=["reboot"], prefixes=["/", "!", "#", "."])
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(commands=["reboot"], prefixes=["/", "!", "#", "."])
+)
 def CmdReboot(client: pyrogram.Client, msg: pyrogram.types.Message):
     utils.Log(
         client=client,
@@ -415,6 +492,10 @@ def CmdReboot(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(commands=["reload"], prefixes=["/", "!", "#", "."])
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.user(utils.config["masters"])
     & pyrogram.filters.command(commands=["reload"], prefixes=["/", "!", "#", "."])
 )
@@ -597,6 +678,10 @@ def CbQryBotPluginsPages(client: pyrogram.Client, cb_qry: pyrogram.types.Callbac
     pyrogram.filters.user(utils.config["masters"])
     & pyrogram.filters.command(commands=["botplugins"], prefixes=["/", "!", "#", "."])
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.user(utils.config["masters"])
+    & pyrogram.filters.command(commands=["botplugins"], prefixes=["/", "!", "#", "."])
+)
 def CmdBotPlugins(client: pyrogram.Client, msg: pyrogram.types.Message):
     methods.ReplyText(
         client=client,
@@ -723,6 +808,12 @@ def CbQryGbannedRemove(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQ
         prefixes=["/", "!", "#", "."],
     )
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["gbanned"], del_=True, pvt=True),
+        prefixes=["/", "!", "#", "."],
+    )
+)
 def CmdGbanned(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsMasterOrBot(user_id=msg.from_user.id):
         if msg.command[0].lower().endswith("pvt"):
@@ -741,7 +832,7 @@ def CmdGbanned(client: pyrogram.Client, msg: pyrogram.types.Message):
                     text=_(msg.from_user.settings.language, "sent_to_pvt").format(
                         client.ME.id
                     ),
-                    parse_mode="html",
+                    parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                 )
         else:
             methods.ReplyText(
@@ -869,6 +960,12 @@ def CbQryBlockedRemove(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQ
         prefixes=["/", "!", "#", "."],
     )
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["blocked"], del_=True, pvt=True),
+        prefixes=["/", "!", "#", "."],
+    )
+)
 def CmdBlocked(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsMasterOrBot(user_id=msg.from_user.id):
         if msg.command[0].lower().endswith("pvt"):
@@ -887,7 +984,7 @@ def CmdBlocked(client: pyrogram.Client, msg: pyrogram.types.Message):
                     text=_(msg.from_user.settings.language, "sent_to_pvt").format(
                         client.ME.id
                     ),
-                    parse_mode="html",
+                    parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                 )
         else:
             methods.ReplyText(

@@ -54,7 +54,10 @@ def callback_command(
 
 async def private_callback_filter(_, __, cb_qry: pyrogram.types.CallbackQuery) -> bool:
     """Filter callback queries sent in private chats."""
-    return bool(cb_qry.message.chat and cb_qry.message.chat.type == "private")
+    return bool(
+        cb_qry.message.chat
+        and cb_qry.message.chat.type == pyrogram.enums.chat_type.ChatType.PRIVATE
+    )
 
 
 callback_private = pyrogram.filters.create(private_callback_filter, name="Private")
@@ -63,7 +66,11 @@ callback_private = pyrogram.filters.create(private_callback_filter, name="Privat
 async def group_callback_filter(_, __, cb_qry: pyrogram.types.CallbackQuery) -> bool:
     """Filter callback queries sent in group chats."""
     return bool(
-        cb_qry.message.chat and (cb_qry.message.chat.type in ("group", "supergroup"))
+        cb_qry.message.chat
+        and (
+            cb_qry.message.chat.type == pyrogram.enums.chat_type.ChatType.GROUP
+            or cb_qry.message.chat.type == pyrogram.enums.chat_type.ChatType.SUPERGROUP
+        )
     )
 
 
@@ -72,7 +79,10 @@ callback_group = pyrogram.filters.create(group_callback_filter, name="Group")
 
 async def channel_callback_filter(_, __, cb_qry: pyrogram.types.CallbackQuery) -> bool:
     """Filter callback queries sent in channels."""
-    return bool(cb_qry.message.chat and cb_qry.message.chat.type == "channel")
+    return bool(
+        cb_qry.message.chat
+        and cb_qry.message.chat.type == pyrogram.enums.chat_type.ChatType.CHANNEL
+    )
 
 
 callback_channel = pyrogram.filters.create(channel_callback_filter, name="Channel")

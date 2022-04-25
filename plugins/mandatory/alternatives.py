@@ -8,11 +8,16 @@ import peewee
 import pyrogram
 import utils
 from pykeyboard import InlineKeyboard
+from pyrogram import errors as pyrogram_errors
 
 _ = utils.GetLocalizedString
 
 
 @pyrogram.Client.on_message(
+    (pyrogram.filters.text | pyrogram.filters.media) & pyrogram.filters.group,
+    group=-6,
+)
+@pyrogram.Client.on_edited_message(
     (pyrogram.filters.text | pyrogram.filters.media) & pyrogram.filters.group,
     group=-6,
 )
@@ -103,9 +108,9 @@ def CbQryAlternativesGet(client: pyrogram.Client, cb_qry: pyrogram.types.Callbac
                 try:
                     client.send_chat_action(
                         chat_id=cb_qry.message.chat.id,
-                        action="upload_document",
+                        action=pyrogram.enums.chat_action.ChatAction.UPLOAD_DOCUMENT,
                     )
-                except pyrogram.errors.ChatWriteForbidden as ex:
+                except pyrogram_errors.ChatWriteForbidden as ex:
                     print(ex)
                     traceback.print_exc()
                     chat_settings.forbidden_writing_counter += 1
@@ -120,7 +125,7 @@ def CbQryAlternativesGet(client: pyrogram.Client, cb_qry: pyrogram.types.Callbac
                         chat_id=utils.config["log_chat"],
                         text=_("en", "tg_error_X").format(ex),
                     )
-                except pyrogram.errors.RPCError as ex:
+                except pyrogram_errors.RPCError as ex:
                     print(ex)
                     traceback.print_exc()
                     methods.ReplyText(
@@ -133,7 +138,7 @@ def CbQryAlternativesGet(client: pyrogram.Client, cb_qry: pyrogram.types.Callbac
                 else:
                     try:
                         cb_qry.message.reply_cached_media(file_id=element.alternative)
-                    except pyrogram.errors.FilerefUpgradeNeeded:
+                    except pyrogram_errors.FilerefUpgradeNeeded:
                         try:
                             original_media_message: pyrogram.types.Message = (
                                 client.get_messages(
@@ -158,10 +163,10 @@ def CbQryAlternativesGet(client: pyrogram.Client, cb_qry: pyrogram.types.Callbac
                                         "original_alternative_deleted",
                                     ),
                                 )
-                        except pyrogram.errors.FloodWait as ex:
+                        except pyrogram_errors.FloodWait as ex:
                             print(ex)
                             traceback.print_exc()
-                        except pyrogram.errors.RPCError as ex:
+                        except pyrogram_errors.RPCError as ex:
                             print(ex)
                             traceback.print_exc()
                             methods.ReplyText(
@@ -172,10 +177,10 @@ def CbQryAlternativesGet(client: pyrogram.Client, cb_qry: pyrogram.types.Callbac
                                     "tg_error_X",
                                 ).format(ex),
                             )
-                    except pyrogram.errors.FloodWait as ex:
+                    except pyrogram_errors.FloodWait as ex:
                         print(ex)
                         traceback.print_exc()
-                    except pyrogram.errors.RPCError as ex:
+                    except pyrogram_errors.RPCError as ex:
                         print(ex)
                         traceback.print_exc()
                         methods.ReplyText(
@@ -361,6 +366,13 @@ def CbQryAlternatives(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQu
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["alternatives"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdAlternatives(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -377,10 +389,11 @@ def CmdAlternatives(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.filters.command(
-        commands=["alternatives"],
-        prefixes=["/", "!", "#", "."],
-    )
+    pyrogram.filters.command(commands=["alternatives"], prefixes=["/", "!", "#", "."])
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(commands=["alternatives"], prefixes=["/", "!", "#", "."])
     & pyrogram.filters.private
 )
 def CmdAlternativesChat(client: pyrogram.Client, msg: pyrogram.types.Message):

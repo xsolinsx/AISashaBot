@@ -2669,12 +2669,14 @@ def BuildRestrictionsKeyboard(
                 text=(
                     ""
                     if r_bot_chat.can_restrict_members
-                    and chat_member.status != "creator"
+                    and chat_member.status
+                    != pyrogram.enums.chat_member_status.ChatMemberStatus.OWNER
                     else pyrogram.emoji.NO_ENTRY
                 )
                 + dictionaries.YES_NO_EMOJI[
                     getattr(chat_member, restriction, 0)
-                    if chat_member.status != "creator"
+                    if chat_member.status
+                    != pyrogram.enums.chat_member_status.ChatMemberStatus.OWNER
                     else 1
                 ],
                 callback_data="restrictions {restriction}",
@@ -2957,7 +2959,7 @@ def BuildTagKeyboard(
     is_member: bool = False,
 ) -> InlineKeyboard:
     keyboard = InlineKeyboard()
-    if chat.type == "supergroup":
+    if chat.type == pyrogram.enums.chat_type.ChatType.SUPERGROUP:
         keyboard.row(
             pyrogram.types.InlineKeyboardButton(
                 text=_(chat_settings.language, "link_to_message"),

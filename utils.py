@@ -19,6 +19,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
+from pyrogram import errors as pyrogram_errors
 from pytz import utc
 
 import db_management
@@ -134,7 +135,7 @@ tmp_dicts = dict(
     ),
     punishments=dict(
         # chat_id = dict(
-        #   msg.message_id or cb_qry.id = dict(
+        #   msg.id or cb_qry.id = dict(
         #       punishment = 0,
         #       reasons = list()
         #   )
@@ -320,9 +321,11 @@ def PrintChat(chat: pyrogram.types.Chat, use_html=False) -> str:
 
 def PrintMessage(msg: pyrogram.types.Message) -> str:
     if msg:
-        date = datetime.datetime.utcfromtimestamp(msg.date)
         receiver = ""
-        if msg.chat.type == "bot" or msg.chat.type == "private":
+        if (
+            msg.chat.type == pyrogram.enums.chat_type.ChatType.BOT
+            or msg.chat.type == pyrogram.enums.chat_type.ChatType.PRIVATE
+        ):
             receiver = PrintUser(user=msg.chat)
         else:
             receiver = PrintChat(chat=msg.chat)
@@ -338,9 +341,9 @@ def PrintMessage(msg: pyrogram.types.Message) -> str:
 
         string = ""
         if receiver == sender:
-            string = f"[UTC {date} #msg{msg.message_id}] {sender} >>>"
+            string = f"[UTC {msg.date} #msg{msg.id}] {sender} >>>"
         else:
-            string = f"[UTC {date} #msg{msg.message_id}] {receiver}, {sender} >>>"
+            string = f"[UTC {msg.date} #msg{msg.id}] {receiver}, {sender} >>>"
         if msg.edit_date:
             string += " [edited] "
         if msg.forward_from or msg.forward_from_chat:
@@ -351,7 +354,7 @@ def PrintMessage(msg: pyrogram.types.Message) -> str:
                 tmp = PrintChat(chat=msg.forward_from_chat)
             string += f" [forwarded from {tmp}] "
         if msg.reply_to_message:
-            string += f" [reply to #msg{msg.reply_to_message.message_id}] "
+            string += f" [reply to #msg{msg.reply_to_message.id}] "
 
         if msg.service:
             tmp = " ERR UNKNOWN SERVICE"
@@ -374,7 +377,7 @@ def PrintMessage(msg: pyrogram.types.Message) -> str:
             elif msg.channel_chat_created:
                 tmp = " [created this channel]"
             elif msg.pinned_message:
-                tmp = f" [pinned #msg{msg.pinned_message.message_id}]"
+                tmp = f" [pinned #msg{msg.pinned_message.id}]"
             elif msg.migrate_to_chat_id:
                 tmp = f" [migrating to #chat{abs(msg.migrate_to_chat_id)}]"
             elif msg.migrate_from_chat_id:
@@ -395,7 +398,10 @@ def PrintCallbackQuery(cb_qry: pyrogram.types.CallbackQuery) -> str:
     if cb_qry:
         date = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
         receiver = ""
-        if cb_qry.message.chat.type == "bot" or cb_qry.message.chat.type == "private":
+        if (
+            cb_qry.message.chat.type == pyrogram.enums.chat_type.ChatType.BOT
+            or cb_qry.message.chat.type == pyrogram.enums.chat_type.ChatType.PRIVATE
+        ):
             receiver = PrintUser(user=cb_qry.message.chat)
         else:
             receiver = PrintChat(chat=cb_qry.message.chat)
@@ -408,9 +414,11 @@ def PrintCallbackQuery(cb_qry: pyrogram.types.CallbackQuery) -> str:
 
         string = ""
         if receiver == sender:
-            string = f"[UTC {date} #cbqry{cb_qry.id} #msg{cb_qry.message.message_id}] {sender} >>>"
+            string = (
+                f"[UTC {date} #cbqry{cb_qry.id} #msg{cb_qry.message.id}] {sender} >>>"
+            )
         else:
-            string = f"[UTC {date} #cbqry{cb_qry.id} #msg{cb_qry.message.message_id}] {receiver}, {sender} >>>"
+            string = f"[UTC {date} #cbqry{cb_qry.id} #msg{cb_qry.message.id}] {receiver}, {sender} >>>"
 
         string += f" {cb_qry.data}"
         return string
@@ -513,55 +521,55 @@ def ExtractMedia(msg: pyrogram.types.Message) -> typing.Tuple[object, str]:
     media = None
     type_ = None
     if msg and not msg.empty:
-        if msg.media == "animation":
+        if msg.media == pyrogram.enums.message_media_type.MessageMediaType.ANIMATION:
             media = msg.animation
             type_ = "animation"
             media.media_id = media.file_id
-        elif msg.media == "audio":
+        elif msg.media == pyrogram.enums.message_media_type.MessageMediaType.AUDIO:
             media = msg.audio
             type_ = "audio"
             media.media_id = media.file_id
-        elif msg.media == "contact":
+        elif msg.media == pyrogram.enums.message_media_type.MessageMediaType.CONTACT:
             media = msg.contact
             type_ = "contact"
             media.media_id = media.phone_number
-        elif msg.media == "document":
+        elif msg.media == pyrogram.enums.message_media_type.MessageMediaType.DOCUMENT:
             media = msg.document
             type_ = "document"
             media.media_id = media.file_id
-        elif msg.media == "game":
+        elif msg.media == pyrogram.enums.message_media_type.MessageMediaType.GAME:
             media = msg.game
             type_ = "game"
             media.media_id = media.id
-        elif msg.media == "location":
+        elif msg.media == pyrogram.enums.message_media_type.MessageMediaType.LOCATION:
             media = msg.location
             type_ = "location"
             media.media_id = f"{media.latitude}, {media.longitude}"
-        elif msg.media == "photo":
+        elif msg.media == pyrogram.enums.message_media_type.MessageMediaType.PHOTO:
             media = msg.photo
             type_ = "photo"
             media.media_id = media.file_id
-        elif msg.media == "poll":
+        elif msg.media == pyrogram.enums.message_media_type.MessageMediaType.POLL:
             media = msg.poll
             type_ = "poll"
             media.media_id = media.id
-        elif msg.media == "sticker":
+        elif msg.media == pyrogram.enums.message_media_type.MessageMediaType.STICKER:
             media = msg.sticker
             type_ = "sticker"
             media.media_id = media.file_id
-        elif msg.media == "venue":
+        elif msg.media == pyrogram.enums.message_media_type.MessageMediaType.VENUE:
             media = msg.venue
             type_ = "venue"
             media.media_id = f"{media.location.latitude}, {media.location.longitude}"
-        elif msg.media == "video":
+        elif msg.media == pyrogram.enums.message_media_type.MessageMediaType.VIDEO:
             media = msg.video
             type_ = "video"
             media.media_id = media.file_id
-        elif msg.media == "video_note":
+        elif msg.media == pyrogram.enums.message_media_type.MessageMediaType.VIDEO_NOTE:
             media = msg.video_note
             type_ = "video_note"
             media.media_id = media.file_id
-        elif msg.media == "voice":
+        elif msg.media == pyrogram.enums.message_media_type.MessageMediaType.VOICE:
             media = msg.voice
             type_ = "voice"
             media.media_id = media.file_id
@@ -755,7 +763,8 @@ def ResolveCommandToId(
                 text_to_use = msg.text or msg.caption
                 for entity in msg.entities:
                     if (
-                        entity.type == "text_mention"
+                        entity.type
+                        == pyrogram.enums.message_entity_type.MessageEntityType.TEXT_MENTION
                         and text_to_use[entity.offset : entity.offset + entity.length]
                         == value
                     ):
@@ -793,13 +802,13 @@ def ResolveCommandToId(
                         tmp = client.get_chat(chat_id=value)
                         tmp = db_management.DBObject(obj=tmp, client=client)
                         return tmp.id
-                    except pyrogram.errors.FloodWait as ex:
+                    except pyrogram_errors.FloodWait as ex:
                         print(ex)
                         traceback.print_exc()
                         return f"{value}: " + _(language, "tg_flood_wait_X").format(
-                            ex.x
+                            ex.value
                         )
-                    except pyrogram.errors.RPCError as ex:
+                    except pyrogram_errors.RPCError as ex:
                         print(ex)
                         traceback.print_exc()
                         return f"{value}: " + _(language, "tg_error_X").format(ex)
@@ -1005,8 +1014,7 @@ def IsTelegramAdministrator(
 
 
 def IsMasterOrBot(user_id: int) -> bool:
-    bot_id = config["telegram"]["bot_api_key"].split(":")[0]
-    return bool(user_id in config["masters"] or user_id == bot_id)
+    return bool(user_id in config["masters"])
 
 
 # TODO IMPLEMENT CHECKS FOR NETWORKS AND BOT ADMINISTRATORS

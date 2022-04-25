@@ -19,6 +19,7 @@ import time
 
 import pyrogram
 from apscheduler.triggers.cron import CronTrigger
+from pyrogram import errors as pyrogram_errors
 from pytz import utc
 
 import db_management
@@ -42,17 +43,15 @@ time.sleep(1)
 db_management.LoadPluginsToDB()
 
 BOT_CLIENT = pyrogram.Client(
-    session_name="AISashaBot",
-    api_id=utils.config["telegram"]["api_id"],
-    api_hash=utils.config["telegram"]["api_hash"],
-    bot_token=utils.config["telegram"]["bot_api_key"],
+    name="AISashaBot",
     workers=4,
     plugins=plugins,
-    parse_mode=None,
+    parse_mode=pyrogram.enums.parse_mode.ParseMode.DISABLED,
 )
 
 BOT_CLIENT.start()
 BOT_CLIENT.ME = BOT_CLIENT.get_me()
+db_management.DBUser(user=BOT_CLIENT.ME)
 print(
     start_string.format(
         bot_version=f"Pyrogram {BOT_CLIENT.ME.first_name}",
@@ -69,7 +68,7 @@ for dirpath, dirnames, filenames in os.walk(BOT_CLIENT.plugins["root"]):
             filter(lambda x: x != "__init__.py", filenames)
         )
 
-for x in utils.config["masters"]:
+for x in utils.config["masters"][1:]:
     try:
         BOT_CLIENT.send_message(
             chat_id=x,
@@ -84,9 +83,9 @@ for x in utils.config["masters"]:
                 )
             )
             + f"\n\n<b>{len(loaded_plugins)} plugins loaded</b>",
-            parse_mode="html",
+            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
         )
-    except pyrogram.errors.RPCError as ex:
+    except pyrogram_errors.RPCError as ex:
         print(ex)
 
 utils.Log(

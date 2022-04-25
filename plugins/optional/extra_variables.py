@@ -8,11 +8,16 @@ import peewee
 import pyrogram
 import utils
 from pykeyboard import InlineKeyboard
+from pyrogram import errors as pyrogram_errors
 
 _ = utils.GetLocalizedString
 
 
 @pyrogram.Client.on_message(
+    (pyrogram.filters.text | pyrogram.filters.caption) & pyrogram.filters.group,
+    group=-3,
+)
+@pyrogram.Client.on_edited_message(
     (pyrogram.filters.text | pyrogram.filters.caption) & pyrogram.filters.group,
     group=-3,
 )
@@ -54,9 +59,9 @@ def SendExtra(client: pyrogram.Client, msg: pyrogram.types.Message):
                             msg.reply_cached_media(
                                 file_id=media_id,
                                 caption=caption,
-                                parse_mode="html",
+                                parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                             )
-                        except pyrogram.errors.FilerefUpgradeNeeded:
+                        except pyrogram_errors.FilerefUpgradeNeeded:
                             original_media_message: pyrogram.types.Message = (
                                 client.get_messages(
                                     chat_id=element.original_chat_id,
@@ -70,7 +75,7 @@ def SendExtra(client: pyrogram.Client, msg: pyrogram.types.Message):
                                 msg.reply_cached_media(
                                     file_id=media_id,
                                     caption=caption,
-                                    parse_mode="html",
+                                    parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                                 )
                             else:
                                 element.delete_instance()
@@ -89,7 +94,7 @@ def SendExtra(client: pyrogram.Client, msg: pyrogram.types.Message):
                                 client=client,
                                 msg=msg,
                                 text=utils.AdjustMarkers(value=element.value, msg=msg),
-                                parse_mode="html",
+                                parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                             )
                     break
     msg.continue_propagation()
@@ -243,9 +248,9 @@ def CbQryExtrasGet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
                         cb_qry.message.reply_cached_media(
                             file_id=media_id,
                             caption=caption,
-                            parse_mode="html",
+                            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                         )
-                    except pyrogram.errors.FilerefUpgradeNeeded:
+                    except pyrogram_errors.FilerefUpgradeNeeded:
                         original_media_message: pyrogram.types.Message = (
                             client.get_messages(
                                 chat_id=element.original_chat_id,
@@ -257,7 +262,7 @@ def CbQryExtrasGet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
                             cb_qry.message.reply_cached_media(
                                 file_id=media_id,
                                 caption=caption,
-                                parse_mode="html",
+                                parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                             )
                         else:
                             element.delete_instance()
@@ -275,7 +280,7 @@ def CbQryExtrasGet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
                             client=client,
                             msg=cb_qry.message,
                             text=element.value,
-                            parse_mode="html",
+                            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                         )
             else:
                 methods.CallbackQueryAnswer(
@@ -366,7 +371,7 @@ def CbQryExtrasSet(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
                     reply_markup=keyboards.BuildExtraList(
                         chat_settings=chat_settings, selected_setting="set"
                     ),
-                    parse_mode="html",
+                    parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                 )
                 return
             elif cb_qry.data.startswith("extras set text") or cb_qry.data.startswith(
@@ -462,6 +467,13 @@ def CbQryExtrasUnset(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["extras"], del_=True, pvt=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdExtras(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
@@ -495,7 +507,7 @@ def CmdExtras(client: pyrogram.Client, msg: pyrogram.types.Message):
                         text=_(msg.from_user.settings.language, "sent_to_pvt").format(
                             client.ME.id
                         ),
-                        parse_mode="html",
+                        parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                     )
             else:
                 methods.ReplyText(
@@ -510,6 +522,13 @@ def CmdExtras(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=["extras"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=["extras"],
         prefixes=["/", "!", "#", "."],

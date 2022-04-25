@@ -10,11 +10,13 @@ import peewee
 import pyrogram
 import utils
 from pykeyboard import InlineKeyboard
+from pyrogram import errors as pyrogram_errors
 
 _ = utils.GetLocalizedString
 
 
 @pyrogram.Client.on_message(pyrogram.filters.group, group=-4)
+@pyrogram.Client.on_edited_message(pyrogram.filters.group, group=-4)
 def SendTagAlerts(client: pyrogram.Client, msg: pyrogram.types.Message):
     if msg.chat.settings.has_tag_alerts:
         query: peewee.ModelSelect = None
@@ -69,18 +71,25 @@ def SendTagAlerts(client: pyrogram.Client, msg: pyrogram.types.Message):
                             member = client.get_chat_member(
                                 chat_id=msg.chat.id, user_id=user.user_id
                             )
-                        except pyrogram.errors.FloodWait as ex:
+                        except pyrogram_errors.FloodWait as ex:
                             print(ex)
                             traceback.print_exc()
-                        except pyrogram.errors.RPCError as ex:
+                        except pyrogram_errors.RPCError as ex:
                             print(ex)
                             traceback.print_exc()
                         else:
                             is_member = (
-                                member.status == "creator"
-                                or member.status == "administrator"
-                                or member.status == "member"
-                                or (member.status == "restricted" and member.is_member)
+                                member.status
+                                == pyrogram.enums.chat_member_status.ChatMemberStatus.OWNER
+                                or member.status
+                                == pyrogram.enums.chat_member_status.ChatMemberStatus.ADMINISTRATOR
+                                or member.status
+                                == pyrogram.enums.chat_member_status.ChatMemberStatus.MEMBER
+                                or (
+                                    member.status
+                                    == pyrogram.enums.chat_member_status.ChatMemberStatus.RESTRICTED
+                                    and member.is_member
+                                )
                             )
 
                             if (
@@ -113,7 +122,7 @@ def SendTagAlerts(client: pyrogram.Client, msg: pyrogram.types.Message):
                                             ),
                                             reply_markup=keyboards.BuildTagKeyboard(
                                                 chat=msg.chat,
-                                                message_id=msg.message_id,
+                                                message_id=msg.id,
                                                 chat_settings=msg.chat.settings,
                                                 is_member=is_member,
                                             ),
@@ -136,7 +145,7 @@ def SendTagAlerts(client: pyrogram.Client, msg: pyrogram.types.Message):
                                         ),
                                         reply_markup=keyboards.BuildTagKeyboard(
                                             chat=msg.chat,
-                                            message_id=msg.message_id,
+                                            message_id=msg.id,
                                             chat_settings=msg.chat.settings,
                                             is_member=is_member,
                                         ),
@@ -259,7 +268,7 @@ def CbQryMySettingsSetNickname(
             utils.config["max_nicknames"]
         ),
         reply_markup=py_k,
-        parse_mode="html",
+        parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
     )
 
 
@@ -327,6 +336,13 @@ def CbQryMySettings(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=["mysettings"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=["mysettings"],
         prefixes=["/", "!", "#", "."],

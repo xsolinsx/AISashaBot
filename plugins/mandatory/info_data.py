@@ -1,5 +1,5 @@
+import datetime
 import re
-import time
 import traceback
 
 import db_management
@@ -10,6 +10,7 @@ import my_filters
 import peewee
 import pyrogram
 import utils
+from pyrogram import errors as pyrogram_errors
 
 _ = utils.GetLocalizedString
 
@@ -73,8 +74,11 @@ def CbQryInfoMenu(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery)
             user_id=chat_id
         )
 
-    if cb_qry.message.chat.type != "private" and not utils.IsJuniorModOrHigher(
-        user_id=cb_qry.from_user.id, chat_id=chat_id, r_user_chat=r_executer_chat
+    if (
+        cb_qry.message.chat.type != pyrogram.enums.chat_type.ChatType.PRIVATE
+        and not utils.IsJuniorModOrHigher(
+            user_id=cb_qry.from_user.id, chat_id=chat_id, r_user_chat=r_executer_chat
+        )
     ):
         methods.CallbackQueryAnswer(
             cb_qry=cb_qry,
@@ -103,7 +107,7 @@ def CbQryInfoMenu(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery)
                 chat_settings=chat_settings,
                 r_target_chat=r_target_chat,
             ),
-            parse_mode="html",
+            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
         )
 
 
@@ -409,7 +413,9 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
                         chat_id=chat_id,
                     )
                 elif punishment == dictionaries.PUNISHMENT_STRING["temprestrict"]:
-                    until_date = int(time.time() + chat_settings.max_temp_restrict)
+                    until_date = datetime.datetime.utcnow() + datetime.timedelta(
+                        seconds=chat_settings.max_temp_restrict
+                    )
                     text = methods.Restrict(
                         client=client,
                         executer=cb_qry.from_user.id,
@@ -425,7 +431,9 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
                         chat_id=chat_id,
                     )
                 elif punishment == dictionaries.PUNISHMENT_STRING["tempban"]:
-                    until_date = int(time.time() + chat_settings.max_temp_ban)
+                    until_date = datetime.datetime.utcnow() + datetime.timedelta(
+                        seconds=chat_settings.max_temp_ban
+                    )
                     text = methods.Ban(
                         client=client,
                         executer=cb_qry.from_user.id,
@@ -491,7 +499,7 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
             r_target_chat=r_target_chat,
             selected_setting=setting,
         ),
-        parse_mode="html",
+        parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
     )
 
 
@@ -503,10 +511,21 @@ def CbQryInfoChange(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
         prefixes=["/", "!", "#", "."],
     )
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(
+            commands=["info", "promote", "demote"], del_=True, pvt=True
+        ),
+        prefixes=["/", "!", "#", "."],
+    )
+)
 def CmdInfo(client: pyrogram.Client, msg: pyrogram.types.Message):
     chat_id = None
     target_id = None
-    if len(msg.command) == 3 and msg.chat.type == "private":
+    if (
+        len(msg.command) == 3
+        and msg.chat.type == pyrogram.enums.chat_type.ChatType.PRIVATE
+    ):
         chat_id = utils.ResolveCommandToId(client=client, msg=msg, value=msg.command[1])
         target_id = utils.ResolveCommandToId(
             client=client, msg=msg, value=msg.command[2]
@@ -548,13 +567,13 @@ def CmdInfo(client: pyrogram.Client, msg: pyrogram.types.Message):
                         try:
                             chat = client.get_chat(chat_id=target_id)
                             chat = db_management.DBObject(obj=chat, client=client)
-                        except pyrogram.errors.FloodWait as ex:
+                        except pyrogram_errors.FloodWait as ex:
                             print(ex)
                             traceback.print_exc()
                             text = _(chat_settings.language, "tg_flood_wait_X").format(
-                                ex.x
+                                ex.value
                             )
-                        except pyrogram.errors.RPCError as ex:
+                        except pyrogram_errors.RPCError as ex:
                             print(ex)
                             traceback.print_exc()
                             text = _(chat_settings.language, "tg_error_X").format(ex)
@@ -578,7 +597,7 @@ def CmdInfo(client: pyrogram.Client, msg: pyrogram.types.Message):
                             )
                             if not text
                             else None,
-                            parse_mode="html",
+                            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                         )
                         methods.ReplyText(
                             client=client,
@@ -586,7 +605,7 @@ def CmdInfo(client: pyrogram.Client, msg: pyrogram.types.Message):
                             text=_(
                                 msg.from_user.settings.language, "sent_to_pvt"
                             ).format(client.ME.id),
-                            parse_mode="html",
+                            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                         )
                     else:
                         methods.ReplyText(
@@ -607,7 +626,7 @@ def CmdInfo(client: pyrogram.Client, msg: pyrogram.types.Message):
                             )
                             if not text
                             else None,
-                            parse_mode="html",
+                            parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                         )
                 else:
                     if chat_id < 0:
@@ -620,13 +639,13 @@ def CmdInfo(client: pyrogram.Client, msg: pyrogram.types.Message):
                             if not db_management.Chats.get_or_none(id=chat_id):
                                 chat = client.get_chat(chat_id=chat_id)
                                 chat = db_management.DBObject(obj=chat, client=client)
-                        except pyrogram.errors.FloodWait as ex:
+                        except pyrogram_errors.FloodWait as ex:
                             print(ex)
                             traceback.print_exc()
                             text = _(chat_settings.language, "tg_flood_wait_X").format(
-                                ex.x
+                                ex.value
                             )
-                        except pyrogram.errors.RPCError as ex:
+                        except pyrogram_errors.RPCError as ex:
                             print(ex)
                             traceback.print_exc()
                             text = _(chat_settings.language, "tg_error_X").format(ex)
@@ -662,7 +681,7 @@ def CmdInfo(client: pyrogram.Client, msg: pyrogram.types.Message):
                                     )
                                     if not text
                                     else None,
-                                    parse_mode="html",
+                                    parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                                 )
                                 methods.ReplyText(
                                     client=client,
@@ -670,7 +689,7 @@ def CmdInfo(client: pyrogram.Client, msg: pyrogram.types.Message):
                                     text=_(
                                         msg.from_user.settings.language, "sent_to_pvt"
                                     ).format(client.ME.id),
-                                    parse_mode="html",
+                                    parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                                 )
                             else:
                                 methods.ReplyText(
@@ -693,7 +712,7 @@ def CmdInfo(client: pyrogram.Client, msg: pyrogram.types.Message):
                                     )
                                     if not text
                                     else None,
-                                    parse_mode="html",
+                                    parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                                 )
                     else:
                         # user
@@ -702,13 +721,13 @@ def CmdInfo(client: pyrogram.Client, msg: pyrogram.types.Message):
                             try:
                                 chat = client.get_chat(chat_id=target_id)
                                 chat = db_management.DBObject(obj=chat, client=client)
-                            except pyrogram.errors.FloodWait as ex:
+                            except pyrogram_errors.FloodWait as ex:
                                 print(ex)
                                 traceback.print_exc()
                                 text = _(
                                     chat_settings.language, "tg_flood_wait_X"
-                                ).format(ex.x)
-                            except pyrogram.errors.RPCError as ex:
+                                ).format(ex.value)
+                            except pyrogram_errors.RPCError as ex:
                                 print(ex)
                                 traceback.print_exc()
                                 text = _(chat_settings.language, "tg_error_X").format(
@@ -734,7 +753,7 @@ def CmdInfo(client: pyrogram.Client, msg: pyrogram.types.Message):
                                 )
                                 if not text
                                 else None,
-                                parse_mode="html",
+                                parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                             )
                             methods.ReplyText(
                                 client=client,
@@ -742,7 +761,7 @@ def CmdInfo(client: pyrogram.Client, msg: pyrogram.types.Message):
                                 text=_(
                                     msg.from_user.settings.language, "sent_to_pvt"
                                 ).format(client.ME.id),
-                                parse_mode="html",
+                                parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                             )
                         else:
                             methods.ReplyText(
@@ -763,7 +782,7 @@ def CmdInfo(client: pyrogram.Client, msg: pyrogram.types.Message):
                                 )
                                 if not text
                                 else None,
-                                parse_mode="html",
+                                parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                             )
     else:
         methods.ReplyText(
@@ -771,7 +790,7 @@ def CmdInfo(client: pyrogram.Client, msg: pyrogram.types.Message):
             msg=msg,
             text=_(
                 msg.chat.settings.language
-                if msg.chat.type != "private"
+                if msg.chat.type != pyrogram.enums.chat_type.ChatType.PRIVATE
                 else msg.from_user.settings.language,
                 "no_chat_settings",
             ),
@@ -839,15 +858,15 @@ def CbQryMessagesOnlyMembers(
         utils.tmp_dicts["membersUpdated"].add(chat_id)
         try:
             db_management.DBChatMembers(client=client, chat_id=chat_id, clean_up=True)
-        except pyrogram.errors.FloodWait as ex:
+        except pyrogram_errors.FloodWait as ex:
             print(ex)
             traceback.print_exc()
             methods.ReplyText(
                 client=client,
                 msg=cb_qry.message,
-                text=_(chat_settings.language, "tg_flood_wait_X").format(ex.x),
+                text=_(chat_settings.language, "tg_flood_wait_X").format(ex.value),
             )
-        except pyrogram.errors.RPCError as ex:
+        except pyrogram_errors.RPCError as ex:
             print(ex)
             traceback.print_exc()
             methods.ReplyText(
@@ -934,6 +953,13 @@ def CbQryMessages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery)
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["messages"], del_=True, pvt=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdMessages(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsJuniorModOrHigher(
         user_id=msg.from_user.id, chat_id=msg.chat.id, r_user_chat=msg.r_user_chat
@@ -944,15 +970,17 @@ def CmdMessages(client: pyrogram.Client, msg: pyrogram.types.Message):
                 db_management.DBChatMembers(
                     client=client, chat_id=msg.chat.id, clean_up=True
                 )
-            except pyrogram.errors.FloodWait as ex:
+            except pyrogram_errors.FloodWait as ex:
                 print(ex)
                 traceback.print_exc()
                 methods.ReplyText(
                     client=client,
                     msg=msg,
-                    text=_(msg.chat.settings.language, "tg_flood_wait_X").format(ex.x),
+                    text=_(msg.chat.settings.language, "tg_flood_wait_X").format(
+                        ex.value
+                    ),
                 )
-            except pyrogram.errors.RPCError as ex:
+            except pyrogram_errors.RPCError as ex:
                 print(ex)
                 traceback.print_exc()
                 methods.ReplyText(
@@ -992,7 +1020,7 @@ def CmdMessages(client: pyrogram.Client, msg: pyrogram.types.Message):
                     text=_(msg.from_user.settings.language, "sent_to_pvt").format(
                         client.ME.id
                     ),
-                    parse_mode="html",
+                    parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                 )
         else:
             methods.ReplyText(
@@ -1007,6 +1035,13 @@ def CmdMessages(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=["messages"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=["messages"],
         prefixes=["/", "!", "#", "."],
@@ -1029,17 +1064,17 @@ def CmdMessagesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                         db_management.DBChatMembers(
                             client=client, chat_id=chat_id, clean_up=True
                         )
-                    except pyrogram.errors.FloodWait as ex:
+                    except pyrogram_errors.FloodWait as ex:
                         print(ex)
                         traceback.print_exc()
                         methods.ReplyText(
                             client=client,
                             msg=msg,
                             text=_(chat_settings.language, "tg_flood_wait_X").format(
-                                ex.x
+                                ex.value
                             ),
                         )
-                    except pyrogram.errors.RPCError as ex:
+                    except pyrogram_errors.RPCError as ex:
                         print(ex)
                         traceback.print_exc()
                         methods.ReplyText(
@@ -1085,17 +1120,23 @@ def CmdMessagesChat(client: pyrogram.Client, msg: pyrogram.types.Message):
         prefixes=["/", "!", "#", "."],
     )
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["id"], del_=True, pvt=True),
+        prefixes=["/", "!", "#", "."],
+    )
+)
 def CmdId(client: pyrogram.Client, msg: pyrogram.types.Message):
     if (
         utils.IsPrivilegedOrHigher(user_id=msg.from_user.id, chat_id=msg.chat.id)
-        or msg.chat.type == "private"
+        or msg.chat.type == pyrogram.enums.chat_type.ChatType.PRIVATE
     ):
         if len(msg.command) == 1 and not msg.reply_to_message:
             methods.ReplyText(
                 client=client,
                 msg=msg,
                 text=f"<code>{msg.chat.id}</code>\n<code>{msg.from_user.id}</code>",
-                parse_mode="html",
+                parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
             )
         else:
             value = utils.ResolveCommandToId(
@@ -1109,14 +1150,14 @@ def CmdId(client: pyrogram.Client, msg: pyrogram.types.Message):
                         client=client,
                         chat_id=msg.from_user.id,
                         text=f"<code>{value}</code>",
-                        parse_mode="html",
+                        parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                     )
                 else:
                     methods.ReplyText(
                         client=client,
                         msg=msg,
                         text=f"<code>{value}</code>",
-                        parse_mode="html",
+                        parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
                     )
             else:
                 if msg.command[0].lower().endswith("pvt"):
@@ -1143,10 +1184,16 @@ def CmdId(client: pyrogram.Client, msg: pyrogram.types.Message):
         prefixes=["/", "!", "#", "."],
     )
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["username"], del_=True, pvt=True),
+        prefixes=["/", "!", "#", "."],
+    )
+)
 def CmdUsername(client: pyrogram.Client, msg: pyrogram.types.Message):
     if (
         utils.IsPrivilegedOrHigher(user_id=msg.from_user.id, chat_id=msg.chat.id)
-        or msg.chat.type == "private"
+        or msg.chat.type == pyrogram.enums.chat_type.ChatType.PRIVATE
     ):
         text = None
         if len(msg.command) == 1 and not msg.reply_to_message:
@@ -1181,13 +1228,13 @@ def CmdUsername(client: pyrogram.Client, msg: pyrogram.types.Message):
                             tmp = client.get_chat(chat_id=msg.command[1])
                             tmp = db_management.DBObject(obj=tmp, client=client)
                             text = f"@{tmp.username}"
-                        except pyrogram.errors.FloodWait as ex:
+                        except pyrogram_errors.FloodWait as ex:
                             print(ex)
                             traceback.print_exc()
                             text = _(
                                 msg.chat.settings.language, "tg_flood_wait_X"
-                            ).format(ex.x)
-                        except pyrogram.errors.RPCError as ex:
+                            ).format(ex.value)
+                        except pyrogram_errors.RPCError as ex:
                             print(ex)
                             traceback.print_exc()
                             text = _(msg.chat.settings.language, "tg_error_X").format(
@@ -1198,7 +1245,10 @@ def CmdUsername(client: pyrogram.Client, msg: pyrogram.types.Message):
                 else:
                     if msg.entities:
                         for entity in msg.entities:
-                            if entity.type == "text_mention":
+                            if (
+                                entity.type
+                                == pyrogram.enums.message_entity_type.MessageEntityType.TEXT_MENTION
+                            ):
                                 text = (
                                     f"@{entity.user.username}"
                                     if entity.user.username
@@ -1233,6 +1283,15 @@ def CmdUsername(client: pyrogram.Client, msg: pyrogram.types.Message):
     )
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(
+            commands=["ishere", "ismember"], del_=True, pvt=True
+        ),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
 def CmdIsMember(client: pyrogram.Client, msg: pyrogram.types.Message):
     if utils.IsPrivilegedOrHigher(user_id=msg.from_user.id, chat_id=msg.chat.id):
         member = None
@@ -1244,7 +1303,10 @@ def CmdIsMember(client: pyrogram.Client, msg: pyrogram.types.Message):
             elif len(msg.command) == 2:
                 if msg.entities:
                     for entity in msg.entities:
-                        if entity.type == "text_mention":
+                        if (
+                            entity.type
+                            == pyrogram.enums.message_entity_type.MessageEntityType.TEXT_MENTION
+                        ):
                             member = client.get_chat_member(
                                 chat_id=msg.chat.id, user_id=entity.user.id
                             )
@@ -1284,18 +1346,18 @@ def CmdIsMember(client: pyrogram.Client, msg: pyrogram.types.Message):
                         member = client.get_chat_member(
                             chat_id=msg.chat.id, user_id=tmp.id
                         )
-                    except pyrogram.errors.FloodWait as ex:
+                    except pyrogram_errors.FloodWait as ex:
                         print(ex)
                         traceback.print_exc()
                         raise ex
-                    except pyrogram.errors.RPCError as ex:
+                    except pyrogram_errors.RPCError as ex:
                         print(ex)
                         traceback.print_exc()
                         raise ex
-        except pyrogram.errors.FloodWait as ex:
+        except pyrogram_errors.FloodWait as ex:
             print(ex)
             traceback.print_exc()
-        except pyrogram.errors.RPCError as ex:
+        except pyrogram_errors.RPCError as ex:
             print(ex)
             traceback.print_exc()
         else:
@@ -1306,10 +1368,17 @@ def CmdIsMember(client: pyrogram.Client, msg: pyrogram.types.Message):
                     text=_(
                         msg.from_user.settings.language,
                         str(
-                            member.status == "creator"
-                            or member.status == "administrator"
-                            or member.status == "member"
-                            or (member.status == "restricted" and member.is_member)
+                            member.status
+                            == pyrogram.enums.chat_member_status.ChatMemberStatus.OWNER
+                            or member.status
+                            == pyrogram.enums.chat_member_status.ChatMemberStatus.ADMINISTRATOR
+                            or member.status
+                            == pyrogram.enums.chat_member_status.ChatMemberStatus.MEMBER
+                            or (
+                                member.status
+                                == pyrogram.enums.chat_member_status.ChatMemberStatus.RESTRICTED
+                                and member.is_member
+                            )
                         ).lower(),
                     ),
                 )
@@ -1320,16 +1389,30 @@ def CmdIsMember(client: pyrogram.Client, msg: pyrogram.types.Message):
                     text=_(
                         msg.chat.settings.language,
                         str(
-                            member.status == "creator"
-                            or member.status == "administrator"
-                            or member.status == "member"
-                            or (member.status == "restricted" and member.is_member)
+                            member.status
+                            == pyrogram.enums.chat_member_status.ChatMemberStatus.OWNER
+                            or member.status
+                            == pyrogram.enums.chat_member_status.ChatMemberStatus.ADMINISTRATOR
+                            or member.status
+                            == pyrogram.enums.chat_member_status.ChatMemberStatus.MEMBER
+                            or (
+                                member.status
+                                == pyrogram.enums.chat_member_status.ChatMemberStatus.RESTRICTED
+                                and member.is_member
+                            )
                         ).lower(),
                     ),
                 )
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["ishere", "ismember"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["ishere", "ismember"], del_=True),
         prefixes=["/", "!", "#", "."],
@@ -1354,10 +1437,10 @@ def CmdIsMemberChat(client: pyrogram.Client, msg: pyrogram.types.Message):
             ):
                 try:
                     member = client.get_chat_member(chat_id=chat_id, user_id=user_id)
-                except pyrogram.errors.FloodWait as ex:
+                except pyrogram_errors.FloodWait as ex:
                     print(ex)
                     traceback.print_exc()
-                except pyrogram.errors.RPCError as ex:
+                except pyrogram_errors.RPCError as ex:
                     print(ex)
                     traceback.print_exc()
                 else:
@@ -1367,16 +1450,30 @@ def CmdIsMemberChat(client: pyrogram.Client, msg: pyrogram.types.Message):
                         text=_(
                             msg.chat.settings.language,
                             str(
-                                member.status == "creator"
-                                or member.status == "administrator"
-                                or member.status == "member"
-                                or (member.status == "restricted" and member.is_member)
+                                member.status
+                                == pyrogram.enums.chat_member_status.ChatMemberStatus.OWNER
+                                or member.status
+                                == pyrogram.enums.chat_member_status.ChatMemberStatus.ADMINISTRATOR
+                                or member.status
+                                == pyrogram.enums.chat_member_status.ChatMemberStatus.MEMBER
+                                or (
+                                    member.status
+                                    == pyrogram.enums.chat_member_status.ChatMemberStatus.RESTRICTED
+                                    and member.is_member
+                                )
                             ).lower(),
                         ),
                     )
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["me"], del_=True, pvt=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.group
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["me"], del_=True, pvt=True),
         prefixes=["/", "!", "#", "."],
@@ -1431,6 +1528,13 @@ def CbQryGroupsPages(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQue
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=["links", "groups"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=["links", "groups"],
         prefixes=["/", "!", "#", "."],

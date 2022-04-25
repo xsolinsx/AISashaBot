@@ -214,7 +214,7 @@ PERMISSIONS = {
     "can_restrict_members": "can_restrict_members",
     "can_promote_members": "can_promote_members",
     "can_pin_messages": "can_pin_messages",
-    "can_manage_voice_chats": "can_manage_voice_chats",
+    "can_manage_video_chats": "can_manage_video_chats",
 }
 
 
@@ -261,4 +261,40 @@ SLOW_MODE_VALUES = {
     "300": 4,
     "900": 5,
     "3600": 6,
+}
+
+
+CHAT_ACTIONS = {
+    pyrogram.enums.chat_action.ChatAction.TYPING: "typing",
+    pyrogram.enums.chat_action.ChatAction.UPLOAD_PHOTO: "upload_photo",
+    pyrogram.enums.chat_action.ChatAction.RECORD_VIDEO: "record_video",
+    pyrogram.enums.chat_action.ChatAction.UPLOAD_VIDEO: "upload_video",
+    pyrogram.enums.chat_action.ChatAction.RECORD_AUDIO: "record_audio",
+    pyrogram.enums.chat_action.ChatAction.UPLOAD_AUDIO: "upload_audio",
+    pyrogram.enums.chat_action.ChatAction.UPLOAD_DOCUMENT: "upload_document",
+    pyrogram.enums.chat_action.ChatAction.FIND_LOCATION: "find_location",
+    pyrogram.enums.chat_action.ChatAction.RECORD_VIDEO_NOTE: "record_video_note",
+    pyrogram.enums.chat_action.ChatAction.UPLOAD_VIDEO_NOTE: "upload_video_note",
+    pyrogram.enums.chat_action.ChatAction.PLAYING: "playing",
+    pyrogram.enums.chat_action.ChatAction.CHOOSE_CONTACT: "choose_contact",
+    pyrogram.enums.chat_action.ChatAction.SPEAKING: "speaking",
+    pyrogram.enums.chat_action.ChatAction.IMPORT_HISTORY: "import_history",
+    pyrogram.enums.chat_action.ChatAction.CHOOSE_STICKER: "choose_sticker",
+    pyrogram.enums.chat_action.ChatAction.CANCEL: "cancel",
+    "typing": pyrogram.enums.chat_action.ChatAction.TYPING,
+    "upload_photo": pyrogram.enums.chat_action.ChatAction.UPLOAD_PHOTO,
+    "record_video": pyrogram.enums.chat_action.ChatAction.RECORD_VIDEO,
+    "upload_video": pyrogram.enums.chat_action.ChatAction.UPLOAD_VIDEO,
+    "record_audio": pyrogram.enums.chat_action.ChatAction.RECORD_AUDIO,
+    "upload_audio": pyrogram.enums.chat_action.ChatAction.UPLOAD_AUDIO,
+    "upload_document": pyrogram.enums.chat_action.ChatAction.UPLOAD_DOCUMENT,
+    "find_location": pyrogram.enums.chat_action.ChatAction.FIND_LOCATION,
+    "record_video_note": pyrogram.enums.chat_action.ChatAction.RECORD_VIDEO_NOTE,
+    "upload_video_note": pyrogram.enums.chat_action.ChatAction.UPLOAD_VIDEO_NOTE,
+    "playing": pyrogram.enums.chat_action.ChatAction.PLAYING,
+    "choose_contact": pyrogram.enums.chat_action.ChatAction.CHOOSE_CONTACT,
+    "speaking": pyrogram.enums.chat_action.ChatAction.SPEAKING,
+    "import_history": pyrogram.enums.chat_action.ChatAction.IMPORT_HISTORY,
+    "choose_sticker": pyrogram.enums.chat_action.ChatAction.CHOOSE_STICKER,
+    "cancel": pyrogram.enums.chat_action.ChatAction.CANCEL,
 }

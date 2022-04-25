@@ -17,6 +17,12 @@ _ = utils.GetLocalizedString
         prefixes=["/", "!", "#", "."],
     )
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["qrencode"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+)
 def CmdQrEncode(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
@@ -28,7 +34,7 @@ def CmdQrEncode(client: pyrogram.Client, msg: pyrogram.types.Message):
             and r_chat_plugin.is_enabled_on_chat
         )
     else:
-        allowed = msg.chat.type == "private"
+        allowed = msg.chat.type == pyrogram.enums.chat_type.ChatType.PRIVATE
     if allowed:
         expression = msg.text[len(msg.command[0]) + 2 :]
         url = f"http://api.qrserver.com/v1/create-qr-code/?size=600x600&data={urllib.parse.quote_plus(expression)}"
@@ -49,6 +55,13 @@ def CmdQrEncode(client: pyrogram.Client, msg: pyrogram.types.Message):
     )
     & pyrogram.filters.reply
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["qrdecode"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.reply
+)
 def CmdQrDecode(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
@@ -60,7 +73,7 @@ def CmdQrDecode(client: pyrogram.Client, msg: pyrogram.types.Message):
             and r_chat_plugin.is_enabled_on_chat
         )
     else:
-        allowed = msg.chat.type == "private"
+        allowed = msg.chat.type == pyrogram.enums.chat_type.ChatType.PRIVATE
     if allowed:
         path = msg.reply_to_message.download()
         try:

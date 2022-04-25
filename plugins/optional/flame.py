@@ -11,6 +11,7 @@ _ = utils.GetLocalizedString
 
 
 @pyrogram.Client.on_message(pyrogram.filters.group, group=-2)
+@pyrogram.Client.on_edited_message(pyrogram.filters.group, group=-2)
 def FlameUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
@@ -62,6 +63,14 @@ def FlameUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["flame"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.reply
+    & pyrogram.filters.group
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["flame"], del_=True),
         prefixes=["/", "!", "#", "."],
@@ -153,6 +162,14 @@ def CmdFlameReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["flame"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & ~pyrogram.filters.reply
+    & pyrogram.filters.group
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["flame"], del_=True),
         prefixes=["/", "!", "#", "."],
@@ -263,6 +280,13 @@ def CmdFlameUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=["flame"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=["flame"],
         prefixes=["/", "!", "#", "."],
@@ -400,6 +424,14 @@ def CmdFlameChatUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     & pyrogram.filters.reply
     & pyrogram.filters.group
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["stopflame"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.reply
+    & pyrogram.filters.group
+)
 def CmdStopFlameReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
     allowed = False
     if msg.chat.id < 0:
@@ -444,6 +476,14 @@ def CmdStopFlameReplyUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["stopflame"], del_=True),
+        prefixes=["/", "!", "#", "."],
+    )
+    & ~pyrogram.filters.reply
+    & pyrogram.filters.group
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=utils.GetCommandsVariants(commands=["stopflame"], del_=True),
         prefixes=["/", "!", "#", "."],
@@ -508,6 +548,13 @@ def CmdStopFlameUser(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(
+    pyrogram.filters.command(
+        commands=["stopflame"],
+        prefixes=["/", "!", "#", "."],
+    )
+    & pyrogram.filters.private
+)
+@pyrogram.Client.on_edited_message(
     pyrogram.filters.command(
         commands=["stopflame"],
         prefixes=["/", "!", "#", "."],

@@ -10,11 +10,13 @@ import methods
 import peewee
 import pyrogram
 import utils
+from pyrogram import errors as pyrogram_errors
 
 _ = utils.GetLocalizedString
 
 
 @pyrogram.Client.on_message(group=-11)
+@pyrogram.Client.on_edited_message(group=-11)
 def PreMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
     # as this is the first handler of this type, if the db is locked wait
     while db_management.DB.is_stopped():
@@ -48,7 +50,7 @@ def PreDeletedMessages(
     while db_management.DB.is_stopped():
         time.sleep(1)
     tmp = ""
-    tmp = " ".join(msg.message_id for msg in msgs.messages)
+    tmp = " ".join(msg.id for msg in msgs.messages)
     # print("######################\nDELETED MESSAGES")
     print(
         "[UTC {0}] >>> Deleted messages\nCount: {1}\nMessage IDs: {2}".format(
@@ -66,7 +68,7 @@ def PreUserStatus(client: pyrogram.Client, user: pyrogram.types.User):
         time.sleep(1)
     # print("######################\nUSER STATUS")
     print(
-        +f"{utils.PrintUser(user=user)} Status: {user.status} Last seen "
+        +f"{utils.PrintUser(user=user)} Status: {user.status.value} Last seen "
         + (
             f"UTC {datetime.datetime.utcfromtimestamp(user.last_online_date)}"
             if user.last_online_date
@@ -118,7 +120,7 @@ def CbQryCancelTmpSteps(client: pyrogram.Client, cb_qry: pyrogram.types.Callback
     if len(parameters) == 1:
         try:
             cb_qry.message.delete()
-        except pyrogram.errors.MessageDeleteForbidden as ex:
+        except pyrogram_errors.MessageDeleteForbidden as ex:
             print(ex)
             traceback.print_exc()
     else:
@@ -263,8 +265,14 @@ def CbQryCancelTmpSteps(client: pyrogram.Client, cb_qry: pyrogram.types.Callback
     ),
     group=-7,
 )
+@pyrogram.Client.on_edited_message(
+    pyrogram.filters.command(
+        commands=utils.GetCommandsVariants(commands=["cancel"], del_=True)
+    ),
+    group=-7,
+)
 def CmdCancelTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
-    msg.reply_chat_action(action="cancel")
+    msg.reply_chat_action(action=pyrogram.enums.chat_action.ChatAction.CANCEL)
     if msg.chat.id in utils.tmp_steps:
         original_cb_qry, variable = utils.tmp_steps[msg.chat.id]
         if msg.from_user.id == original_cb_qry.from_user.id:
@@ -421,6 +429,7 @@ def CmdCancelTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(~pyrogram.filters.service, group=-7)
+@pyrogram.Client.on_edited_message(~pyrogram.filters.service, group=-7)
 def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
     if msg.chat.id in utils.tmp_steps:
         original_cb_qry, variable = utils.tmp_steps[msg.chat.id]
@@ -450,7 +459,7 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                     value=media_variable if media_variable else msg.text,
                     is_media=media_variable is not None,
                     original_chat_id=msg.chat.id if media_variable else None,
-                    original_message_id=msg.message_id if media_variable else None,
+                    original_message_id=msg.id if media_variable else None,
                 ).where(
                     (db_management.ChatExtras.chat_id == chat_settings.chat_id)
                     & (
@@ -571,7 +580,7 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                         is_media=True,
                         is_regex=False,
                         original_chat_id=msg.chat.id,
-                        original_message_id=msg.message_id,
+                        original_message_id=msg.id,
                     ):
                         db_management.ChatCensorships.update(
                             value=media.media_id, is_media=True, is_regex=False
@@ -585,7 +594,7 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                             is_media=True,
                             is_regex=False,
                             original_chat_id=msg.chat.id,
-                            original_message_id=msg.message_id,
+                            original_message_id=msg.id,
                         )
                     utils.Log(
                         client=client,
@@ -671,7 +680,7 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                                 original_chat_id=msg.chat.id
                                 if value_type == "media"
                                 else None,
-                                original_message_id=msg.message_id
+                                original_message_id=msg.id
                                 if value_type == "media"
                                 else None,
                             ).where(
@@ -688,7 +697,7 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                                 original_chat_id=msg.chat.id
                                 if value_type == "media"
                                 else None,
-                                original_message_id=msg.message_id
+                                original_message_id=msg.id
                                 if value_type == "media"
                                 else None,
                             )
@@ -906,9 +915,7 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                                 alternative=alternative,
                                 is_media=is_media,
                                 original_chat_id=msg.chat.id if is_media else None,
-                                original_message_id=msg.message_id
-                                if is_media
-                                else None,
+                                original_message_id=msg.id if is_media else None,
                             ).where(
                                 (db_management.ChatAlternatives.chat_id == chat_id)
                                 & (db_management.ChatAlternatives.original == original)
@@ -924,9 +931,7 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
                                 alternative=alternative,
                                 is_media=is_media,
                                 original_chat_id=msg.chat.id if is_media else None,
-                                original_message_id=msg.message_id
-                                if is_media
-                                else None,
+                                original_message_id=msg.id if is_media else None,
                             )
                         utils.Log(
                             client=client,
@@ -1056,6 +1061,7 @@ def ProcessTmpSteps(client: pyrogram.Client, msg: pyrogram.types.Message):
 
 
 @pyrogram.Client.on_message(group=1)
+@pyrogram.Client.on_edited_message(group=1)
 def PostMessageCleanUp(client: pyrogram.Client, msg: pyrogram.types.Message):
     # delete resolved objects older than X minutes
     subquery: peewee.ModelSelect = db_management.ResolvedObjects.select().where(
@@ -1080,10 +1086,18 @@ def PostMessageCleanUp(client: pyrogram.Client, msg: pyrogram.types.Message):
     & pyrogram.filters.group,
     group=1,
 )
+@pyrogram.Client.on_edited_message(
+    (
+        pyrogram.filters.regex(pattern="^[/!#.]del", flags=re.I)
+        | pyrogram.filters.regex(pattern="^[/!#.]delete", flags=re.I)
+    )
+    & pyrogram.filters.group,
+    group=1,
+)
 def PostDeleteMessage(client: pyrogram.Client, msg: pyrogram.types.Message):
     try:
         msg.delete()
-    except pyrogram.errors.MessageDeleteForbidden as ex:
+    except pyrogram_errors.MessageDeleteForbidden as ex:
         print(ex)
         traceback.print_exc()
         methods.ReplyText(
@@ -1170,7 +1184,10 @@ def CbQryActionAll(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
                     executer=cb_qry.from_user.id,
                     target=user_id,
                     chat_id=cb_qry.message.chat.id,
-                    until_date=cb_qry.message.chat.settings.max_temp_restrict,
+                    until_date=datetime.datetime.utcnow()
+                    + datetime.timedelta(
+                        seconds=cb_qry.message.chat.settings.max_temp_restrict
+                    ),
                     r_executer_chat=cb_qry.r_user_chat,
                     chat_settings=cb_qry.message.chat.settings,
                 )
@@ -1198,7 +1215,10 @@ def CbQryActionAll(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
                     executer=cb_qry.from_user.id,
                     target=user_id,
                     chat_id=cb_qry.message.chat.id,
-                    until_date=cb_qry.message.chat.settings.max_temp_ban,
+                    until_date=datetime.datetime.utcnow()
+                    + datetime.timedelta(
+                        seconds=cb_qry.message.chat.settings.max_temp_ban
+                    ),
                     r_executer_chat=cb_qry.r_user_chat,
                     chat_settings=cb_qry.message.chat.settings,
                 )
@@ -1222,7 +1242,10 @@ def CbQryActionAll(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuery
                 )
             elif action == "test":
                 try:
-                    client.send_chat_action(chat_id=user_id, action="typing")
+                    client.send_chat_action(
+                        chat_id=user_id,
+                        action=pyrogram.enums.chat_action.ChatAction.TYPING,
+                    )
                 except Exception as ex:
                     print(ex)
                     traceback.print_exc()
@@ -1359,7 +1382,10 @@ def CbQryActionUser(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
                 executer=cb_qry.from_user.id,
                 target=user_id,
                 chat_id=cb_qry.message.chat.id,
-                until_date=cb_qry.message.chat.settings.max_temp_restrict,
+                until_date=datetime.datetime.utcnow()
+                + datetime.timedelta(
+                    seconds=cb_qry.message.chat.settings.max_temp_restrict
+                ),
                 r_executer_chat=cb_qry.r_user_chat,
                 chat_settings=cb_qry.message.chat.settings,
             )
@@ -1387,7 +1413,8 @@ def CbQryActionUser(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
                 executer=cb_qry.from_user.id,
                 target=user_id,
                 chat_id=cb_qry.message.chat.id,
-                until_date=cb_qry.message.chat.settings.max_temp_ban,
+                until_date=datetime.datetime.utcnow()
+                + datetime.timedelta(seconds=cb_qry.message.chat.settings.max_temp_ban),
                 r_executer_chat=cb_qry.r_user_chat,
                 chat_settings=cb_qry.message.chat.settings,
             )
@@ -1411,7 +1438,9 @@ def CbQryActionUser(client: pyrogram.Client, cb_qry: pyrogram.types.CallbackQuer
             )
         elif action == "test":
             try:
-                client.send_chat_action(chat_id=user_id, action="typing")
+                client.send_chat_action(
+                    chat_id=user_id, action=pyrogram.enums.chat_action.ChatAction.TYPING
+                )
             except Exception as ex:
                 print(ex)
                 traceback.print_exc()
