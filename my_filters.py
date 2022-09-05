@@ -5,7 +5,7 @@ import pyrogram
 
 async def anonymous_filter(_, __, msg: pyrogram.types.Message):
     """Filter anonymous messages."""
-    return bool(msg.sender_chat)
+    return bool(msg.sender_chat and msg.sender_chat.id == msg.chat.id)
 
 
 message_anonymous = pyrogram.filters.create(anonymous_filter, name="Anonymous")
