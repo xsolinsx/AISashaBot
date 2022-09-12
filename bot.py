@@ -68,7 +68,7 @@ for dirpath, dirnames, filenames in os.walk(BOT_CLIENT.plugins["root"]):
             filter(lambda x: x != "__init__.py", filenames)
         )
 
-for x in utils.config["masters"][1:]:
+for x in utils.config["masters"]:
     try:
         BOT_CLIENT.send_message(
             chat_id=x,

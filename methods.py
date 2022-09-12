@@ -2244,7 +2244,7 @@ def ReplyDocument(
 
 def SendBackup(client: pyrogram.Client):
     tmp_msgs = dict()
-    for id_ in utils.config["masters"][1:]:
+    for id_ in utils.config["masters"]:
         try:
             tmp_msgs[id_] = client.send_message(
                 chat_id=id_, text=_("en", "automatic_backup"), disable_notification=True
