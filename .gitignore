@@ -29,3 +29,4 @@ backup*.tar.xz
 # vscode
 *.code-workspace
 .vscode/
+test.py
