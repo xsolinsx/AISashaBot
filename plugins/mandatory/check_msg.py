@@ -737,7 +737,7 @@ def InitCheckGroupMessageMedia(client: pyrogram.Client, msg: pyrogram.types.Mess
         utils.tmp_dicts["msgsHashes"][msg.chat.id][media.media_id] = [
             x
             for x in utils.tmp_dicts["msgsHashes"][msg.chat.id][media.media_id]
-            if (msg.date - x).total_seconds <= utils.config["shitstorm_time_window"]
+            if (msg.date - x).total_seconds() <= utils.config["shitstorm_time_window"]
         ]
         if (
             len(utils.tmp_dicts["msgsHashes"][msg.chat.id][media.media_id])
